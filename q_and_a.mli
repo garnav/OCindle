@@ -21,13 +21,5 @@ or answer.*)
 val delete : t' -> int -> bool
 
 (* [question_list ()] is the list of question present in the given
-database and id's they correspond too.*)
+database and ids they correspond too.*)
 val question_list : unit -> int * string list
-
-====================================
-TODO:
-How do you recognize what each question is
-if its encapsulated
-How to post to a specific server/db?
-How are we getting answers to related questions
-
