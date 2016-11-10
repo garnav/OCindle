@@ -1,6 +1,6 @@
 module type Marginalia = sig
 
-  open Colour
+  open Colours
 
   (* [t] is a type representing the annotations,
   ie: highlights, notes and bookmark in/of a given
@@ -25,12 +25,12 @@ module type Marginalia = sig
   (* [add_highlight it1 c1 t1] is [t2] with a highlight of colour
   c1 added between the starting (s) and ending index (t), inclusive.
   [it1] is (s,t) *)
-  val add_highlight : int * int -> Colour.t -> t -> t
+  val add_highlight : int * int -> Colours.t -> t -> t
 
   (* [highlights t1 it1] is [hlst], representing
   the list of bounding indices and the colour of highlights 
   for each.*)
-  val highlights : t -> (int * int) * Colour.t list
+  val highlights : t -> (int * int) * Colours.t list
 
   (* [is_bookmarked t1] is [true] if the page [t1]
   refers to is bookmarked. [false] otherwise. *)
@@ -38,10 +38,10 @@ module type Marginalia = sig
 
   (* [add_bookmark t1 c1] is [t2] with the page [t1]
   bookmarked with colour [c1]. [false] otherwise. *)
-  val add_bookmark : t -> Colour.t -> bool
+  val add_bookmark : t -> Colours.t -> bool
 
   (* [bookmarks book] returns the list of bookmarks
   associated with the book of title [book]. *)
-  val bookmarks : string -> (int * int) * Colour.t list
+  val bookmarks : string -> (int * int) * Colours.t list
 
 end
