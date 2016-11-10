@@ -5,9 +5,9 @@ module Dictionary = sig
 	exception Word_Not_Found
 	
 	(* The type of a definition *)
-  type definition = string
+  type definition
 
-	(* Returns the definition of a given word, or raises Word_Not_Found *)
-	(* exception if the word was not found *)
+	(* [get_definition word] Returns the definition of [word],
+	or raises Word_Not_Found exception if the word was not found *)
 	val get_definition : string -> definition
 end

@@ -2,17 +2,17 @@
 
 module Bookshelf = sig
 	(* The unique identifier for a bookshelf *)
-  type bookshelf_id = int
+  type bookshelf_id
   
 	(* The unique identifier for a book *)
-  type book_id = int
+  type book_id
   
-	(* The string of text that represents the content of a book *)
-  type book_text = string
+	(* The type of the text that represents the content of a book *)
+  type book_text
   
 	(* The data contained by an individual book *)
   type book_data = {id : book_id; title : string; author : string; 
-      current_position : int}
+      text : book_text; current_position : int}
   
 	(* Lists the books currently on the bookshelf with the given ID *)
   val list_books : bookshelf_id -> book_list
