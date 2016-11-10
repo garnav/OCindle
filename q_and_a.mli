@@ -1,9 +1,10 @@
 module type QA = sig
+	
   (* [t'] represents either a Question (Q) or
   Answer (A)*)
   type t' = Q | A
   
- (* [post t1 str] is [true] if the
+  (* [post t1 str] is [true] if the
   statement [str] is added as a question
   or answer [t1] to the database.
   [false] otherwise.*)

@@ -2,7 +2,6 @@ module DataController = sig
 
   (* the type of the data structure that stores relevant information
   about the book such as number of pages, fontsize, current page, etc. *)
-
   type t 
   
   (* Allows the user to increase or decrease the fontsize *)

@@ -1,6 +1,6 @@
 (* Controls and stores data about available books *)
-
 module Bookshelf = sig
+	
 	(* The unique identifier for a bookshelf *)
   type bookshelf_id
   
@@ -17,15 +17,18 @@ module Bookshelf = sig
 	(* Lists the books currently on the bookshelf with the given ID *)
   val list_books : bookshelf_id -> book_list
   
-	(* Returns the text of a book *)
+	(* Returns the text of a book given a book id *)
   val get_book : book_id -> book_text
   
-	(* Closes a book and saves current reading position *)
-  val close_book : book_id -> bool
+	(* [close_book bid position] Closes the book with book id [bid] and saves
+	current reading position at [position]. Returns true if save was 
+	successful *)
+  val close_book : book_id -> int -> bool
   
 	(* Returns the number of books in the given bookshelf *)
   val get_num_books : bookshelf_id -> int
   
 	(* Returns the data for a given book *)
   val get_book_data : book_id -> book_data
+	
 end
