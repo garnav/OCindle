@@ -1,5 +1,6 @@
 module type Marginalia = sig
-  open Colours
+  
+	open Colours
 
   (* type [t] represents the annotations,
   ie: highlights, notes and bookmark status on a given
@@ -12,7 +13,7 @@ module type Marginalia = sig
   type page = int * int
 
   (* [get_range t1] is the [page] that [t1] contains annotations for.*)
-  get_range : t -> int * int
+  val get_range : t -> int * int
    
   (* [get_page_overlay book_id range t1] is [t] for annotations
   present on the page of a book, denoted by it's unique book_id [book_id].
