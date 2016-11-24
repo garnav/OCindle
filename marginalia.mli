@@ -1,5 +1,4 @@
 module type Marginalia = sig
-
   open Colours
 
   (* type [t] represents the annotations,
