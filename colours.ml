@@ -17,12 +17,12 @@ module Colours = struct
 
    let decolorify c =
      match c with
-	 | RED    -> "redcd "
+	 | RED    -> "red"
 	 | BLUE   -> "blue"
 	 | GREEN  -> "green" 
 	 | YELLOW -> "yellow"
 	 | PURPLE -> "purple"
 	 | PINK   -> "pink"
-	 | BLACK  -> "black
+	 | BLACK  -> "black"
 
 end
