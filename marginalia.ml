@@ -12,7 +12,7 @@ module Marginalia = struct
   type page = int * int
   		
   type t = {
-    book_id : int;
+    id : int;
 	page : page;
 	highlights : highlights_list;
 	notes : notes_list;
@@ -31,39 +31,59 @@ module Marginalia = struct
 
   let get_range t1 = t1.page
   
-  let single_index_notes j_index =
-    let single = List.assoc "notes" j_index |> to_assoc in
-	(List.assoc "colour" single |> to_string |> colorify, List.assoc "note" single |> to_int)
+  let single_index_note j_index =
+    try
+	  let single = List.assoc "notes" j_index |> to_assoc in
+	  Some (List.assoc "colour" single |> to_string |> colorify, List.assoc "note" single |> to_string)
+	with
+	| _ -> None
   
   let single_index_highlight j_index =
-    let single = List.assoc "highlight" j_index |> to_assoc in
-	(List.assoc "colour" single |> to_string |> colorify, List.assoc "end" single |> to_int)
+    try 
+      let single = List.assoc "highlight" j_index |> to_assoc in
+	  Some (List.assoc "colour" single |> to_string |> colorify, List.assoc "end" single |> to_int)
+	with
+	| _ -> None
+	
+  let debox_lst e lst=
+    match lst with
+    | Some x -> [(e, x)]
+	| None   -> []
   
-  (*e must be greater than or equal to b. collects highlights in a one json*) 
-  let rec collect_highlights j_entire (b,e) =
+  (*e must be greater than or equal to b. collects highlights in a one json. optimized so that notes and highlights
+  are collected together, insteaad of having to over the structure twice?*) 
+  let rec collect_annotations j_entire (b,e) f =
     let index = string_of_int e in
     if e < b then []
-	else if mem_assoc index j_entire then (e, single_index_highlight (List.assoc (string_of_int e) j_entire |> to_assoc))
-	                                      :: collect_highlights j_entire (b, e - 1)
-	else collect_highlights j_entire (b, e - 1)
+	else if mem_assoc index j_entire then debox_lst e (List.assoc index j_entire |> to_assoc |> f)
+	                                      @ collect_annotations j_entire (b, e - 1) f
+	else collect_annotations j_entire (b, e - 1) f
 	  
-  let rec collect_all_highlights book_id (b, e) =
+  let rec collect_all (b, e) t f =
     let base = b / 2000 in
-	let base_next = (base + 1) *2000
+	let base_next = (base + 1) * 2000 in
 	let ending = e / 2000 in
 	try
-	  let j_file = Basic.from_file ((string_of_int book_id) ^ "_" ^ (string_of_int base) ^ ".json") in
-	  if ending = base then collect_highlights (j_file |> to_assoc) (b, e)
-	  else collect_highlights (j_file |> to_assoc) (b, (base_next - 1) @ collect_all_highlights book_id (base_next, e)
+	  let j_file = Basic.from_file ((string_of_int t.id) ^ "_" ^ (string_of_int base) ^ ".json") |> to_assoc in
+	  if ending = base then collect_annotations j_file (b, e) f
+	  else collect_annotations j_file (b, (base_next - 1)) f
+	     @ collect_all (base_next, e) t f
 	with
 	| Sys_error _ -> if ending = base then []
-	                 else collect_all_highlights book_id ((base + 1) *2000, e)
+	                 else collect_all ((base + 1) *2000, e) t f
 	
   (*also have to add the json stuff to the record*)
-   let get_page_overlay book_id (b,e) t1 =
-     
-
-	
+   let get_page_overlay book_id (b,e) =
+     let init = {
+		id = book_id ;
+		page = (b, e) ;
+		highlights = [] ;
+		notes = [] ;
+		bookmark = false ;
+		file_json = `Null } in
+     let new_highlights = collect_all (b, e) init single_index_highlight in
+	 let new_notes = collect_all (b, e) init single_index_note in
+	 { init with highlights = new_highlights ; notes = new_notes}
 
   let add_note note i c t1 =
     if not (mem_assoc i t1.notes)
