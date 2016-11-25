@@ -23,22 +23,31 @@ module Marginalia = struct
 	Also when new notes and highlights are created, then we just want to
 	add it to the existing lists instead of adding it to the JSon structure
 	and having to create the list all over again.*)
-	mutable file_json : Yojson.json
+	mutable file_json : Yojson.Basic.json
   }
+  
+  (*if the file_json is empty, then add whats there,
+  what if add is empty. prevent duplicates.*)
+  let add_assoc existing add =
+    match (existing, add) with
+	| (`Assoc a, _) -> `Assoc ((List.filter (fun (j,x) -> not (mem_assoc j a)) add) @ a)
+	| (`Null, [])   -> `Null
+	| (`Null, _ )   -> `Assoc add
+	| _             -> `Null
   
   let rec delete_helper lst i =
     List.filter (fun (j,x) -> i <> j) lst
 
   let get_range t1 = t1.page
   
-  let single_index_note j_index =
+  let single_note j_index =
     try
 	  let single = List.assoc "notes" j_index |> to_assoc in
 	  Some (List.assoc "colour" single |> to_string |> colorify, List.assoc "note" single |> to_string)
 	with
 	| _ -> None
   
-  let single_index_highlight j_index =
+  let single_highlight j_index =
     try 
       let single = List.assoc "highlight" j_index |> to_assoc in
 	  Some (List.assoc "colour" single |> to_string |> colorify, List.assoc "end" single |> to_int)
@@ -55,7 +64,7 @@ module Marginalia = struct
   let rec collect_annotations j_entire (b,e) f =
     let index = string_of_int e in
     if e < b then []
-	else if mem_assoc index j_entire then debox_lst e (List.assoc index j_entire |> to_assoc |> f)
+	else if mem_assoc index j_entire then (List.assoc index j_entire |> to_assoc |> f |> debox_lst e)
 	                                      @ collect_annotations j_entire (b, e - 1) f
 	else collect_annotations j_entire (b, e - 1) f
 	  
@@ -65,25 +74,26 @@ module Marginalia = struct
 	let ending = e / 2000 in
 	try
 	  let j_file = Basic.from_file ((string_of_int t.id) ^ "_" ^ (string_of_int base) ^ ".json") |> to_assoc in
+	  t.file_json <- add_assoc t.file_json j_file;
 	  if ending = base then collect_annotations j_file (b, e) f
-	  else collect_annotations j_file (b, (base_next - 1)) f
+	  else collect_annotations j_file (b, base_next - 1) f
 	     @ collect_all (base_next, e) t f
 	with
 	| Sys_error _ -> if ending = base then []
-	                 else collect_all ((base + 1) *2000, e) t f
+	                 else collect_all ((base + 1) * 2000, e) t f
 	
   (*also have to add the json stuff to the record*)
    let get_page_overlay book_id (b,e) =
-     let init = {
-		id = book_id ;
-		page = (b, e) ;
-		highlights = [] ;
-		notes = [] ;
-		bookmark = false ;
-		file_json = `Null } in
-     let new_highlights = collect_all (b, e) init single_index_highlight in
-	 let new_notes = collect_all (b, e) init single_index_note in
-	 { init with highlights = new_highlights ; notes = new_notes}
+     let init = { id = book_id ;
+		          page = (b, e) ;
+		          highlights = [] ;
+		          notes = [] ;
+		          bookmark = false ;
+		          file_json = `Null } in
+     let new_h = collect_all (b, e) init single_highlight in
+	 let new_n = collect_all (b, e) init single_note in
+	 { init with highlights = new_h ; notes = new_n }
+	 (*sort?*)
 
   let add_note note i c t1 =
     if not (mem_assoc i t1.notes)
@@ -133,7 +143,7 @@ module Marginalia = struct
     failwith "Unimplemented"
 	(*should take care of creating a new file, if it doesn't already exist?*)
 	(*but only create if there are actually eny highlights to add?*)
-		(*also what if the book id or the index doesn't exist.*)
+		(*also what if the book id or the index doesn't exist. Need sort to make it easier?*)
 
 end
 (*
@@ -144,8 +154,6 @@ into the file.
 4. how to bookmark
 
 *)
-
-
 (*TWO Options:
 - everytime something is added, add it to the JSON file
 OR once a new page is asked for, just rewrite everything all together.
