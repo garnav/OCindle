@@ -30,30 +30,41 @@ module Marginalia = struct
 
   let get_range t1 = t1.page
   
-  let create_highlight_lists t1 =
-    match t1. with
-	| (i, a) -> if int_of_string i >= fst t1.page && 
-	| _      -> 
-    
-    failwith "Unimplemented"
-  
-  (*e must be greater than or equal to b*) 
+  (*e must be greater than or equal to b. collects highlights in a one json*) 
   let rec collect_highlights j_entire (b,e) = 
     try
 	  if e < b then []
 	  else single_index_highlight (List.assoc (string_of_int e) j_entire |> to_assoc)
 	       :: collect_highlights j_entire (b, e - 1)
 	with
-	  | _ -> [] @ collect_highlights j_entire (b, e - 1)
+	  | _ -> collect_highlights j_entire (b, e - 1)
    
   let single_index_highlight j_index =
     let single = List.Assoc "highlight" j_index |> to_assoc in
 	(List.assoc "colour" single |> to_string |> colorify, List.assoc "end" single |> to_int)
-	
-  let get_page_overlay book_id range t1 =
+  
+  
+  let rec collect_all_highlights book_id (b, e) =
+    let base = b / 2000 in
+	let ending = e / 2000 in
+	let j_file = Basic.from_file
+	           (string_of_int book_id) ^ "_" ^ (string_of_int base) ^ ".json" in
+	if ending = base
+	  then collect_highlights (j_file |> to_assoc) (b, e)
+    else
+	  let new_end = ((base + 1) *2000) - 1 in 
+	  collect_highlights (j_file |> to_assoc) (b, new_end) :: collect_all book_id ((base + 1) *2000, e)
+  
+  	
+  (*let get_page_overlay book_id (b,e) t1 =
+    try 
     let base = (fst range) / 2000 in
 	let j_file = Basic.from_file
-	             (string_of_int book_id) ^ "/" ^ (string_of_int base) ^ ".json" in
+	             (string_of_int book_id) ^ "_" ^ (string_of_int base) ^ ".json" in
+	with
+	  | Sys_error "test_schjson: No such file or directory" -> *)
+	  (*no file, should it create it here, why waste mems? BUT what if part of it doesn't exist*)
+	  
 	
 	
 	(*also what if the book id or the index doesn't exist.*)
@@ -85,7 +96,7 @@ module Marginalia = struct
     if not (mem_assoc i t1.highlights)
 	  then { t1 with highlights = (i, (decolorify c, e))::t1.highlights }
 	else raise Already_Exists
-	(*also have to add to JSON structure*)
+	(*also have to add to JSON structure, note that it could also be empty*)
  
   (*didn't use List.remove_assoc cause it's not tail recursive.
   Can't use a higher order function because how would you refer to high*)
@@ -103,6 +114,10 @@ module Marginalia = struct
   
   let remove_bookmark t1 =
     failwith "Unimplemented"
+	
+  let save_page t1 =
+    failwith "Unimplemented"
+	(*should take care of creating a new file, if it doesn't already exist?*)
 
 end
 (*
