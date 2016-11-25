@@ -15,12 +15,12 @@ module type Marginalia = sig
   (* [get_range t1] is the [page] that [t1] contains annotations for.*)
   val get_range : t -> int * int
    
-  (* [get_page_overlay book_id range t1] is [t] for annotations
+  (* [get_page_overlay book_id range] is [t] for annotations
   present on the page of a book, denoted by it's unique book_id [book_id].
   Annotations beginning within the page are retrieved.
   requires:
   - [range], ie (s,t), where s and t are non-negative
-  and are smaller than or equal to the greatest index of the book.*)
+  and are smaller than or equal to the greatest index of the book. t > s*)
   val get_page_overlay : int -> page -> t
 
   (* [add_note note i c t1] is [t2] with [note] of colour [c]
