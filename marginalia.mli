@@ -23,16 +23,15 @@ module type Marginalia = sig
   and are smaller than or equal to the greatest index of the book.*)
   val get_page_overlay : int -> page -> t
 
-  (* [add_note note i e c t1] is [t2] with [note] of colour [c]
-  added at index [i] and ending index [e]. Exception Already_Exists
+  (* [add_note note i c t1] is [t2] with [note] of colour [c]
+  added at index [i]. Exception Already_Exists
   is thrown if [t1] already contains a note at i.
   requires:
-  - [i] must be within [t1]'s page.
-  - [e] must be greater than [i] and smaller than the largest index of the book.**)
-  val add_note : string -> int -> int -> Colours.t -> t -> t
+  - [i] must be within [t1]'s page.*)
+  val add_note : string -> int -> -> Colours.t -> t -> t
   
  (* [delete_note i t1] is [t2] with the note at index [i] removed.
-  Exception Not_Found is thrown if [t1] does not contain a note
+  Exception Not_found is thrown if [t1] does not contain a note
   at i.
   requires:
   - [i] must be within [t1]'s page. *)
@@ -48,7 +47,7 @@ module type Marginalia = sig
   val add_highlight : int -> int -> Colours.t -> t -> t
   
   (* [delete_highlight i t1] is [t2] with the highlight at index [i] removed.
-  Exception Not_Found is thrown if [t1] does not contain a highlight
+  Exception Not_found is thrown if [t1] does not contain a highlight
   at i.
   requires:
   - [i] must be within [t1]'s page. *)
@@ -64,8 +63,12 @@ module type Marginalia = sig
   val add_bookmark : t -> Colours.t -> t
   
   (* [remove_bookmark t1] is [t2] with all the properties
-  of [t1], only with it's bookmark removed. Exception Not_Found
+  of [t1], only with it's bookmark removed. Exception Not_found
   is thrown if the page is not bookmarked.*)
   val remove_bookmark : t -> t
+	
+	(* [save_page t1] ensures that the page represent by [t1] is
+	stored in local memory. *)
+	val save_page : t -> ()
 
 end
