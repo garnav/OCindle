@@ -8,7 +8,9 @@ module Marginalia = struct
   open Colours
   		
   type notes_list = (int * (Colours.t *  string)) list
+  
   type highlights_list = (int * (Colours.t * int)) list
+  
   type page = int * int
   		
   type t = {
@@ -17,12 +19,6 @@ module Marginalia = struct
 	highlights : highlights_list;
 	notes : notes_list;
 	bookmark : bool; (*what if there are two bookmarks of contrasting colours*)
-	(*Design choices: why are these made before they are actually needed,
-	because it's intended use is for actually making sure all of this stuff
-	is shown on a page, so it makes to have it there and pre-processed.
-	Also when new notes and highlights are created, then we just want to
-	add it to the existing lists instead of adding it to the JSon structure
-	and having to create the list all over again.*)
 	mutable file_json : Yojson.Basic.json
   }
   
@@ -80,7 +76,7 @@ module Marginalia = struct
 	     @ collect_all (base_next, e) t f
 	with
 	| Sys_error _ -> if ending = base then []
-	                 else collect_all ((base + 1) * 2000, e) t f
+	                 else collect_all (base_next, e) t f
 	
   (*also have to add the json stuff to the record*)
    let get_page_overlay book_id (b,e) =
@@ -89,7 +85,8 @@ module Marginalia = struct
 		          highlights = [] ;
 		          notes = [] ;
 		          bookmark = false ;
-		          file_json = `Null } in
+		          file_json = `Null }
+				  in
      let new_h = collect_all (b, e) init single_highlight in
 	 let new_n = collect_all (b, e) init single_note in
 	 { init with highlights = new_h ; notes = new_n }
@@ -128,25 +125,29 @@ module Marginalia = struct
     let without_assoc = t1.file_json |> to_assoc in
 	let to_change = List.assoc is without_assoc |> to_assoc in
 	let changed = delete_helper to_change tag in
-	let new_indexed =
-	  if changed = [] then []
-	  else [(is, `Assoc changed)] in
-	let remove_assoc = List.remove_assoc is without_assoc in
-	t1.file_json <- `Assoc (new_indexed @ remove_assoc)
+	let r_assoc = List.remove_assoc is without_assoc in
+	let finalized =
+	  match (r_assoc, changed) with
+	  | ([], []) -> `Null
+	  | (_, [])  -> `Assoc r_assoc
+	  | ([], _)  -> `Assoc [(is, `Assoc changed)]
+	  | (_, _)   -> `Assoc ([(is, `Assoc changed)] @ r_assoc)
+	  in
+	t1.file_json <- finalized
   
-    (*didn't use List.remove_assoc cause it's not tail recursive.h*)
+  (*didn't use List.remove_assoc cause it's not tail recursive.h*)
   let delete i t1 t_aspect tag =
     if mem_assoc i t_aspect then
 	  match tag with
-	  | `Notes      -> json_remove t1 (string_of_int i) "notes"; { t1 with notes = delete_helper t1.notes i }
-	  | `Highlights -> 	json_remove t1 (string_of_int i) "highlight"; { t1 with highlights = delete_helper t1.highlights i }
+	  | `Notes      -> json_remove t1 (string_of_int i) "notes" ;
+	                   { t1 with notes = delete_helper t1.notes i }
+	  | `Highlights -> json_remove t1 (string_of_int i) "highlight" ;
+	                   { t1 with highlights = delete_helper t1.highlights i }
 	else raise Not_found
   
-  let delete_note i t1 =
-    delete i t1 t1.notes `Notes
+  let delete_note i t1 = delete i t1 t1.notes `Notes
 	
-  let delete_highlight i t1 =
-    delete i t1 t1.highlights `Highlights 
+  let delete_highlight i t1 = delete i t1 t1.highlights `Highlights
 
   let is_bookmarked t1 = t1.bookmark
 
@@ -155,23 +156,42 @@ module Marginalia = struct
   
   let remove_bookmark t1 =
     failwith "Unimplemented"
+
+  let rec remove_all_files id (b,e) =
+    let base = b / 2000 in
+	let ending = e / 2000 in
+	let base_next = (base + 1) * 2000 in
+	let file_name = (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
+	if base = ending then try Sys.remove file_name with Sys_error _ -> ()
+	else try Sys.remove file_name ; remove_all_files id (base_next, e)
+	     with Sys_error _ -> remove_all_files id (base_next, e)
+  
+  (*give it a sorted list? and copy, without assoc too.*)
+  let save_to_file assoc_copy id (b, e) =
+    let to_save = List.filter (fun (j, x) -> let k = int_of_string j in k >= b && k < e) assoc_copy in
+	let base = b / 2000 in
+	let file_name = (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
+	if to_save = [] then try Sys.remove file_name with Sys_error _ -> ()
+	else Basic.to_file file_name (`Assoc to_save)
+	
+  let rec save_all assoc_copy id (b,e) =
+    let base = b / 2000 in
+	let ending = e / 2000 in
+	let base_next = (base + 1) * 2000 in
+	if base = ending then save_to_file assoc_copy id (b, e)
+	else save_to_file assoc_copy t1.id (b, e) ; save_all assoc_copy id (base_next, e)
 	
   let save_page t1 =
-    failwith "Unimplemented"
-	(*should take care of creating a new file, if it doesn't already exist?*)
-	(*but only create if there are actually eny highlights to add?*)
-		(*also what if the book id or the index doesn't exist. Need sort to make it easier?*)
+    match t1.file_json with
+	| `Null    -> remove_all_files t1.id t1.page
+	| `Assoc x -> let copy = fold_left (fun acc x -> x::acc) [] (t1.file_json |> to_assoc) in
+	              let sorted = List.sort (fun (i, _) (k, _) -> Pervasives.compare i k) copy in
+				  save_all sorted t1.id (b,e)
+	
+	(*also what if the book id or the index doesn't exist. *)
 
 end
 (*
-1. decide on how to store after reading file
-2. how to manipulate that data to create what we need
-3. how to add that data to the json structure and put it back
-into the file.
 4. how to bookmark
+*)
 
-*)
-(*TWO Options:
-- everytime something is added, add it to the JSON file
-OR once a new page is asked for, just rewrite everything all together.
-*)
