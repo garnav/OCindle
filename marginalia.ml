@@ -95,10 +95,33 @@ module Marginalia = struct
 	 { init with highlights = new_h ; notes = new_n }
 	 (*sort?*)
 
+  let json_add t1 is tag c ad_key ad =
+    let without_assoc = t1.file_json |> to_assoc in
+	let prepare = (tag, `Assoc [("colour", `String c); (ad_key, ad)]) in
+	if mem_assoc is without_assoc then
+	  let to_alter = assoc is without_assoc |> to_assoc in
+	  let altered = `Assoc (prepare :: to_alter) in
+	  let removed = delete_helper without_assoc is in
+	  let changed = `Assoc ((is, altered) :: removed) in
+	  t1.file_json <- changed
+	else
+	  let addition = (is, `Assoc [prepare]) in
+	  let final = `Assoc (addition :: without_assoc) in
+	  t1.file_json <- final
+
   let add_note note i c t1 =
-    if not (mem_assoc i t1.notes)
-	  then { t1 with notes = (i, (c, note))::t1.notes }
+    if not (mem_assoc i t1.notes) then
+	  let () = json_add t1 (string_of_int i) "notes" (decolorify c) "note" (`String note) in
+	  { t1 with notes = (i, (c, note))::t1.notes }
 	else raise Already_Exists
+	
+  (*doesn't preserve order, just adds to the beginning of the list.*)
+  let add_highlight i e c t1 =
+    if not (mem_assoc i t1.highlights) then
+	  let () = json_add t1 (string_of_int i) "highlight" (decolorify c) "end" (`Int e) in
+	  { t1 with highlights = (i, (c, e))::t1.highlights }
+	else raise Already_Exists
+	(*also have to add to JSON structure, note that it could also be empty*)
 
   (*assumes that its actually there*)	
   let json_remove t1 is tag =
@@ -111,31 +134,21 @@ module Marginalia = struct
 	let remove_assoc = List.remove_assoc is without_assoc in
 	t1.file_json <- `Assoc (new_indexed @ remove_assoc)
   
+    (*didn't use List.remove_assoc cause it's not tail recursive.h*)
   let delete i t1 t_aspect tag =
     if mem_assoc i t_aspect then
 	  match tag with
 	  | `Notes      -> json_remove t1 (string_of_int i) "notes"; { t1 with notes = delete_helper t1.notes i }
 	  | `Highlights -> 	json_remove t1 (string_of_int i) "highlight"; { t1 with highlights = delete_helper t1.highlights i }
 	else raise Not_found
-	(*have to delete from json structure as well. *)
   
   let delete_note i t1 =
     delete i t1 t1.notes `Notes
-
-  (*doesn't preserve order, just adds to the beginning of the list.*)
-  let add_highlight i e c t1 =
-    if not (mem_assoc i t1.highlights)
-	  then { t1 with highlights = (i, (c, e))::t1.highlights }
-	else raise Already_Exists
-	(*also have to add to JSON structure, note that it could also be empty*)
- 
-  (*didn't use List.remove_assoc cause it's not tail recursive.
-  Can't use a higher order function because how would you refer to high*)
+	
   let delete_highlight i t1 =
     delete i t1 t1.highlights `Highlights 
 
-  let is_bookmarked t1 =
-    failwith "Unimplemented"
+  let is_bookmarked t1 = t1.bookmark
 
   let add_bookmark t1 c1 =
     failwith "Unimplemented"
