@@ -181,6 +181,10 @@ module Marginalia = struct
 	if base = ending then save_to_file assoc_copy id (base * 2000, base_next)
 	else (save_to_file assoc_copy t1.id (base * 2000, base_next) ; save_all assoc_copy id (base_next, e))
 	
+  let notes_list t1 = t1.notes
+  
+  let highlights_list t1 = t1.highlights
+  
   let save_page t1 =
     match t1.file_json with
 	| `Null    -> remove_all_files t1.id t1.page

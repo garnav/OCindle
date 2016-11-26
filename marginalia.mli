@@ -67,6 +67,18 @@ module type Marginalia = sig
   is thrown if the page is not bookmarked.*)
   val remove_bookmark : t -> t
 	
+	(* [notes_list t1] is a list of all the notes
+	present on the page that t1 represents. Specifically,
+	this returns a list of (s, (c, note)) where s is the index position
+	of the note and c is it's colour.*)
+	val notes_list : t -> (int * (Colours.t * string)) list
+	
+	(* [highlights_list t1] is a list of all the highlights
+	present on the page that t1 represents. Specifically,
+	this returns a list of (s, (c, e)) where s is the starting and
+	e is the ending index and c is the colour of the highlight.*)
+	val highlights_list : t -> (int * (Colours.t * int)) list
+	
 	(* [save_page t1] ensures that the page represent by [t1] is
 	stored in local memory. *)
 	val save_page : t -> ()
