@@ -16,7 +16,7 @@ module Marginalia = struct
 	page : page;
 	highlights : highlights_list;
 	notes : notes_list;
-	bookmark : bool;(*what if there are two bookmarks of contrasting colours*)
+	bookmark : bool; (*what if there are two bookmarks of contrasting colours*)
 	(*Design choices: why are these made before they are actually needed,
 	because it's intended use is for actually making sure all of this stuff
 	is shown on a page, so it makes to have it there and pre-processed.
@@ -99,20 +99,28 @@ module Marginalia = struct
     if not (mem_assoc i t1.notes)
 	  then { t1 with notes = (i, (c, note))::t1.notes }
 	else raise Already_Exists
+
+  (*assumes that its actually there*)	
+  let json_remove t1 is tag =
+    let without_assoc = t1.file_json |> to_assoc in
+	let to_change = List.assoc is without_assoc |> to_assoc in
+	let changed = delete_helper to_change tag in
+	let new_indexed =
+	  if changed = [] then []
+	  else [(is, `Assoc changed)] in
+	let remove_assoc = List.remove_assoc is without_assoc in
+	t1.file_json <- `Assoc (new_indexed @ remove_assoc)
   
- (* let delete i t1 t_aspect tag =
-    if mem_assoc i t_aspect
-	  then match tag with
-	       | `Notes      -> { t1 with notes = delete_helper t_aspect i }
-		   | `Highlights -> { t1 with highlights = delete_helper t_aspect i }
+  let delete i t1 t_aspect tag =
+    if mem_assoc i t_aspect then
+	  match tag with
+	  | `Notes      -> json_remove t1 (string_of_int i) "notes"; { t1 with notes = delete_helper t1.notes i }
+	  | `Highlights -> 	json_remove t1 (string_of_int i) "highlight"; { t1 with highlights = delete_helper t1.highlights i }
 	else raise Not_found
-	have to delete from json structure as well.*)
+	(*have to delete from json structure as well. *)
   
   let delete_note i t1 =
-    (*delete i t1 t1.notes `Notes *)
-    if mem_assoc i t1.notes
-	  then { t1 with notes = delete_helper t1.notes i }
-	else raise Not_found 
+    delete i t1 t1.notes `Notes
 
   (*doesn't preserve order, just adds to the beginning of the list.*)
   let add_highlight i e c t1 =
@@ -124,11 +132,7 @@ module Marginalia = struct
   (*didn't use List.remove_assoc cause it's not tail recursive.
   Can't use a higher order function because how would you refer to high*)
   let delete_highlight i t1 =
-    (*delete i t1 t1.highlights `Highlights *)
-    if mem_assoc i t1.highlights
-	  then { t1 with highlights = delete_helper t1.highlights i }
-	else raise Not_found
-	(*also have to delete from JSON structure*)
+    delete i t1 t1.highlights `Highlights 
 
   let is_bookmarked t1 =
     failwith "Unimplemented"
