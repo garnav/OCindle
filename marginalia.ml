@@ -169,6 +169,7 @@ module Marginalia = struct
   (*give it a sorted list? and copy, without assoc too.*)
   let save_to_file assoc_copy id (b, e) =
     let to_save = List.filter (fun (j, x) -> let k = int_of_string j in k >= b && k < e) assoc_copy in
+	(*not true, even if k is better has to be written*)
 	let base = b / 2000 in
 	let file_name = (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
 	if to_save = [] then try Sys.remove file_name with Sys_error _ -> ()
@@ -178,15 +179,16 @@ module Marginalia = struct
     let base = b / 2000 in
 	let ending = e / 2000 in
 	let base_next = (base + 1) * 2000 in
-	if base = ending then save_to_file assoc_copy id (b, e)
-	else save_to_file assoc_copy t1.id (b, e) ; save_all assoc_copy id (base_next, e)
+	print_string (string_of_bool (base = ending));
+	if base = ending then save_to_file assoc_copy id (base * 2000, base_next)
+	else (save_to_file assoc_copy t1.id (base * 2000, base_next) ; save_all assoc_copy id (base_next, e))
 	
   let save_page t1 =
     match t1.file_json with
 	| `Null    -> remove_all_files t1.id t1.page
 	| `Assoc x -> let copy = fold_left (fun acc x -> x::acc) [] (t1.file_json |> to_assoc) in
 	              let sorted = List.sort (fun (i, _) (k, _) -> Pervasives.compare i k) copy in
-				  save_all sorted t1.id (b,e)
+				  save_all sorted t1.id t1.page
 	
 	(*also what if the book id or the index doesn't exist. *)
 
