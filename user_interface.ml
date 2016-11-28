@@ -6,4 +6,6 @@ module UserInterface = struct
   |   ->
   |   ->
 
+(* trigger input *)
+
 end

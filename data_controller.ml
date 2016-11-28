@@ -1,11 +1,12 @@
 module DataController = struct
 
-
+(* [t] is a record containing important information about the book *)
 type t = 
     {book_name: string; book_text : string; mutable ind_pos : int; 
     curr_page_cont : string}
 
-
+(* This is a helper function that prints [str] on the Graphics window starting
+from [(x,y)]. *)
 let rec custom_print str x y =
     if (String.length str > 0 || x < 540 || y < 650) 
     then
@@ -15,6 +16,9 @@ let rec custom_print str x y =
     else
     ();
 
+(* This is a helper function that draws a line from [(pos1_x, pos1_y)] to 
+[(pos2_x, pos2_y)] on the Graphics window. Used in [add_highlights] and 
+[delete_highlights] *)
 let rec custom_highlight t pos1_x pos1_y pos2_x pos2_y =
     if (!pos1_x < !pos2_x)
     then
@@ -33,17 +37,17 @@ let rec custom_highlight t pos1_x pos1_y pos2_x pos2_y =
     ();
 
     (* if before end of page or t is smaller, draw straight line *)
-    (* recursively call *)
-
 
 let open_file name = 
 
     (* Number of characters: 3735 *)
     (* Window resolution: 540 x 650 *)
+    (* RAISE AND DEFINE exception *)
 
     Graphics.open_graph " 540x650";
     Graphics.set_window_title "OCindle";
 
+    (* The user is presented with a list of bookshelves, each containing a list of books. *)
     (* Display list of bookshelves; choose bookshelf; display list of books;
     choose book; display first/last saved page of book *)
 
@@ -68,14 +72,16 @@ let find_meaning word =
      with
      | Word_Not_Found -> failwith "Please type in a correct word") in
 
-    (* change position to write definition; *)
-    Graphics.draw_string word_def
+    (* IMPLEMENT: change position to write definition; erase page and display
+    word definition until clicked again *)
+    Graphics.draw_string word_def;
     
 let percent_read t =
     ((float_of_int t.ind_pos) /. (float_of_int (String.length t.book_text)))
     (* format string using printf *)
 
 let next_page t =
+    (* RAISE EXCEPTION *)
 
     (* erase previous content *)
     Graphics.clear_graph ();
@@ -96,7 +102,7 @@ let next_page t =
     | _ -> failwith "Can't go to next page!"
     
 let prev_page t =
-
+    (* RAISE EXCEPTION *)
     (* erase previous content *)
     Graphics.clear_graph ();
     
