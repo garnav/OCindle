@@ -10,12 +10,6 @@ module DataController = sig
   (* Closes the current file *)
   val close_file: t -> unit
 
-  (* Change font color *)
-  val change_font_color: ANSITerminal.color -> t -> unit
-
-  (* Returns the current page being read *)
-  val curr_page: t -> int
-
   (* finds the meaning of the given word *)
   val find_meaning: string -> string
 
