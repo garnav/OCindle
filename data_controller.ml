@@ -8,7 +8,7 @@ type t =
 (* This is a helper function to find the substring of [str] from index position 
 [s] to index position [e] *)
 let actual_sub str s e =
-String.sub str s (e - s + 1);;
+String.sub str s (e - s + 1)
 
 (* This is a helper function that prints [str] on the Graphics window starting
 from [(x,y)]. *)
@@ -17,10 +17,19 @@ let rec custom_print str x y =
     then
         (Graphics.moveto x y;
         Graphics.draw_string (actual_sub str 0 (522 - x));
-        custom_print (actual_sub str (522 - x) (String.length str)) 18 (y - 13))
-    else 
+        custom_print (actual_sub str (522 - x) (String.length str - 1)) 18 (y - 13))
+    else
+        if (x = 18)
+        then
         (Graphics.moveto x y;
         Graphics.draw_string str)
+        else
+        (Graphics.moveto x y;
+         Graphics.draw_string (actual_sub str 0 (522 - x));
+         Graphics.moveto 18 (y - 13);
+         Graphics.draw_string (actual_sub str (522 - x) (String.length str - 1)))
+
+
 
 (* This is a helper function that draws a line from [(pos1_x, pos1_y)] to 
 [(pos2_x, pos2_y)] on the Graphics window. Used in [add_highlights] and 
