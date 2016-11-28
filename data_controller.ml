@@ -2,19 +2,20 @@ module DataController = struct
 
 (* [t] is a record containing important information about the book *)
 type t = 
-    {book_name: string; book_text : string; mutable ind_pos : int; 
+    {book_name: string; book_text : string; book_id : int; mutable ind_pos : int; 
     curr_page_cont : string}
 
 (* This is a helper function that prints [str] on the Graphics window starting
 from [(x,y)]. *)
 let rec custom_print str x y =
-    if (String.length str > 0 || x < 540 || y < 650) 
+    if (String.length str >= 504) 
     then
-    Graphics.moveto x y;
-    Graphics.draw_string (String.sub str 0 83);
-    custom_print (String.sub str 83 (String.length str)) x (y - 13);
-    else
-    ();
+        (Graphics.moveto x y;
+        Graphics.draw_string (String.sub str 0 (522 - x));
+        custom_print (String.sub str (522 - x) (String.length str)) 18 (y - 13))
+    else 
+        (Graphics.moveto x y;
+        Graphics.draw_string str)
 
 (* This is a helper function that draws a line from [(pos1_x, pos1_y)] to 
 [(pos2_x, pos2_y)] on the Graphics window. Used in [add_highlights] and 
@@ -22,17 +23,17 @@ let rec custom_print str x y =
 let rec custom_highlight t pos1_x pos1_y pos2_x pos2_y =
     if (!pos1_x < !pos2_x)
     then
-    (* move to start position *)
-    (Graphics.moveto !pos1_x !pos1_y;
-    (* draw straight line on first line of text *)
-    Graphics.lineto 522 !pos1_y;
-    pos1_x := 18;
-    pos1_y := !pos1_y - 13;
-    custom_highlight t pos1_x pos1_y pos2_x pos2_y;)    
+        (* move to start position *)
+        (Graphics.moveto !pos1_x !pos1_y;
+        (* draw straight line on first line of text *)
+        Graphics.lineto 522 !pos1_y;
+        pos1_x := 18;
+        pos1_y := !pos1_y - 13;
+        custom_highlight t pos1_x pos1_y pos2_x pos2_y;)    
     else if (!pos1_x = !pos2_x && !pos1_y < !pos2_y)
     then 
-    (Graphics.moveto !pos1_x !pos1_y;
-    Graphics.lineto !pos2_x !pos2_y;)
+        (Graphics.moveto !pos1_x !pos1_y;
+        Graphics.lineto !pos2_x !pos2_y;)
     else
     ();
 
@@ -52,7 +53,7 @@ let open_file name =
     choose book; display first/last saved page of book *)
 
     (* initialize values *)
-    let book_details = {book_name = name; book_text = []; 
+    let book_details = {book_name = name; book_text = []; book_id = []; 
                         ind_pos = []; curr_page_cont = String.sub [] ind_pos (ind_pos + 3735)} in 
     
     (* actually display page *)
@@ -122,39 +123,39 @@ let prev_page t =
 let add_notes t = 
     (* call helper function in perspective to add these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in 
-    let start_x = first_pos.mouse_x / 6 in 
-    let start_y = first_pos.mouse_y / 13 in 
+    let start_x = first_pos.mouse_x in 
+    let start_y = first_pos.mouse_y in 
     (* change color if needbe *)
     Graphics.fill_circle start_x start_y 2; 
 
 let delete_notes t = 
     (* call helper function in perspective to delete these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in 
-    let start_x = first_pos.mouse_x / 6 in 
-    let start_y = first_pos.mouse_y / 13 in 
+    let start_x = first_pos.mouse_x in 
+    let start_y = first_pos.mouse_y in 
     Graphics.set_color white;
     Graphics.fill_circle start_x start_y 2; 
 
 let add_bookmark t = 
     (* call function in perspective to add a bookmark to the current page *)
     Graphics.set_color blue;
-    Graphics.draw_circle 510 636 10;
+    Graphics.fill_circle 510 636 10;
     Graphics.set_color black;
 
 let delete_bookmark t = 
     (* call function in perspective to delete a bookmark to the current page *)
     Graphics.set_color white;
-    Graphics.draw_circle 510 636 10;
+    Graphics.fill_circle 510 636 10;
     Graphics.set_color black;
 
 let add_highlights t = 
     (* call function in perspective to add highlights to the current page *)
     let first_pos = Graphics.wait_next_event [Button_down] in 
     let second_pos = Graphics.wait_next_event [Button_down] in 
-    let start_x = ref (first_pos.mouse_x / 6) in 
-    let start_y = ref (first_pos.mouse_y / 13) in 
-    let end_x = ref (second_pos.mouse_x / 6) in 
-    let end_y = ref (second_pos.mouse_y / 13) in
+    let start_x = ref (first_pos.mouse_x) in 
+    let start_y = ref (first_pos.mouse_y) in 
+    let end_x = ref (second_pos.mouse_x) in 
+    let end_y = ref (second_pos.mouse_y) in
     (* change color if needbe *)
     custom_highlight t start_x start_y end_x end_y;
 
@@ -162,10 +163,10 @@ let delete_highlights t =
     (* call function in perspective to delete highlights to the current page *)
     let first_pos = Graphics.wait_next_event [Button_down] in 
     let second_pos = Graphics.wait_next_event [Button_down] in 
-    let start_x = ref (first_pos.mouse_x / 6) in 
-    let start_y = ref (first_pos.mouse_y / 13) in 
-    let end_x = ref (second_pos.mouse_x / 6) in 
-    let end_y = ref (second_pos.mouse_y / 13) in
+    let start_x = ref (first_pos.mouse_x) in 
+    let start_y = ref (first_pos.mouse_y) in 
+    let end_x = ref (second_pos.mouse_x) in 
+    let end_y = ref (second_pos.mouse_y) in
     Graphics.set_color white;
     custom_highlight t start_x start_y end_x end_y;
 
