@@ -5,14 +5,19 @@ type t =
     {book_name: string; book_text : string; book_id : int; mutable ind_pos : int; 
     curr_page_cont : string}
 
+(* This is a helper function to find the substring of [str] from index position 
+[s] to index position [e] *)
+let actual_sub str s e =
+String.sub str s (e - s + 1);;
+
 (* This is a helper function that prints [str] on the Graphics window starting
 from [(x,y)]. *)
 let rec custom_print str x y =
     if (String.length str >= 504) 
     then
         (Graphics.moveto x y;
-        Graphics.draw_string (String.sub str 0 (522 - x));
-        custom_print (String.sub str (522 - x) (String.length str)) 18 (y - 13))
+        Graphics.draw_string (actual_sub str 0 (522 - x));
+        custom_print (actual_sub str (522 - x) (String.length str)) 18 (y - 13))
     else 
         (Graphics.moveto x y;
         Graphics.draw_string str)
@@ -54,7 +59,7 @@ let open_file name =
 
     (* initialize values *)
     let book_details = {book_name = name; book_text = []; book_id = []; 
-                        ind_pos = []; curr_page_cont = String.sub [] ind_pos (ind_pos + 3735)} in 
+                        ind_pos = []; curr_page_cont = actual_sub [] ind_pos (ind_pos + 3735)} in 
     
     (* actually display page *)
     Graphics.draw_string t.curr_page_cont;
@@ -90,7 +95,7 @@ let next_page t =
     (* actually display page and update word counter *)
     try
         t.ind_pos := !t.ind_pos + 3735;
-        t.curr_page_cont <- String.sub t.book_text !t.ind_pos (ind_pos + 3735);
+        t.curr_page_cont <- actual_sub t.book_text !t.ind_pos (ind_pos + 3735);
 
         (* position cursor *)
         Graphics.moveto 18 611;
@@ -110,7 +115,7 @@ let prev_page t =
     (* actually display page and update word counter *)
     try
         t.ind_pos := !t.ind_pos - 3735;
-        t.curr_page_cont := String.sub t.book_text !t.ind_pos (!t.ind_pos + 3735);
+        t.curr_page_cont := actual_sub t.book_text !t.ind_pos (!t.ind_pos + 3735);
         Graphics.moveto 18 611;
 
         (* recursive function to draw string *)
