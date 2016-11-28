@@ -2,8 +2,8 @@ module DataController = struct
 
 
 type t = 
-    {book_name: string; book_text : string; mutable curr_page : int;
-     mutable ind_pos : int; curr_page_cont : string}
+    {book_name: string; book_text : string; mutable ind_pos : int; 
+    curr_page_cont : string}
 
 
 let rec custom_print str x y =
@@ -15,12 +15,23 @@ let rec custom_print str x y =
     else
     ();
 
-let rec custom_highlight t pos_1 pos_2 pos_3 pos_4 =
-    if (String
+let rec custom_highlight t pos1_x pos1_y pos2_x pos2_y =
+    if (!pos1_x < !pos2_x)
     then
-
+    (* move to start position *)
+    (Graphics.moveto !pos1_x !pos1_y;
+    (* draw straight line on first line of text *)
+    Graphics.lineto 522 !pos1_y;
+    pos1_x := 18;
+    pos1_y := !pos1_y - 13;
+    custom_highlight t pos1_x pos1_y pos2_x pos2_y;)    
+    else if (!pos1_x = !pos2_x && !pos1_y < !pos2_y)
+    then 
+    (Graphics.moveto !pos1_x !pos1_y;
+    Graphics.lineto !pos2_x !pos2_y;)
     else
     ();
+
     (* if before end of page or t is smaller, draw straight line *)
     (* recursively call *)
 
@@ -38,7 +49,6 @@ let open_file name =
 
     (* initialize values *)
     let book_details = {book_name = name; book_text = []; 
-                        curr_page = []; 
                         ind_pos = []; curr_page_cont = String.sub [] ind_pos (ind_pos + 3735)} in 
     
     (* actually display page *)
@@ -70,13 +80,10 @@ let next_page t =
     (* erase previous content *)
     Graphics.clear_graph ();
     
-    (* change curr_page *)
-    t.curr_page <- t.curr_page + 1;
-    
     (* actually display page and update word counter *)
     try
-        t.ind_pos <- t.ind_pos + 3735;
-        t.curr_page_cont <- String.sub t.book_text ind_pos (ind_pos + 3735);
+        t.ind_pos := !t.ind_pos + 3735;
+        t.curr_page_cont <- String.sub t.book_text !t.ind_pos (ind_pos + 3735);
 
         (* position cursor *)
         Graphics.moveto 18 611;
@@ -93,13 +100,10 @@ let prev_page t =
     (* erase previous content *)
     Graphics.clear_graph ();
     
-    (* change curr_page *)
-    t.curr_page <- t.curr_page - 1;
-    
     (* actually display page and update word counter *)
     try
-        t.ind_pos <- t.ind_pos - 3735;
-        t.curr_page_cont <- String.sub t.book_text ind_pos (ind_pos + 3735);
+        t.ind_pos := !t.ind_pos - 3735;
+        t.curr_page_cont := String.sub t.book_text !t.ind_pos (!t.ind_pos + 3735);
         Graphics.moveto 18 611;
 
         (* recursive function to draw string *)
@@ -110,10 +114,20 @@ let prev_page t =
     | _ -> failwith "Can't go to previous page!"
     
 let add_notes t = 
-    failwith "Unimplemented"
     (* call helper function in perspective to add these notes *)
-    (* return page with all lines pertaining to notes underlined:
-    capture start and end; highlight *)
+    let first_pos = Graphics.wait_next_event [Button_down] in 
+    let start_x = first_pos.mouse_x / 6 in 
+    let start_y = first_pos.mouse_y / 13 in 
+    (* change color if needbe *)
+    Graphics.fill_circle start_x start_y 2; 
+
+let delete_notes t = 
+    (* call helper function in perspective to delete these notes *)
+    let first_pos = Graphics.wait_next_event [Button_down] in 
+    let start_x = first_pos.mouse_x / 6 in 
+    let start_y = first_pos.mouse_y / 13 in 
+    Graphics.set_color white;
+    Graphics.fill_circle start_x start_y 2; 
 
 let add_bookmark t = 
     (* call function in perspective to add a bookmark to the current page *)
@@ -129,9 +143,25 @@ let delete_bookmark t =
 
 let add_highlights t = 
     (* call function in perspective to add highlights to the current page *)
-    let first_pos = wait_next_event [Button_down];;
-    let second_pos = wait_next_event [Button_down];;
-    custom_highlight t first_pos.mouse_x first_pos.mouse_y second_pos.mouse_x second_pos.mouse_y;
+    let first_pos = Graphics.wait_next_event [Button_down] in 
+    let second_pos = Graphics.wait_next_event [Button_down] in 
+    let start_x = ref (first_pos.mouse_x / 6) in 
+    let start_y = ref (first_pos.mouse_y / 13) in 
+    let end_x = ref (second_pos.mouse_x / 6) in 
+    let end_y = ref (second_pos.mouse_y / 13) in
+    (* change color if needbe *)
+    custom_highlight t start_x start_y end_x end_y;
+
+let delete_highlights t = 
+    (* call function in perspective to delete highlights to the current page *)
+    let first_pos = Graphics.wait_next_event [Button_down] in 
+    let second_pos = Graphics.wait_next_event [Button_down] in 
+    let start_x = ref (first_pos.mouse_x / 6) in 
+    let start_y = ref (first_pos.mouse_y / 13) in 
+    let end_x = ref (second_pos.mouse_x / 6) in 
+    let end_y = ref (second_pos.mouse_y / 13) in
+    Graphics.set_color white;
+    custom_highlight t start_x start_y end_x end_y;
 
 
 end
