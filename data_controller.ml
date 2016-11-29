@@ -3,15 +3,6 @@ module DataController = struct
   exception Annotation_Error
   exception No_Annotation
 
-  (*Window Constants*)
-  let char_height = 13
-  let char_width = 6
-  let left_edge = 18   (*left edge of first char in any line*)
-  let right_edge = 516 (*left edge of final char in any line*)
-  let top_edge = 611   (*bottom of chars in the top line*)
-  let bot_edge = 26    (*bottom of chars in the last line*)
-  let chars_line = 83  (*max divisions in a line. chars are chars_line + 1*)
-
   (*Main Functions*)
 
   type possible_ann = None | Some of Marginalia.t
