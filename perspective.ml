@@ -18,7 +18,8 @@ module Perspective = struct
   
   let rec sort_colour main_lst acc =
     match main_lst with
-	| (i, (c, j))::t -> if mem_assoc c acc then sort_colour t (insert_colour [] acc (c, (i, j)))
+	| (i, (c, j))::t -> if mem_assoc c acc
+	                      then sort_colour t (insert_colour [] acc (c, (i, j)))
 	                    else sort_colour t ((c, [(i, j)]) :: acc)
 	| _              -> acc
   
@@ -50,7 +51,7 @@ module Perspective = struct
 	search_through_lst custom_reg lst_of_words
 	
   let search_notes t1 note =
-    fold_left (fun acc (i, (c, s)) -> if search_in_string (String.lowercase_ascii note) s
+    fold_left (fun acc (i, (c, s)) -> if search_in_string (String.lowercase_ascii note)
 	                                    then (i, (c, s)) :: acc
 									  else acc) [] (notes_list t1)
 
