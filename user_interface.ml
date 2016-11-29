@@ -27,14 +27,35 @@ module UserInterface = struct
 
   (* Graphics Colours to Colours Module *)
   let color_to_colour c =
-    match c with
-    | black   -> BLACK
-    | red     -> RED
-    | blue    -> BLUE
-    | yellow  -> YELLOW
-    | magenta -> PURPLE
-    | green   -> GREEN
-    | _       -> raise Invalid_Colour
+    if c = Graphics.black then BLACK
+    else if c = Graphics.red then RED
+    else if c = Graphics.blue then BLUE
+    else if c = Graphics.yellow then YELLOW
+    else if c = Graphics.magenta then PURPLE
+    else if c = Graphics.green then GREEN
+    else raise Invalid_Colour
+
+  (* Initialization *)
+    (**)
+  let open_file name =
+
+    (* Number of characters: 3735 *)
+    (* Window resolution: 540 x 650 *)
+    (* RAISE AND DEFINE exception *)
+
+    Graphics.open_graph " 540x650";
+    Graphics.set_window_title "OCindle - No. It's not the Kindle";
+
+    (* The user is presented with a list of bookshelves, each containing a list of books. *)
+    (* Display list of bookshelves; choose bookshelf; display list of books;
+    choose book; display first/last saved page of book *)
+
+    (* initialize values *)
+    (*let book_details = {book_name = name; book_text = []; book_id = [];
+                        ind_pos = []; curr_page_cont = actual_sub [] ind_pos (ind_pos + 3735)} in
+
+    (* actually display page *)
+    Graphics.draw_string t.curr_page_cont; *)
 
   (* Highlight Manipulation *)
   let rec custom_highlight x1 y1 x2 y2 =
@@ -62,8 +83,27 @@ module UserInterface = struct
     with
       | Annotation_Error -> print_string "A highlight already exists" ; t1
 
+  (*NOTE: Technically only needs the start index to begin. Uses, the second
+  index to understand what line to draw too.*)
+  let delete_highlights t =
+    (* call function in perspective to delete highlights to the current page *)
+    let first_pos = Graphics.wait_next_event [Button_down] in
+    let s_x = within_x_range first_pos.mouse_x in
+    let s_y = within_y_range first_pos.mouse_y in
+    try
+      let new_t = DataController.delete_highlights (relative_index s_x s_y) t in
+      let second_pos = Graphics.wait_next_event [Button_down] in
+      let e_x = within_x_range second_pos.mouse_x in
+      let e_y = within_y_range second_pos.mouse_y in
+      Graphics.set_color Graphics.white ;
+      custom_highlight s_x s_y e_x e_y ;
+      new_t
+    with
+      | Annotation_Error -> print_string "No highlight starts at this position." ; t
+
   (* Printing *)
   let rec custom_print str x y =
+    Graphics.set_color Graphics.black ;
     let print_chars = chars_line + 1 in
     if (String.length str > print_chars)
       then
@@ -71,14 +111,10 @@ module UserInterface = struct
         Graphics.draw_string (String.sub str 0 print_chars);
         custom_print (String.sub str print_chars
                      (String.length str - print_chars))
-                     18 (y - char_height))
+                     left_edge (y - char_height))
     else
         (Graphics.moveto x y;
         Graphics.draw_string str)
-
-
-
-
 
   (*Testing Purposes*)
   let check a =
@@ -88,13 +124,32 @@ module UserInterface = struct
     let start_y = within_y_range first_pos.mouse_y in
     print_int (relative_index start_x start_y) ;
 
+(*LIST OF POSSIBLE COMMANDS:
+(DOES IT DEPEND ON STATE THOUGH)
+'w' : next page in a book
+'s' : previous page in a book
+'a' : intention to add something
+      FOLLOWED BY - 'b' : book mark
+                    'h' : highlight
+                    'n' : note
+'d' : intention to delete something
+      FOLLOWED BY - 'b' : book mark
+                    'h' : highlight
+                    'n' : note
+'b' : go to list of bookshelfs
 
+
+*)
+
+(*
   let command = read_int () in
   match command with
   |   ->
   |   ->
-  |   ->
+  |   ->*)
 
 (* trigger input *)
+
+(**)
 
 end
