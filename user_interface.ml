@@ -10,11 +10,13 @@ module UserInterface = struct
   (*Window Constants*)
   let char_height = 13
   let char_width = 6
-  let left_edge = 18   (*left edge of first char in any line*)
-  let right_edge = 516 (*left edge of final char in any line*)
-  let top_edge = 611   (*bottom of chars in the top line*)
-  let bot_edge = 26    (*bottom of chars in the last line*)
-  let chars_line = 83  (*max divisions in a line. chars are chars_line + 1*)
+  let left_edge = 18   (* left edge of first char in any line *)
+  let right_edge = 516 (* left edge of final char in any line *)
+  let top_edge = 611   (* bottom of chars in the top line *)
+  let bot_edge = 26    (* bottom of chars in the last line *)
+  let chars_line = 83  (* max divisions in a line. chars are chars_line + 1 *)
+  let window_size = " 540x650"
+  let window_title = "OCindle - no, it's not the Kindle"
 
   let within_y_range y = (y / char_height) * char_height
 
@@ -35,6 +37,22 @@ module UserInterface = struct
     else if c = Graphics.green then GREEN
     else raise Invalid_Colour
 
+      (* Printing *)
+  let rec custom_print str x y =
+    Graphics.set_color Graphics.black ;
+    let print_chars = chars_line + 1 in
+    if (String.length str > print_chars)
+      then
+        (Graphics.moveto x y;
+        Graphics.draw_string (String.sub str 0 print_chars);
+        custom_print (String.sub str print_chars
+                     (String.length str - print_chars))
+                     left_edge (y - char_height))
+    else
+        (Graphics.moveto x y;
+        Graphics.draw_string str)
+
+
   (* Initialization *)
     (**)
   let open_file name =
@@ -43,8 +61,8 @@ module UserInterface = struct
     (* Window resolution: 540 x 650 *)
     (* RAISE AND DEFINE exception *)
 
-    Graphics.open_graph " 540x650";
-    Graphics.set_window_title "OCindle - No. It's not the Kindle";
+    Graphics.open_graph window_size;
+    Graphics.set_window_title window_title;
 
     (* The user is presented with a list of bookshelves, each containing a list of books. *)
     (* Display list of bookshelves; choose bookshelf; display list of books;
@@ -65,7 +83,7 @@ module UserInterface = struct
            custom_highlight left_edge (y1 - char_height) x2 y2 )
   else ( Graphics.moveto x1 y1 ; Graphics.lineto x2 y1 )
 
-  let draw_highlight colour t1 =
+let draw_highlights colour t1 =
     let first_pos = Graphics.wait_next_event [Button_down] in
     let second_pos = Graphics.wait_next_event [Button_down] in
     let start_x = within_x_range first_pos.mouse_x in
@@ -77,16 +95,16 @@ module UserInterface = struct
                    (relative_index start_x start_y)
                    (relative_index end_x end_y)
                    (color_to_colour colour) t1 in
-       Graphics.set_color colour ;
-       custom_highlight start_x start_y end_x end_y ;
+       Graphics.set_color colour;
+       custom_highlight start_x start_y end_x end_y;
        new_t
     with
       | Annotation_Error -> print_string "A highlight already exists" ; t1
 
   (*NOTE: Technically only needs the start index to begin. Uses, the second
   index to understand what line to draw too.*)
-  let delete_highlights t =
-    (* call function in perspective to delete highlights to the current page *)
+
+let erase_highlights t =
     let first_pos = Graphics.wait_next_event [Button_down] in
     let s_x = within_x_range first_pos.mouse_x in
     let s_y = within_y_range first_pos.mouse_y in
@@ -101,20 +119,63 @@ module UserInterface = struct
     with
       | Annotation_Error -> print_string "No highlight starts at this position." ; t
 
-  (* Printing *)
-  let rec custom_print str x y =
-    Graphics.set_color Graphics.black ;
-    let print_chars = chars_line + 1 in
-    if (String.length str > print_chars)
-      then
-        (Graphics.moveto x y;
-        Graphics.draw_string (String.sub str 0 print_chars);
-        custom_print (String.sub str print_chars
-                     (String.length str - print_chars))
-                     left_edge (y - char_height))
-    else
-        (Graphics.moveto x y;
-        Graphics.draw_string str)
+let draw_notes color t =
+    (* call helper function in perspective to add these notes *)
+    let first_pos = Graphics.wait_next_event [Button_down] in
+    (* try/with, prompt with nice message *)
+    let note_text = read_line ();
+    let start_x = within_range first_pos.mouse_x in
+    let start_y = within_range first_pos.mouse_y - 5 in
+    try
+      let new_t = DataController.add_notes
+                   (relative_index start_x start_y)
+                   note_text
+                   (color_to_colour colour) t1 in
+       Graphics.set_color colour;
+       Graphics.fill_circle start_x start_y 2;
+       new_t
+    with
+      | Annotation_Error -> print_string "A note already exists" ; t1
+
+let erase_notes t =
+    (* call helper function in perspective to add these notes *)
+    let first_pos = Graphics.wait_next_event [Button_down] in
+    let start_x = within_range first_pos.mouse_x in
+    let start_y = within_range first_pos.mouse_y - 5 in
+    try
+      let new_t = DataController.delete_notes
+                   (relative_index start_x start_y)
+                   t1 in
+       Graphics.set_color colour;
+       Graphics.set_color white;
+       Graphics.fill_circle start_x start_y 2;
+       new_t
+    with
+      | Annotation_Error -> print_string "A note doesn't exist" ; t1
+
+let draw_bookmark colour t1 =
+    try
+       let new_t = DataController.add_bookmark
+                   (relative_index start_x start_y)
+                   (relative_index end_x end_y)
+                   (color_to_colour colour) t1 in
+       Graphics.set_color colour;
+       Graphics.fill_circle 510 636 10;
+       Graphics.set_color black; (* original color *)
+       new_t
+    with
+      | Annotation_Error -> print_string "A bookmark already exists" ; 
+
+  let erase_bookmark t1 =
+    try
+       let new_t = DataController.delete_bookmark
+                   (relative_index start_x start_y) t1 in
+      Graphics.set_color white;
+      Graphics.fill_circle 510 636 10;
+      Graphics.set_color black; (* original color *)
+       new_t
+    with
+      | Annotation_Error -> print_string "A bookmark doesn't exist" ; t1
 
   (*Testing Purposes*)
   let check a =
@@ -153,3 +214,5 @@ module UserInterface = struct
 (**)
 
 end
+
+
