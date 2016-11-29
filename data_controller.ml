@@ -22,28 +22,17 @@ let rec custom_print str x y =
         (Graphics.moveto x y;
         Graphics.draw_string str)
 
-let draw pos_x pos_y =
-        (* move to start position *)
-        (Graphics.moveto !pos1_x !pos1_y;
-        (* draw straight line on first line of text *)
-        Graphics.lineto 522 !pos1_y;
-        pos1_x := 18;
-        pos1_y := !pos1_y - 13;
-
 (* This is a helper function that draws a line from [(pos1_x, pos1_y)] to 
 [(pos2_x, pos2_y)] on the Graphics window. Used in [add_highlights] and 
 [delete_highlights] *)
-let custom_highlight t pos1_x pos1_y pos2_x pos2_y =
-    while (!pos1_y < !pos2_y) 
-        do
-            draw pos1_x pos1_y; 
-        done
-(*     else if (!pos1_y = !pos2_y && !pos1_x <= !pos2_x)
-    then 
-        (Graphics.moveto !pos1_x !pos1_y;
-        Graphics.lineto !pos2_x !pos2_y;)
-    else
-    (); *)
+let rec custom_highlight x1 y1 x2 y2 =
+  if (y2 < y1)
+    then (moveto x1 y1 ;
+         Graphics.lineto 522 y1 ;
+         draw_highlight 18 (y1 - 13) x2 y2)
+  else
+    (moveto x1 y1 ; 
+    Graphics.lineto x2 y1)
 
     (* if before end of page or t is smaller, draw straight line *)
 
@@ -160,23 +149,23 @@ let add_highlights t =
     (* call function in perspective to add highlights to the current page *)
     let first_pos = Graphics.wait_next_event [Button_down] in 
     let second_pos = Graphics.wait_next_event [Button_down] in 
-    let start_x = ref (first_pos.mouse_x) in 
-    let start_y = ref (first_pos.mouse_y) in 
-    let end_x = ref (second_pos.mouse_x) in 
-    let end_y = ref (second_pos.mouse_y) in
+    let start_x = first_pos.mouse_x in 
+    let start_y = first_pos.mouse_y in 
+    let end_x = second_pos.mouse_x in 
+    let end_y = second_pos.mouse_y in
     (* change color if needbe *)
-    custom_highlight t start_x start_y end_x end_y;
+    custom_highlight start_x start_y end_x end_y;
 
 let delete_highlights t = 
     (* call function in perspective to delete highlights to the current page *)
     let first_pos = Graphics.wait_next_event [Button_down] in 
     let second_pos = Graphics.wait_next_event [Button_down] in 
-    let start_x = ref (first_pos.mouse_x) in 
-    let start_y = ref (first_pos.mouse_y) in 
-    let end_x = ref (second_pos.mouse_x) in 
-    let end_y = ref (second_pos.mouse_y) in
+    let start_x = first_pos.mouse_x in 
+    let start_y = first_pos.mouse_y in 
+    let end_x = second_pos.mouse_x in 
+    let end_y = second_pos.mouse_y in
     Graphics.set_color white;
-    custom_highlight t start_x start_y end_x end_y;
+    custom_highlight start_x start_y end_x end_y;
 
 
 end
