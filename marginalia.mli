@@ -4,12 +4,12 @@ module type Marginalia = sig
 
   (* type [t] represents the annotations,
   ie: highlights, notes and bookmark status on a given
-  page.*)
+  page. *)
   type t
   
-  (*type [page] represents the range of indices that make up
-  a page of a book. [page] is of the form (s,t), ie: the starting
-  (s) and ending (t) indices, inclusive.*)
+  (* type [page] represents the range of indices of a book
+	with relevant content. [page] is of the form (s,t),
+	ie: the starting (s) and ending (t) indices, inclusive. *)
   type page = int * int
 
   (* [get_range t1] is the [page] that [t1] contains annotations for.*)
@@ -28,7 +28,7 @@ module type Marginalia = sig
   is thrown if [t1] already contains a note at i.
   requires:
   - [i] must be within [t1]'s page.*)
-  val add_note : string -> int -> -> Colours.t -> t -> t
+  val add_note : string -> int -> Colours.t -> t -> t
   
  (* [delete_note i t1] is [t2] with the note at index [i] removed.
   Exception Not_found is thrown if [t1] does not contain a note
