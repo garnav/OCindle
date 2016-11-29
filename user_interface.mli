@@ -1,5 +1,5 @@
 module type UserInterface = sig
-	open DataController
+  open DataController
 
   (* this single function in user interface pattern matches a keypress
   to call various functions in DataController which perform the required task
