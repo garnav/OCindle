@@ -22,7 +22,7 @@ let rec custom_print str x y =
         (Graphics.moveto x y;
         Graphics.draw_string str)
 
-let rec draw pos_x pos_y =
+let draw pos_x pos_y =
         (* move to start position *)
         (Graphics.moveto !pos1_x !pos1_y;
         (* draw straight line on first line of text *)
@@ -33,18 +33,17 @@ let rec draw pos_x pos_y =
 (* This is a helper function that draws a line from [(pos1_x, pos1_y)] to 
 [(pos2_x, pos2_y)] on the Graphics window. Used in [add_highlights] and 
 [delete_highlights] *)
-let rec custom_highlight t pos1_x pos1_y pos2_x pos2_y =
-    if (!pos1_y < !pos2_y)
-    then
-        while (!pos1_y < !pos2_y) do
+let custom_highlight t pos1_x pos1_y pos2_x pos2_y =
+    while (!pos1_y < !pos2_y) 
+        do
             draw pos1_x pos1_y; 
         done
-    else if (!pos1_y = !pos2_y && !pos1_x <= !pos2_x)
+(*     else if (!pos1_y = !pos2_y && !pos1_x <= !pos2_x)
     then 
         (Graphics.moveto !pos1_x !pos1_y;
         Graphics.lineto !pos2_x !pos2_y;)
     else
-    ();
+    (); *)
 
     (* if before end of page or t is smaller, draw straight line *)
 
