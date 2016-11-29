@@ -13,7 +13,7 @@ String.sub str s (e - s + 1)
 (* This is a helper function that prints [str] on the Graphics window starting
 from [(x,y)]. *)
 let rec custom_print str x y =
-    if (String.length str >= 83) 
+    if (String.length str > 83) 
     then
         (Graphics.moveto x y;
         Graphics.draw_string (actual_sub str 0 83);
