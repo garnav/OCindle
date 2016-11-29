@@ -22,7 +22,6 @@ let rec custom_print str x y =
         (Graphics.moveto x y;
         Graphics.draw_string str)
 
-
 (* This is a helper function that draws a line from [(pos1_x, pos1_y)] to 
 [(pos2_x, pos2_y)] on the Graphics window. Used in [add_highlights] and 
 [delete_highlights] *)
@@ -130,7 +129,7 @@ let add_notes t =
     (* call helper function in perspective to add these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in 
     let start_x = first_pos.mouse_x in 
-    let start_y = first_pos.mouse_y in 
+    let start_y = first_pos.mouse_y - 7 in 
     (* change color if needbe *)
     Graphics.fill_circle start_x start_y 2; 
 
@@ -138,7 +137,7 @@ let delete_notes t =
     (* call helper function in perspective to delete these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in 
     let start_x = first_pos.mouse_x in 
-    let start_y = first_pos.mouse_y in 
+    let start_y = first_pos.mouse_y - 7 in 
     Graphics.set_color white;
     Graphics.fill_circle start_x start_y 2; 
 
