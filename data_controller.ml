@@ -34,8 +34,9 @@ let rec custom_highlight t pos1_x pos1_y pos2_x pos2_y =
         Graphics.lineto 522 !pos1_y;
         pos1_x := 18;
         pos1_y := !pos1_y - 13;
+        print_string "Hey!";
         custom_highlight t pos1_x pos1_y pos2_x pos2_y;)    
-    else if (!pos1_y = !pos2_y && !pos1_x < !pos2_x)
+    else if (!pos1_y = !pos2_y && !pos1_x <= !pos2_x)
     then 
         (Graphics.moveto !pos1_x !pos1_y;
         Graphics.lineto !pos2_x !pos2_y;)
