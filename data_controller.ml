@@ -50,6 +50,15 @@ module DataController = struct
     with
       | Marginalia.Already_Exists -> raise Annotation_Error
 
+  let delete_notes beg t1 =
+    let absolute_start = t1.page_start + beg in
+    try
+      let new_ann = Marginalia.delete_note
+                    absolute_start (debox_ann t1.page_annotations) in
+      {t1 with page_annotations = new_ann}
+    with
+      | Not_found -> raise Annotation_Error
+
 
 (*
 
