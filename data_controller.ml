@@ -26,7 +26,7 @@ let rec custom_print str x y =
 [(pos2_x, pos2_y)] on the Graphics window. Used in [add_highlights] and 
 [delete_highlights] *)
 let rec custom_highlight t pos1_x pos1_y pos2_x pos2_y =
-    if (!pos1_x < !pos2_x)
+    if (!pos1_y < !pos2_y)
     then
         (* move to start position *)
         (Graphics.moveto !pos1_x !pos1_y;
@@ -35,7 +35,7 @@ let rec custom_highlight t pos1_x pos1_y pos2_x pos2_y =
         pos1_x := 18;
         pos1_y := !pos1_y - 13;
         custom_highlight t pos1_x pos1_y pos2_x pos2_y;)    
-    else if (!pos1_x = !pos2_x && !pos1_y < !pos2_y)
+    else if (!pos1_y = !pos2_y && !pos1_x < !pos2_x)
     then 
         (Graphics.moveto !pos1_x !pos1_y;
         Graphics.lineto !pos2_x !pos2_y;)
