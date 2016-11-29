@@ -1,0 +1,8 @@
+### Starting build.
+# Target: marginalia.mli.depends, tags: { extension:mli, file:marginalia.mli, ocaml, ocamldep, quiet }
+/home/opam/.opam/4.03.0/bin/ocamldep.opt -modules marginalia.mli > marginalia.mli.depends
++ /home/opam/.opam/4.03.0/bin/ocamldep.opt -modules marginalia.mli > marginalia.mli.depends
+File "marginalia.mli", line 84, characters 23-24:
+Error: Syntax error
+Command exited with code 2.
+# Compilation unsuccessful.
