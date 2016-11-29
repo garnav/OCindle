@@ -1,20 +1,19 @@
 module Colours = struct
 
-   type t = RED | BLUE | GREEN | YELLOW | PURPLE | PINK | BLACK
+   type t = RED | BLUE | GREEN | YELLOW | PURPLE | BLACK
  
    (*[rank_by_shade c] ranks colours by their brightness.
-   Hence, the order is as follows 1. Yellow 2. Pink 3. Red
-   4. Purple 5. Blue 6. Green 7. Black. This functions returns,
+   Hence, the order is as follows 1. Yellow 2. Red
+   3. Purple 4. Blue 5. Green 6. Black. This functions returns,
    the colours position in this sequence.*)
    let rank_by_shade c =
      match c with
-	 | RED    -> 3
-	 | BLUE   -> 5
-	 | GREEN  -> 6
+	 | RED    -> 2
+	 | BLUE   -> 4
+	 | GREEN  -> 5
 	 | YELLOW -> 1
-	 | PURPLE -> 4
-	 | PINK   -> 2
-	 | BLACK  -> 7
+	 | PURPLE -> 3
+	 | BLACK  -> 6
    
    let compare_colours c1 c2 =
      Pervasives.compare (rank_by_shade c1) (rank_by_shade c2)
@@ -26,7 +25,6 @@ module Colours = struct
 	 | "green"  -> GREEN
 	 | "yellow" -> YELLOW
 	 | "purple" -> PURPLE
-	 | "pink"   -> PINK
 	 | "black"  -> BLACK
 	 | _        -> raise Not_found
 
@@ -37,7 +35,6 @@ module Colours = struct
 	 | GREEN  -> "green" 
 	 | YELLOW -> "yellow"
 	 | PURPLE -> "purple"
-	 | PINK   -> "pink"
 	 | BLACK  -> "black"
 	 
 end
