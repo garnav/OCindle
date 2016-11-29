@@ -13,22 +13,14 @@ String.sub str s (e - s + 1)
 (* This is a helper function that prints [str] on the Graphics window starting
 from [(x,y)]. *)
 let rec custom_print str x y =
-    if (String.length str >= 504) 
+    if (String.length str >= 83) 
     then
         (Graphics.moveto x y;
-        Graphics.draw_string (actual_sub str 0 (522 - x));
-        custom_print (actual_sub str (522 - x) (String.length str - 1)) 18 (y - 13))
+        Graphics.draw_string (actual_sub str 0 83);
+        custom_print (actual_sub str 83 (String.length str - 1)) 18 (y - 13))
     else
-        if (x = 18)
-        then
         (Graphics.moveto x y;
         Graphics.draw_string str)
-        else
-        (Graphics.moveto x y;
-         Graphics.draw_string (actual_sub str 0 (522 - x));
-         Graphics.moveto 18 (y - 13);
-         Graphics.draw_string (actual_sub str (522 - x) (String.length str - 1)))
-
 
 
 (* This is a helper function that draws a line from [(pos1_x, pos1_y)] to 
