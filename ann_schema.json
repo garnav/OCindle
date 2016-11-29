@@ -1,0 +1,35 @@
+{
+	"type" : "object",
+	"properties" : {
+		"0" : {
+			"type" : "object",
+			"properties" : {
+			    "1" : {
+				    "type" : "object",
+				    "properties" : {
+			            "highlight" : {
+				            "type" : "object",
+				            "properties" : {
+					            "end" : { "type" : "integer" },
+					            "colour" : { "type" : "string" }	
+				            }
+			            },
+			            "notes" : {
+				            "type" : "object",
+				            "properties" : {
+					            "end" : { "type" : "integer" },
+					            "colour" : { "type" : "string" }
+				            }
+			            },
+			            "bookmarks" : {
+				            "type" : "object",
+				            "properties" : {
+				                "colour" : { "type" : "string" }
+				            }
+			            }
+		            }
+			    }
+	        }
+	    }
+    }
+}

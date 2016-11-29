@@ -14,11 +14,11 @@ module Marginalia = struct
   type page = int * int
   		
   type t = {
-    id : int;
-	page : page;
-	highlights : highlights_list;
-	notes : notes_list;
-	bookmark : bool; (*what if there are two bookmarks of contrasting colours*)
+    id : int ;
+	page : page ;
+	highlights : highlights_list ;
+	notes : notes_list ;
+	bookmark : bool ; (*what if there are two bookmarks of contrasting colours*)
 	mutable file_json : Yojson.Basic.json
   }
   
@@ -152,6 +152,8 @@ module Marginalia = struct
   let is_bookmarked t1 = t1.bookmark
 
   let add_bookmark t1 c1 =
+    (*can only add a bookmark, if its not already bookmarked. Prevents duplicates
+	being added on the page. *)
     failwith "Unimplemented"
   
   let remove_bookmark t1 =
@@ -179,11 +181,7 @@ module Marginalia = struct
 	let ending = e / 2000 in
 	let base_next = (base + 1) * 2000 in
 	if base = ending then save_to_file assoc_copy id (base * 2000, base_next)
-	else (save_to_file assoc_copy t1.id (base * 2000, base_next) ; save_all assoc_copy id (base_next, e))
-	
-  let notes_list t1 = t1.notes
-  
-  let highlights_list t1 = t1.highlights
+	else (save_to_file assoc_copy id (base * 2000, base_next) ; save_all assoc_copy id (base_next, e))
   
   let save_page t1 =
     match t1.file_json with
@@ -191,6 +189,10 @@ module Marginalia = struct
 	| `Assoc x -> let copy = fold_left (fun acc x -> x::acc) [] (t1.file_json |> to_assoc) in
 	              let sorted = List.sort (fun (i, _) (k, _) -> Pervasives.compare i k) copy in
 				  save_all sorted t1.id t1.page
+				  
+  let notes_list t1 = t1.notes
+  
+  let highlights_list t1 = t1.highlights
 				  
 end
 (*

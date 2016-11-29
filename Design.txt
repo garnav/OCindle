@@ -1,0 +1,93 @@
+DESIGN CHOICES
+JSON Design Options
+(i) Page-wise annotations : Each page represents a json
+object and among it's properties are an array each for
+the bookmarks, notes and highlights the 'page' it contains.
+(ii) Type-wise annotations : An array each for the
+book's bookmarks, notes and highlights.
+(iii) Broad Index Grouping : Similar to option (ii) but
+splits up the book into ~1000 index sections and notes,
+highlights and bookmarks starting at an index within a
+range is referenced in this part of the JSON structure
+
+Use broad general pages (just like 1000 ranges) but those based
+on smaller ranges instead.
+
+------------------------------------------------------------
+
+(ii) is an efficient form of storing information. There is no
+need, especially since notes and highlights are limitless, to
+store all the annotations at a single point. The only
+forseable advantage in going with this option, or with (iii)
+is that 'pages' are very loosely defined in ereaders because
+the content of any given page is altered when font size or
+famiy is changed. Thus, these would mean the the program would
+only have to rely on a single key to search for all the information
+it needs. If one were to create a JSON structure based on
+index ranges that conformed to standard page sizes, then
+change index ranges that represent a page would defeat
+the purpose of having a form of organized storage.
+
+------------------------------------------------------------
+CATALOGUE
+
+- Upon closing page, that parrt is rewritten because that's just easier
+than inserting things individually into the JSON structure. old pages are untouched.
+Also better than contacting the page everytime.
+- JSON reading: File reading causes the entire json structure to be picked up, do we want
+to split it up? (use different files)
+- JSON design
+- What happens if page doesn't contain the entire highlight
+- Double bookmark characters
+- Store everything less than but not equal to the number
+in that file, that number is stored in the next file. (fst range) / 2000
+files should be of the form bookid_base.json
+
+RECORD
+	(*Design choices: why are these made before they are actually needed,
+	because it's intended use is for actually making sure all of this stuff
+	is shown on a page, so it makes to have it there and pre-processed.
+	Also when new notes and highlights are created, then we just want to
+	add it to the existing lists instead of adding it to the JSon structure
+	and having to create the list all over again.*)
+ 
+(*TWO Options:
+- everytime something is added, add it to the JSON file
+OR once a new page is asked for, just rewrite everything all together.
+*)	
+	
+
+
+CHECK
+- Don't annotations to start on the same index
+- If any annotation doesn't fulful a given range (goes beyond a page)
+then still display it if starts there and add a tag that it does beyond
+(maybe allow you to see the entire thing?)
+
+
+FURTHER DESIGN CHOICES
+- JSON Schema:
+  Two options:
+  (i) Group annotations on one 'page' in a key
+  (ii) Group diff. types of annotations together
+		
+  (i) is difficult for the reason that pages will not remain constant because
+  text size cand font will change the characters displayed on a page.
+  (ii) Inefficient to search through. Having a large block of annotations would
+  be inefficient to search through, insert into.
+  Compromise: Have preset ranges, suggested to be about ~1000 chars and have any
+  annotation that starts there within it (doesn't matter where it ends because
+  we'll display it there and have a not saying that they have an annotation going
+  to the next page)
+  
+  
+  
+
+
+  If (ii) were chosen efficiency is terrible because you'll have to go through the entire list.
+  Because the list is mostly ordered coming in, in this scenario insertion
+  sort is the fasted (for a nearly ordered list)
+  
+
+When a file is loaded, place everything in a buffer
+so that it can easily be added?
