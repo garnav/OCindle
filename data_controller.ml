@@ -1,6 +1,7 @@
 module DataController = struct
 
-  exception Annotation_Error of string
+  exception Annotation_Error
+  exception No_Annotation
 
   (*Window Constants*)
   let char_height = 13
@@ -9,74 +10,48 @@ module DataController = struct
   let right_edge = 516 (*left edge of final char in any line*)
   let top_edge = 611   (*bottom of chars in the top line*)
   let bot_edge = 26    (*bottom of chars in the last line*)
-  let chars_line = 84  (*max. number of chars in one line*)
+  let chars_line = 83  (*max divisions in a line. chars are chars_line + 1*)
 
-(*Main Functions*)
+  (*Main Functions*)
 
-(* [t] is a record containing important information about the book *)
-type t = {
-          id : int ;
-          book_text : string ;
-          page_start : int ;
-          page_end : int ;
-          page_content : string ;
-          page_annotations : Marginalia.t
-         }
+  type possible_ann = None | Some of Marginalia.t
 
-(* This is a helper function to find the substring of [str] from index position
-[s] to index position [e] *)
-let actual_sub str s e = String.sub str s (e - s + 1)
+  (* [t] is a record containing important information about the book *)
+  type t = {
+            id : int ;
+            book_text : string ;
+            page_start : int ;
+            page_end : int ;
+            page_content : string ;
+            page_annotations : possible_ann
+           }
 
-let within_y_range y = (y / char_height) * char_height
+  let debox_ann ann =
+    match ann with
+    | Some x -> x
+    | None   -> No_Annotation
 
-let within_x_range x = (x / char_width) * char_width
+  let add_highlights beg ending colour t1 =
+    let absolute_start = t1.page_start + beg in
+    let absolute_end = t1.page_start + ending in
+    try
+      let new_ann = Marginalia.add_highlight
+                    absolute_start absolute_end colour (debox_ann t1.page_annotations) in
+      {t1 with page_annotations = new_ann}
+    with
+      | Marginalia.Already_Exists -> raise Annotation_Error
 
-(* This is a helper function that prints [str] on the Graphics window starting
-from [(x,y)]. *)
-let rec custom_print str x y =
-    let print_chars = chars_line + 1 in
-    if (String.length str > print_chars)
-    then
-        (Graphics.moveto x y;
-        Graphics.draw_string (String.sub str 0 print_chars);
-        custom_print (String.sub str print_chars
-                     (String.length str - print_chars))
-                     18 (y - char_height))
-    else
-        (Graphics.moveto x y;
-        Graphics.draw_string str)
+  let delete_highlights beg t1 =
+    let absolute_start = t1.page_start + beg in
+    try
+      let new_ann = Marginalia.delete_highlight
+                    absolute_start (debox_ann t1.page_annotations) in
+      {t1 with page_annotations = new_ann}
+    with
+      | Not_found -> raise Annotation_Error
 
-(* This is a helper function that draws a line from [(pos1_x, pos1_y)] to
-[(pos2_x, pos2_y)] on the Graphics window. Used in [add_highlights] and
-[delete_highlights] *)
-let rec custom_highlight x1 y1 x2 y2 =
-  if (y2 < y1)
-    then (Graphics.moveto x1 y1 ;
-         Graphics.lineto right_edge y1 ;
-         custom_highlight left_edge (y1 - char_height) x2 y2)
-  else
-    (Graphics.moveto x1 y1 ;
-    Graphics.lineto x2 y1)
 
-let open_file name =
-
-    (* Number of characters: 3735 *)
-    (* Window resolution: 540 x 650 *)
-    (* RAISE AND DEFINE exception *)
-
-    Graphics.open_graph " 540x650";
-    Graphics.set_window_title "OCindle";
-
-    (* The user is presented with a list of bookshelves, each containing a list of books. *)
-    (* Display list of bookshelves; choose bookshelf; display list of books;
-    choose book; display first/last saved page of book *)
-
-    (* initialize values *)
-    let book_details = {book_name = name; book_text = []; book_id = [];
-                        ind_pos = []; curr_page_cont = actual_sub [] ind_pos (ind_pos + 3735)} in
-
-    (* actually display page *)
-    Graphics.draw_string t.curr_page_cont;
+(*
 
 let close_file t =
     (* save data before erasing *)
@@ -167,29 +142,9 @@ let delete_bookmark t =
     Graphics.fill_circle 510 636 10;
     Graphics.set_color black;
 
-let add_highlights beg ending colour t1 =
-    let absolute_start = t1.page_start + beg in
-    print_int absolute_start ;
-    let absolute_end = t1.page_start + ending in
-    try
-      let new_ann = Marginalia.add_highlight
-                               absolute_start absolute_end colour (t1.page_annotations) in
-      {t1 with page_annotations = new_ann}
+    (* This is a helper function to find the substring of [str] from index position
+[s] to index position [e] *)
+let actual_sub str s e = String.sub str s (e - s + 1)
 
-    with
-      | Marginalia.Already_Exists -> raise Annotation_Error ("A highlight already exists here.")
-
-
-let delete_highlights t =
-    (* call function in perspective to delete highlights to the current page *)
-    let first_pos = Graphics.wait_next_event [Button_down] in
-    let second_pos = Graphics.wait_next_event [Button_down] in
-    let start_x = within_x_range first_pos.mouse_x in
-    let start_y = within_y_range first_pos.mouse_y in
-    let end_x = within_x_range second_pos.mouse_x in
-    let end_y = within_y_range second_pos.mouse_y in
-    Graphics.set_color white;
-    custom_highlight start_x start_y end_x end_y;
-
-
+*)
 end
