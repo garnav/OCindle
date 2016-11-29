@@ -50,6 +50,15 @@ module DataController = struct
     with
       | Not_found -> raise Annotation_Error
 
+  let add_notes beg note colour t1 =
+    let absolute_start = t1.page_start + beg in
+    try
+      let new_ann = Marginalia.add_note note
+                    absolute_start colour (debox_ann t1.page_annotations) in
+      {t1 with page_annotations = new_ann}
+    with
+      | Marginalia.Already_Exists -> raise Annotation_Error
+
 
 (*
 
