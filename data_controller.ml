@@ -26,7 +26,7 @@ let rec custom_print str x y =
 [(pos2_x, pos2_y)] on the Graphics window. Used in [add_highlights] and 
 [delete_highlights] *)
 let rec custom_highlight t pos1_x pos1_y pos2_x pos2_y =
-    if (!pos1_x < !pos2_x)
+    if (!pos1_y < !pos2_y)
     then
         (* move to start position *)
         (Graphics.moveto !pos1_x !pos1_y;
@@ -35,7 +35,7 @@ let rec custom_highlight t pos1_x pos1_y pos2_x pos2_y =
         pos1_x := 18;
         pos1_y := !pos1_y - 13;
         custom_highlight t pos1_x pos1_y pos2_x pos2_y;)    
-    else if (!pos1_x = !pos2_x && !pos1_y < !pos2_y)
+    else if (!pos1_y = !pos2_y && !pos1_x < !pos2_x)
     then 
         (Graphics.moveto !pos1_x !pos1_y;
         Graphics.lineto !pos2_x !pos2_y;)
@@ -129,7 +129,7 @@ let add_notes t =
     (* call helper function in perspective to add these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in 
     let start_x = first_pos.mouse_x in 
-    let start_y = first_pos.mouse_y - 7 in 
+    let start_y = first_pos.mouse_y - 5 in 
     (* change color if needbe *)
     Graphics.fill_circle start_x start_y 2; 
 
@@ -137,7 +137,7 @@ let delete_notes t =
     (* call helper function in perspective to delete these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in 
     let start_x = first_pos.mouse_x in 
-    let start_y = first_pos.mouse_y - 7 in 
+    let start_y = first_pos.mouse_y - 5 in 
     Graphics.set_color white;
     Graphics.fill_circle start_x start_y 2; 
 
