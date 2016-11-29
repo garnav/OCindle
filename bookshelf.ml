@@ -107,12 +107,6 @@ module Bookshelf = struct
   let close_book book_id cur_pos =
     failwith "Deprecated"
   
-  (* [save_book_position bid position] Closes the book with book id [bid]  *)
-  (* and saves current reading position at [position]. Returns true if     *)
-  (* save was successful                                                   *)
-  let save_book_position bid cur_pos =
-    failwith "Unimplemented "
-  
   (* Returns the number of books in the given bookshelf *)
   let get_num_books bookshelf_id =
     let books = list_books bookshelf_id in
@@ -129,5 +123,18 @@ module Bookshelf = struct
     let total_chars = (to_int (member "total_chars" j)) in
     { title = title; author = author; current_position = current_position;
       total_chars = total_chars; id = book_id }
+      
+  (* [save_book_position bid position] Closes the book with book id [bid]  *)
+  (* and saves current reading position at [position]. Returns true if     *)
+  (* save was successful                                                   *)
+  let save_book_position bookshelf_id book_id cur_pos =
+    let d = get_book_data bookshelf_id book_id in
+    (* let book_data = {book_data with current_position = cur_pos} in *)
+    let json = `Assoc [ ("title", `String d.title); ("author", `String d.author);
+      ("current_position", `Int cur_pos); ("total_chars", `Int d.total_chars);
+      ("id", `Int d.id) ] in
+    Yojson.Basic.to_file ((Sys.getcwd ()) ^ Filename.dir_sep ^ 
+      (string_of_int bookshelf_id) ^ Filename.dir_sep ^
+      ((string_of_int book_id) ^ ".json")) json
   
 end
