@@ -1,51 +1,64 @@
 module DataController = struct
 
-(* [t] is a record containing important information about the book *)
-type t = 
-    {book_name: string; book_text : string; book_id : int; mutable ind_pos : int; 
-    curr_page_cont : string}
+  exception Annotation_Error of string
 
-(* This is a helper function to find the substring of [str] from index position 
+  (*Window Constants*)
+  let char_height = 13
+  let char_width = 6
+  let left_edge = 18   (*left edge of first char in any line*)
+  let right_edge = 516 (*left edge of final char in any line*)
+  let top_edge = 611   (*bottom of chars in the top line*)
+  let bot_edge = 26    (*bottom of chars in the last line*)
+  let chars_line = 84  (*max. number of chars in one line*)
+
+(*Main Functions*)
+
+(* [t] is a record containing important information about the book *)
+type t = {
+          id : int ;
+          book_text : string ;
+          page_start : int ;
+          page_end : int ;
+          page_content : string ;
+          page_annotations : Marginalia.t
+         }
+
+(* This is a helper function to find the substring of [str] from index position
 [s] to index position [e] *)
-let actual_sub str s e =
-String.sub str s (e - s + 1)
+let actual_sub str s e = String.sub str s (e - s + 1)
+
+let within_y_range y = (y / char_height) * char_height
+
+let within_x_range x = (x / char_width) * char_width
 
 (* This is a helper function that prints [str] on the Graphics window starting
 from [(x,y)]. *)
 let rec custom_print str x y =
-    if (String.length str > 83) 
+    let print_chars = chars_line + 1 in
+    if (String.length str > print_chars)
     then
         (Graphics.moveto x y;
-        Graphics.draw_string (actual_sub str 0 83);
-        custom_print (actual_sub str 83 (String.length str - 1)) 18 (y - 13))
+        Graphics.draw_string (String.sub str 0 print_chars);
+        custom_print (String.sub str print_chars
+                     (String.length str - print_chars))
+                     18 (y - char_height))
     else
         (Graphics.moveto x y;
         Graphics.draw_string str)
 
-(* This is a helper function that draws a line from [(pos1_x, pos1_y)] to 
-[(pos2_x, pos2_y)] on the Graphics window. Used in [add_highlights] and 
+(* This is a helper function that draws a line from [(pos1_x, pos1_y)] to
+[(pos2_x, pos2_y)] on the Graphics window. Used in [add_highlights] and
 [delete_highlights] *)
-let rec custom_highlight t pos1_x pos1_y pos2_x pos2_y =
-    if (!pos1_y < !pos2_y)
-    then
-        (* move to start position *)
-        (Graphics.moveto !pos1_x !pos1_y;
-        (* draw straight line on first line of text *)
-        Graphics.lineto 522 !pos1_y;
-        pos1_x := 18;
-        pos1_y := !pos1_y - 13;
-        print_string "Hey!";
-        custom_highlight t pos1_x pos1_y pos2_x pos2_y;)    
-    else if (!pos1_y = !pos2_y && !pos1_x <= !pos2_x)
-    then 
-        (Graphics.moveto !pos1_x !pos1_y;
-        Graphics.lineto !pos2_x !pos2_y;)
-    else
-    ();
+let rec custom_highlight x1 y1 x2 y2 =
+  if (y2 < y1)
+    then (Graphics.moveto x1 y1 ;
+         Graphics.lineto right_edge y1 ;
+         custom_highlight left_edge (y1 - char_height) x2 y2)
+  else
+    (Graphics.moveto x1 y1 ;
+    Graphics.lineto x2 y1)
 
-    (* if before end of page or t is smaller, draw straight line *)
-
-let open_file name = 
+let open_file name =
 
     (* Number of characters: 3735 *)
     (* Window resolution: 540 x 650 *)
@@ -59,21 +72,21 @@ let open_file name =
     choose book; display first/last saved page of book *)
 
     (* initialize values *)
-    let book_details = {book_name = name; book_text = []; book_id = []; 
-                        ind_pos = []; curr_page_cont = actual_sub [] ind_pos (ind_pos + 3735)} in 
-    
+    let book_details = {book_name = name; book_text = []; book_id = [];
+                        ind_pos = []; curr_page_cont = actual_sub [] ind_pos (ind_pos + 3735)} in
+
     (* actually display page *)
     Graphics.draw_string t.curr_page_cont;
 
 let close_file t =
     (* save data before erasing *)
     Marginalia.save_page t;
-    
+
     (* actually erase text *)
     Graphics.close_graph ();
-    
+
 let find_meaning word =
-    let word_def = 
+    let word_def =
     (try
         get_definition word
      with
@@ -82,7 +95,7 @@ let find_meaning word =
     (* IMPLEMENT: change position to write definition; erase page and display
     word definition until clicked again *)
     Graphics.draw_string word_def;
-    
+
 let percent_read t =
     ((float_of_int t.ind_pos) /. (float_of_int (String.length t.book_text)))
     (* format string using printf *)
@@ -92,7 +105,7 @@ let next_page t =
 
     (* erase previous content *)
     Graphics.clear_graph ();
-    
+
     (* actually display page and update word counter *)
     try
         t.ind_pos := !t.ind_pos + 3735;
@@ -107,12 +120,12 @@ let next_page t =
         Marginalia.save_page t;
     with
     | _ -> failwith "Can't go to next page!"
-    
+
 let prev_page t =
     (* RAISE EXCEPTION *)
     (* erase previous content *)
     Graphics.clear_graph ();
-    
+
     (* actually display page and update word counter *)
     try
         t.ind_pos := !t.ind_pos - 3735;
@@ -125,56 +138,58 @@ let prev_page t =
         Marginalia.save_page t;
     with
     | _ -> failwith "Can't go to previous page!"
-    
-let add_notes t = 
+
+let add_notes t =
     (* call helper function in perspective to add these notes *)
-    let first_pos = Graphics.wait_next_event [Button_down] in 
-    let start_x = first_pos.mouse_x in 
-    let start_y = first_pos.mouse_y - 5 in 
+    let first_pos = Graphics.wait_next_event [Button_down] in
+    let start_x = first_pos.mouse_x in
+    let start_y = first_pos.mouse_y - 5 in
     (* change color if needbe *)
-    Graphics.fill_circle start_x start_y 2; 
+    Graphics.fill_circle start_x start_y 2;
 
-let delete_notes t = 
+let delete_notes t =
     (* call helper function in perspective to delete these notes *)
-    let first_pos = Graphics.wait_next_event [Button_down] in 
-    let start_x = first_pos.mouse_x in 
-    let start_y = first_pos.mouse_y - 5 in 
+    let first_pos = Graphics.wait_next_event [Button_down] in
+    let start_x = first_pos.mouse_x in
+    let start_y = first_pos.mouse_y - 5 in
     Graphics.set_color white;
-    Graphics.fill_circle start_x start_y 2; 
+    Graphics.fill_circle start_x start_y 2;
 
-let add_bookmark t = 
+let add_bookmark colour =
     (* call function in perspective to add a bookmark to the current page *)
-    Graphics.set_color blue;
+    Graphics.set_color colour;
     Graphics.fill_circle 510 636 10;
     Graphics.set_color black;
 
-let delete_bookmark t = 
+let delete_bookmark t =
     (* call function in perspective to delete a bookmark to the current page *)
     Graphics.set_color white;
     Graphics.fill_circle 510 636 10;
     Graphics.set_color black;
 
-let add_highlights t = 
-    (* call function in perspective to add highlights to the current page *)
-    let first_pos = Graphics.wait_next_event [Button_down] in 
-    let second_pos = Graphics.wait_next_event [Button_down] in 
-    let start_x = ref (first_pos.mouse_x) in 
-    let start_y = ref (first_pos.mouse_y) in 
-    let end_x = ref (second_pos.mouse_x) in 
-    let end_y = ref (second_pos.mouse_y) in
-    (* change color if needbe *)
-    custom_highlight t start_x start_y end_x end_y;
+let add_highlights beg ending colour t1 =
+    let absolute_start = t1.page_start + beg in
+    print_int absolute_start ;
+    let absolute_end = t1.page_start + ending in
+    try
+      let new_ann = Marginalia.add_highlight
+                               absolute_start absolute_end colour (t1.page_annotations) in
+      {t1 with page_annotations = new_ann}
 
-let delete_highlights t = 
+    with
+      | Marginalia.Already_Exists -> raise Annotation_Error ("A highlight already exists here.")
+
+
+let delete_highlights t =
     (* call function in perspective to delete highlights to the current page *)
-    let first_pos = Graphics.wait_next_event [Button_down] in 
-    let second_pos = Graphics.wait_next_event [Button_down] in 
-    let start_x = ref (first_pos.mouse_x) in 
-    let start_y = ref (first_pos.mouse_y) in 
-    let end_x = ref (second_pos.mouse_x) in 
-    let end_y = ref (second_pos.mouse_y) in
+    let first_pos = Graphics.wait_next_event [Button_down] in
+    let second_pos = Graphics.wait_next_event [Button_down] in
+    let start_x = within_x_range first_pos.mouse_x in
+    let start_y = within_y_range first_pos.mouse_y in
+    let end_x = within_x_range second_pos.mouse_x in
+    let end_y = within_y_range second_pos.mouse_y in
     Graphics.set_color white;
-    custom_highlight t start_x start_y end_x end_y;
+    custom_highlight start_x start_y end_x end_y;
 
 
 end
