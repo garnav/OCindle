@@ -20,15 +20,18 @@ module DataController = struct
   let debox_ann ann =
     match ann with
     | Some x -> x
-    | None   -> No_Annotation
+    | None   -> raise No_Annotation
 
   let add_highlights beg ending colour t1 =
     let absolute_start = t1.page_start + beg in
     let absolute_end = t1.page_start + ending in
     try
-      let new_ann = Marginalia.add_highlight
-                    absolute_start absolute_end colour (debox_ann t1.page_annotations) in
-      {t1 with page_annotations = new_ann}
+      if absolute_end < absolute_start then raise Annotation_Error
+      else
+        let new_ann = Marginalia.add_highlight
+                      absolute_start absolute_end colour
+                      (debox_ann t1.page_annotations) in
+        {t1 with page_annotations = Some new_ann}
     with
       | Marginalia.Already_Exists -> raise Annotation_Error
 
@@ -37,7 +40,7 @@ module DataController = struct
     try
       let new_ann = Marginalia.delete_highlight
                     absolute_start (debox_ann t1.page_annotations) in
-      {t1 with page_annotations = new_ann}
+      {t1 with page_annotations = Some new_ann}
     with
       | Not_found -> raise Annotation_Error
 
@@ -46,7 +49,7 @@ module DataController = struct
     try
       let new_ann = Marginalia.add_note note
                     absolute_start colour (debox_ann t1.page_annotations) in
-      {t1 with page_annotations = new_ann}
+      {t1 with page_annotations = Some new_ann}
     with
       | Marginalia.Already_Exists -> raise Annotation_Error
 
@@ -55,7 +58,7 @@ module DataController = struct
     try
       let new_ann = Marginalia.delete_note
                     absolute_start (debox_ann t1.page_annotations) in
-      {t1 with page_annotations = new_ann}
+      {t1 with page_annotations = Some new_ann}
     with
       | Not_found -> raise Annotation_Error
 
