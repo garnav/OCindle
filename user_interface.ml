@@ -16,7 +16,7 @@ module UserInterface = struct
   let bot_edge = 26    (* bottom of chars in the last line *)
   let chars_line = 83  (* max divisions in a line. chars are chars_line + 1 *)
   let max_char = 3780 (* maximum number of characters on a page *)
-  let window_size = " 540x650"
+  let window_size = " 540x650" (* width x height *)
   let window_title = "OCindle - no, it's not the Kindle"
 
   let within_y_range y = (y / char_height) * char_height
