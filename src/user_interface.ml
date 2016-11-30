@@ -38,7 +38,16 @@ module UserInterface = struct
     else if c = Graphics.green then GREEN
     else raise Invalid_Colour
 
-      (* Printing *)
+
+  let rec custom_highlight x1 y1 x2 y2 =
+    if y2 < y1
+    then ( Graphics.moveto x1 y1 ;
+           Graphics.lineto right_edge y1 ;
+           custom_highlight left_edge (y1 - char_height) x2 y2 )
+  else ( Graphics.moveto x1 y1 ; Graphics.lineto x2 y1 )
+
+
+  (* Printing *)
   let rec custom_print str x y =
     Graphics.set_color Graphics.black ;
     let print_chars = chars_line + 1 in
@@ -55,7 +64,7 @@ module UserInterface = struct
 
 
   (* Initialization *)
-  let open_file name =
+  let open_book name =
 
     (* RAISE AND DEFINE exception *)
 
@@ -72,12 +81,85 @@ module UserInterface = struct
     (* initialize values *)
 
 
-  let rec custom_highlight x1 y1 x2 y2 =
-  if y2 < y1
-    then ( Graphics.moveto x1 y1 ;
-           Graphics.lineto right_edge y1 ;
-           custom_highlight left_edge (y1 - char_height) x2 y2 )
-  else ( Graphics.moveto x1 y1 ; Graphics.lineto x2 y1 )
+  let close_book () =
+    failwith "Unimplemented"
+
+   let draw_page which color t =
+    try
+      (* match mouse click with polymorphic variants *)
+      let new_t = 
+      match which with 
+      | `Prev -> DataController.prev_page max_char t
+      | `Next -> DataController.next_page max_char t
+      | `Curr -> t in
+      Graphics.clear_graph ();
+      custom_print t.page_content left_edge top_edge; 
+      (* add bookmarks, highlights and notes already there *)
+    with
+      | Page_Undefined -> print_string "Can't draw page";
+
+
+  let draw_bookmark colour t1 =
+    try
+       let new_t = DataController.add_bookmark
+                   (relative_index start_x start_y)
+                   (relative_index end_x end_y)
+                   (color_to_colour colour) t1 in
+       Graphics.set_color colour;
+       Graphics.fill_circle 510 636 10;
+       Graphics.set_color black; (* original color *)
+       new_t
+    with
+      | Annotation_Error -> print_string "A bookmark already exists" ; 
+
+
+  let erase_bookmark t1 =
+    try
+       let new_t = DataController.delete_bookmark
+                   (relative_index start_x start_y) t1 in
+      Graphics.set_color white;
+      Graphics.fill_circle 510 636 10;
+      Graphics.set_color black; (* original color *)
+       new_t
+    with
+      | Annotation_Error -> print_string "A bookmark doesn't exist" ; t1
+
+
+  let draw_notes color t1 =
+    (* call helper function in perspective to add these notes *)
+    let first_pos = Graphics.wait_next_event [Button_down] in
+    (* try/with, prompt with nice message *)
+    let note_text = read_line ();
+    let start_x = within_range first_pos.mouse_x in
+    let start_y = within_range first_pos.mouse_y - 5 in
+    try
+      let new_t = DataController.add_notes
+                   (relative_index start_x start_y)
+                   note_text
+                   (color_to_colour colour) t1 in
+       Graphics.set_color colour;
+       Graphics.fill_circle start_x start_y 2;
+       new_t
+    with
+      | Annotation_Error -> print_string "A note already exists" ; t1
+
+
+  let erase_notes t1 =
+    (* call helper function in perspective to add these notes *)
+    let first_pos = Graphics.wait_next_event [Button_down] in
+    let start_x = within_range first_pos.mouse_x in
+    let start_y = within_range first_pos.mouse_y - 5 in
+    try
+      let new_t = DataController.delete_notes
+                   (relative_index start_x start_y)
+                   t1 in
+       Graphics.set_color colour;
+       Graphics.set_color white;
+       Graphics.fill_circle start_x start_y 2;
+       new_t
+    with
+      | Annotation_Error -> print_string "A note doesn't exist" ; t1
+
 
   let draw_highlights colour t1 =
     let first_pos = Graphics.wait_next_event [Button_down] in
@@ -100,6 +182,7 @@ module UserInterface = struct
   (*NOTE: Technically only needs the start index to begin. Uses, the second
   index to understand what line to draw too.*)
 
+
   let erase_highlights t =
     let first_pos = Graphics.wait_next_event [Button_down] in
     let s_x = within_x_range first_pos.mouse_x in
@@ -115,63 +198,6 @@ module UserInterface = struct
     with
       | Annotation_Error -> print_string "No highlight starts at this position." ; t
 
-  let draw_notes color t1 =
-    (* call helper function in perspective to add these notes *)
-    let first_pos = Graphics.wait_next_event [Button_down] in
-    (* try/with, prompt with nice message *)
-    let note_text = read_line ();
-    let start_x = within_range first_pos.mouse_x in
-    let start_y = within_range first_pos.mouse_y - 5 in
-    try
-      let new_t = DataController.add_notes
-                   (relative_index start_x start_y)
-                   note_text
-                   (color_to_colour colour) t1 in
-       Graphics.set_color colour;
-       Graphics.fill_circle start_x start_y 2;
-       new_t
-    with
-      | Annotation_Error -> print_string "A note already exists" ; t1
-
-  let erase_notes t1 =
-    (* call helper function in perspective to add these notes *)
-    let first_pos = Graphics.wait_next_event [Button_down] in
-    let start_x = within_range first_pos.mouse_x in
-    let start_y = within_range first_pos.mouse_y - 5 in
-    try
-      let new_t = DataController.delete_notes
-                   (relative_index start_x start_y)
-                   t1 in
-       Graphics.set_color colour;
-       Graphics.set_color white;
-       Graphics.fill_circle start_x start_y 2;
-       new_t
-    with
-      | Annotation_Error -> print_string "A note doesn't exist" ; t1
-
-  let draw_bookmark colour t1 =
-    try
-       let new_t = DataController.add_bookmark
-                   (relative_index start_x start_y)
-                   (relative_index end_x end_y)
-                   (color_to_colour colour) t1 in
-       Graphics.set_color colour;
-       Graphics.fill_circle 510 636 10;
-       Graphics.set_color black; (* original color *)
-       new_t
-    with
-      | Annotation_Error -> print_string "A bookmark already exists" ; 
-
-  let erase_bookmark t1 =
-    try
-       let new_t = DataController.delete_bookmark
-                   (relative_index start_x start_y) t1 in
-      Graphics.set_color white;
-      Graphics.fill_circle 510 636 10;
-      Graphics.set_color black; (* original color *)
-       new_t
-    with
-      | Annotation_Error -> print_string "A bookmark doesn't exist" ; t1
 
   let draw_meaning word t =
   try
@@ -218,18 +244,7 @@ module UserInterface = struct
     print_int (relative_index start_x start_y) ;
 
 
-  let draw_page which color t =
-  try
-      (* match mouse click with buttons *)
-      let new_t = 
-      match which with 
-      | `Prev -> DataController.prev_page max_char t
-      | `Next -> DataController.next_page max_char t
-      | `Curr -> t in
-      Graphics.clear_graph ();
-      custom_print t.page_content left_edge top_edge; 
-  with
-  | Page_Undefined -> print_string "Can't draw page";
+ 
 
 
 (*LIST OF POSSIBLE COMMANDS:
