@@ -1,9 +1,9 @@
 module DataController = struct
 
   exception Annotation_Error
+  exception Page_Undefined of string
   exception No_Annotation
-
-  (*Main Functions*)
+  exception Book_Error of string
 
   type possible_ann = None | Some of Marginalia.t
 
@@ -62,7 +62,76 @@ module DataController = struct
     with
       | Not_found -> raise Annotation_Error
 
+  let page_highlights t =
+    Marginalia.highlights_list (debox_ann (t.page_annotations))
 
+  let page_notes t =
+    Marginalia.notes_list (debox_ann (t.page_annotations))
+
+  let next_page max_char t =
+    (*Save all annotations on the current page*)
+    Marginalia.save_page (debox_ann t.page_annotations) ;
+    let book_length = String.length t.book_text in
+    (*Ensure that the current page is not the last page*)
+    let new_start = if t.page_end = (book_length - 1)
+                      then raise Page_Undefined ("End of Book")
+                    else t.page_end + 1 in
+    let potential_end = new_start + max_char - 1 in
+    (*Ensure that there is enough characters to print on this new page*)
+    let new_end = if potential_end + 1 <= book_length then potential_end
+                  else book_length - 1 in
+    let new_contents = String.sub new_start (new_end - new_start + 1) t.book_text in
+    let new_ann = Marginalia.get_page_overlay t.id (new_start, new_end) in
+    { t with page_start = new_start ;
+             page_end   = new_end ;
+             page_content = new_contents ;
+             page_annotations = Some new_ann }
+
+  let prev_page max_char t =
+    (*Save all annotations on the current page*)
+    Marginalia.save_page (debox_ann t.page_annotations) ;
+    let book_length = String.length t.book_text in
+    (*Ensure that the current page is not the first page*)
+    let new_end = if t.page_start = 0 then raise Page_Undefined ("Can't go back")
+                  else t.page_start - 1 in
+    let potential_start = new_end - max_char + 1 in
+    let new_start = if potential_start < 0 then 0
+                    else potential_start in
+    let new_contents = String.sub new_start (new_end - new_start + 1) t.book_text in
+    let new_ann = Marginalia.get_page_overlay t.id (new_start, new_end) in
+    { t with page_start = new_start ;
+             page_end   = new_end ;
+             page_content = new_contents ;
+             page_annotations = Some new_ann }
+
+  let initbook max_char shelf_id book_id =
+    let book = Bookshelf.get_book_text shelf_id book_id in
+    let book_length = String.length book in
+    (*Final index relative to the book depends on the length of the book*)
+    let page_end = if book_length = 0 then Book_Error "Empty Book"
+                   else if book_length < max_char then book_length - 1
+                   else max_char - 1 in
+    let new_content = String.sub 0 (page_end + 1) book in
+    let new_ann = Marginalia.get_page_overlay book_id (0, page_end) in
+    { id = book_id ;
+      book_text = book ;
+      page_start = 0 ;
+      page_end = page_end ;
+      page_content = new_content ;
+      page_annotations = Some new_ann }
+
+  let close_book t =
+    Marginalia.save_page (debox_ann t.page_annotations) ;
+    (*Bookshelf close book gives the final position read but doesn't return
+    it in anyway later*)
+
+
+(*
+add bookmarks
+delete bookmarks
+return current page string
+m
+*)
 (*
 
 let close_file t =
@@ -86,61 +155,6 @@ let find_meaning word =
 let percent_read t =
     ((float_of_int t.ind_pos) /. (float_of_int (String.length t.book_text)))
     (* format string using printf *)
-
-let next_page t =
-    (* RAISE EXCEPTION *)
-
-    (* erase previous content *)
-    Graphics.clear_graph ();
-
-    (* actually display page and update word counter *)
-    try
-        t.ind_pos := !t.ind_pos + 3735;
-        t.curr_page_cont <- actual_sub t.book_text !t.ind_pos (ind_pos + 3735);
-
-        (* position cursor *)
-        Graphics.moveto 18 611;
-
-        (* recursive function to draw string *)
-        custom_print t.book_text 18 611;
-
-        Marginalia.save_page t;
-    with
-    | _ -> failwith "Can't go to next page!"
-
-let prev_page t =
-    (* RAISE EXCEPTION *)
-    (* erase previous content *)
-    Graphics.clear_graph ();
-
-    (* actually display page and update word counter *)
-    try
-        t.ind_pos := !t.ind_pos - 3735;
-        t.curr_page_cont := actual_sub t.book_text !t.ind_pos (!t.ind_pos + 3735);
-        Graphics.moveto 18 611;
-
-        (* recursive function to draw string *)
-        custom_print t.book_text 18 611;
-
-        Marginalia.save_page t;
-    with
-    | _ -> failwith "Can't go to previous page!"
-
-let add_notes t =
-    (* call helper function in perspective to add these notes *)
-    let first_pos = Graphics.wait_next_event [Button_down] in
-    let start_x = first_pos.mouse_x in
-    let start_y = first_pos.mouse_y - 5 in
-    (* change color if needbe *)
-    Graphics.fill_circle start_x start_y 2;
-
-let delete_notes t =
-    (* call helper function in perspective to delete these notes *)
-    let first_pos = Graphics.wait_next_event [Button_down] in
-    let start_x = first_pos.mouse_x in
-    let start_y = first_pos.mouse_y - 5 in
-    Graphics.set_color white;
-    Graphics.fill_circle start_x start_y 2;
 
 let add_bookmark colour =
     (* call function in perspective to add a bookmark to the current page *)
