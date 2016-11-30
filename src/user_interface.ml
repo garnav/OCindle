@@ -243,10 +243,6 @@ module UserInterface = struct
     let start_y = within_y_range first_pos.mouse_y in
     print_int (relative_index start_x start_y) ;
 
-
- 
-
-
 (*LIST OF POSSIBLE COMMANDS:
 (DOES IT DEPEND ON STATE THOUGH)
 'w' : next page in a book
@@ -259,9 +255,7 @@ module UserInterface = struct
       FOLLOWED BY - 'b' : book mark
                     'h' : highlight
                     'n' : note
-'b' : go to list of bookshelfs
-
-
+'b' : go to list of bookshelves
 *)
 
 (*
@@ -269,11 +263,10 @@ module UserInterface = struct
   match command with
   |   ->
   |   ->
-  |   ->*)
+  |   -> *)
 
 (* trigger input *)
 
-(**)
 
 end
 
