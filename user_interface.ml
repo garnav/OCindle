@@ -7,7 +7,7 @@ module UserInterface = struct
 
   type t = DataController.t
 
-  (*Window Constants*)
+  (* Window Constants *)
   let char_height = 13
   let char_width = 6
   let left_edge = 18   (* left edge of first char in any line *)
@@ -15,6 +15,7 @@ module UserInterface = struct
   let top_edge = 611   (* bottom of chars in the top line *)
   let bot_edge = 26    (* bottom of chars in the last line *)
   let chars_line = 83  (* max divisions in a line. chars are chars_line + 1 *)
+  let max_char = 3780 (* maximum number of characters on a page *)
   let window_size = " 540x650"
   let window_title = "OCindle - no, it's not the Kindle"
 
@@ -27,7 +28,7 @@ module UserInterface = struct
     let within_line = (x - left_edge) / char_width in
     (line_number * chars_line) + within_line + line_number
 
-  (* Graphics Colours to Colours Module *)
+  (* Graphics Colours to Colours module *)
   let color_to_colour c =
     if c = Graphics.black then BLACK
     else if c = Graphics.red then RED
@@ -54,29 +55,24 @@ module UserInterface = struct
 
 
   (* Initialization *)
-    (**)
   let open_file name =
 
-    (* Number of characters: 3735 *)
-    (* Window resolution: 540 x 650 *)
     (* RAISE AND DEFINE exception *)
 
     Graphics.open_graph window_size;
     Graphics.set_window_title window_title;
+
+    let page_contents = [get_book_data name] in 
+    ;
 
     (* The user is presented with a list of bookshelves, each containing a list of books. *)
     (* Display list of bookshelves; choose bookshelf; display list of books;
     choose book; display first/last saved page of book *)
 
     (* initialize values *)
-    (*let book_details = {book_name = name; book_text = []; book_id = [];
-                        ind_pos = []; curr_page_cont = actual_sub [] ind_pos (ind_pos + 3735)} in
 
-    (* actually display page *)
-    Graphics.draw_string t.curr_page_cont; *)
 
-  (* Highlight Manipulation *)
-let rec custom_highlight x1 y1 x2 y2 =
+  let rec custom_highlight x1 y1 x2 y2 =
   if y2 < y1
     then ( Graphics.moveto x1 y1 ;
            Graphics.lineto right_edge y1 ;
@@ -177,12 +173,41 @@ let rec custom_highlight x1 y1 x2 y2 =
     with
       | Annotation_Error -> print_string "A bookmark doesn't exist" ; t1
 
-  let draw_meaning word =
-    DataController.find_meaning word
+  let draw_meaning word t =
+  try
+    (* Highlight word *)
+    let first_pos = Graphics.wait_next_event [Button_down] in
+    let second_pos = Graphics.wait_next_event [Button_down] in
+    let start_x = within_x_range first_pos.mouse_x in
+    let start_y = within_y_range first_pos.mouse_y in
+    let end_x = within_x_range second_pos.mouse_x in
+    let end_y = within_y_range second_pos.mouse_y in
+    Graphics.set_color colour;
+    custom_highlight start_x start_y end_x end_y;
 
-    (* IMPLEMENT: change position to write definition; erase page and display
-    word definition until clicked again *)
-    Graphics.draw_string word_def;
+    (* Convert to English word *)
+    let start_pos = relative_index start_x start_y in 
+    let end_pos = relative_index end_x end_y in 
+    let extr_str = String.sub t.page_content start_pos (end_pos - start_pos + 1) in
+    (* Don't know whether this is a single word or not *)
+
+    (* Find word meaning *)
+    let word_meaning = DataController.find_meaning extr_str in
+
+    (* Clear page and print definition if it exists *)
+    Graphics.clear_graph ();
+    custom_print ("Definition: " ^ extr_str) left_edge top_edge;
+
+    (* return previous page on key press *)
+    if (Graphics.key_pressed () = true) 
+    (* Unsure how this works *)
+    then custom_print t.page_content left_edge top_edge;
+  else ();
+
+  with
+  | Word_Not_Found -> print_string "You didn't choose a single word " ^
+                      "or no meaning of the word exists"
+    
 
   (* Testing Purposes *)
   let check a =
@@ -193,14 +218,18 @@ let rec custom_highlight x1 y1 x2 y2 =
     print_int (relative_index start_x start_y) ;
 
 
-  let draw_prev_page color t =
-    Graphics.clear_graph ();
-    let page_contents = prev_page t in 
-    custom_print page_contents left_edge top_edge;
-    let t2 = add_highlights color t in
-    let t3 = add_notes color t2 in
-    add_bookmark color t3
-
+  let draw_page which color t =
+  try
+      (* match mouse click with buttons *)
+      let new_t = 
+      match which with 
+      | `Prev -> DataController.prev_page max_char t
+      | `Next -> DataController.next_page max_char t
+      | `Curr -> t in
+      Graphics.clear_graph ();
+      custom_print t.page_content left_edge top_edge; 
+  with
+  | Page_Undefined -> print_string "Can't draw page";
 
 
 (*LIST OF POSSIBLE COMMANDS:
