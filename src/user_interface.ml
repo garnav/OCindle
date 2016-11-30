@@ -76,14 +76,14 @@ module UserInterface = struct
     Graphics.draw_string t.curr_page_cont; *)
 
   (* Highlight Manipulation *)
-  let rec custom_highlight x1 y1 x2 y2 =
+let rec custom_highlight x1 y1 x2 y2 =
   if y2 < y1
     then ( Graphics.moveto x1 y1 ;
            Graphics.lineto right_edge y1 ;
            custom_highlight left_edge (y1 - char_height) x2 y2 )
   else ( Graphics.moveto x1 y1 ; Graphics.lineto x2 y1 )
 
-let draw_highlights colour t1 =
+  let draw_highlights colour t1 =
     let first_pos = Graphics.wait_next_event [Button_down] in
     let second_pos = Graphics.wait_next_event [Button_down] in
     let start_x = within_x_range first_pos.mouse_x in
@@ -104,7 +104,7 @@ let draw_highlights colour t1 =
   (*NOTE: Technically only needs the start index to begin. Uses, the second
   index to understand what line to draw too.*)
 
-let erase_highlights t =
+  let erase_highlights t =
     let first_pos = Graphics.wait_next_event [Button_down] in
     let s_x = within_x_range first_pos.mouse_x in
     let s_y = within_y_range first_pos.mouse_y in
@@ -119,7 +119,7 @@ let erase_highlights t =
     with
       | Annotation_Error -> print_string "No highlight starts at this position." ; t
 
-let draw_notes color t =
+  let draw_notes color t1 =
     (* call helper function in perspective to add these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in
     (* try/with, prompt with nice message *)
@@ -137,7 +137,7 @@ let draw_notes color t =
     with
       | Annotation_Error -> print_string "A note already exists" ; t1
 
-let erase_notes t =
+  let erase_notes t1 =
     (* call helper function in perspective to add these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in
     let start_x = within_range first_pos.mouse_x in
@@ -153,7 +153,7 @@ let erase_notes t =
     with
       | Annotation_Error -> print_string "A note doesn't exist" ; t1
 
-let draw_bookmark colour t1 =
+  let draw_bookmark colour t1 =
     try
        let new_t = DataController.add_bookmark
                    (relative_index start_x start_y)
@@ -177,13 +177,31 @@ let draw_bookmark colour t1 =
     with
       | Annotation_Error -> print_string "A bookmark doesn't exist" ; t1
 
-  (*Testing Purposes*)
+  let draw_meaning word =
+    DataController.find_meaning word
+
+    (* IMPLEMENT: change position to write definition; erase page and display
+    word definition until clicked again *)
+    Graphics.draw_string word_def;
+
+  (* Testing Purposes *)
   let check a =
     (* call function in perspective to add highlights to the current page *)
     let first_pos = Graphics.wait_next_event [Button_down] in
     let start_x = within_x_range first_pos.mouse_x in
     let start_y = within_y_range first_pos.mouse_y in
     print_int (relative_index start_x start_y) ;
+
+
+  let draw_prev_page color t =
+    Graphics.clear_graph ();
+    let page_contents = prev_page t in 
+    custom_print page_contents left_edge top_edge;
+    let t2 = add_highlights color t in
+    let t3 = add_notes color t2 in
+    add_bookmark color t3
+
+
 
 (*LIST OF POSSIBLE COMMANDS:
 (DOES IT DEPEND ON STATE THOUGH)
