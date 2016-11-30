@@ -77,11 +77,11 @@ module UserInterface = struct
 
   (* Highlight Manipulation *)
 let rec custom_highlight x1 y1 x2 y2 =
-  if y2 < y1
+  if (y2 < y1)
     then ( Graphics.moveto x1 y1 ;
            Graphics.lineto right_edge y1 ;
-           custom_highlight left_edge (y1 - char_height) x2 y2 )
-  else ( Graphics.moveto x1 y1 ; Graphics.lineto x2 y1 )
+           custom_highlight left_edge (y1 - char_height) x2 y2;)
+  else ( Graphics.moveto x1 y1 ; Graphics.lineto x2 y1;)
 
   let draw_highlights colour t1 =
     let first_pos = Graphics.wait_next_event [Button_down] in
@@ -119,29 +119,30 @@ let rec custom_highlight x1 y1 x2 y2 =
     with
       | Annotation_Error -> print_string "No highlight starts at this position." ; t
 
-  let draw_notes color t1 =
+  let draw_notes colour t1 =
     (* call helper function in perspective to add these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in
     (* try/with, prompt with nice message *)
-    let note_text = read_line ();
-    let start_x = within_range first_pos.mouse_x in
-    let start_y = within_range first_pos.mouse_y - 5 in
+    print_string "Write your note: " ;
+    let note_text = read_line () in
+    let start_x = within_x_range first_pos.mouse_x in
+    let start_y = within_y_range (first_pos.mouse_y - 5) in
     try
-      let new_t = DataController.add_notes
+      (let new_t = DataController.add_notes
                    (relative_index start_x start_y)
                    note_text
                    (color_to_colour colour) t1 in
        Graphics.set_color colour;
        Graphics.fill_circle start_x start_y 2;
-       new_t
+       new_t)
     with
       | Annotation_Error -> print_string "A note already exists" ; t1
 
   let erase_notes t1 =
     (* call helper function in perspective to add these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in
-    let start_x = within_range first_pos.mouse_x in
-    let start_y = within_range first_pos.mouse_y - 5 in
+    let start_x = within_x_range first_pos.mouse_x in
+    let start_y = within_y_range (first_pos.mouse_y - 5) in
     try
       let new_t = DataController.delete_notes
                    (relative_index start_x start_y)
@@ -164,7 +165,7 @@ let rec custom_highlight x1 y1 x2 y2 =
        Graphics.set_color black; (* original color *)
        new_t
     with
-      | Annotation_Error -> print_string "A bookmark already exists" ; 
+      | Annotation_Error -> print_string "A bookmark already exists" ;
 
   let erase_bookmark t1 =
     try
@@ -195,7 +196,7 @@ let rec custom_highlight x1 y1 x2 y2 =
 
   let draw_prev_page color t =
     Graphics.clear_graph ();
-    let page_contents = prev_page t in 
+    let page_contents = prev_page t in
     custom_print page_contents left_edge top_edge;
     let t2 = add_highlights color t in
     let t3 = add_notes color t2 in
