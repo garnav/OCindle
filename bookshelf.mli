@@ -2,7 +2,7 @@
 module Bookshelf = sig
   
   (* The unique identifier for a bookshelf *)
-  type bookshelf_id
+  type bookshelf_id = string
   
   (* The unique identifier for a book *)
   type book_id
@@ -11,10 +11,9 @@ module Bookshelf = sig
   type book_text
   
   (* The data contained by an individual book *)
-  type book_data = {id : book_id; title : string; author : string; 
-      current_position : int; total_chars : int}
-      
-  val list_bookshelfs : bookshelf_id list
+  type book_data
+  
+  val list_bookshelves : bookshelf_id list
   
   (* Lists the books currently on the bookshelf with the given ID *)
   val list_books : bookshelf_id -> book_data list
@@ -35,5 +34,12 @@ module Bookshelf = sig
   
   (* Returns the data for a given book *)
   val get_book_data : bookshelf_id -> book_id -> book_data
+  
+  (* Getters for book_data information *)
+  val get_book_id : book_data -> book_id
+  val get_title : book_data -> string
+  val get_author : book_data -> string
+  val get_current_position : book_id -> int
+  val get_total_chars : book_id -> int
   
 end

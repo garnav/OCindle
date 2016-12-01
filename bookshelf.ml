@@ -44,9 +44,13 @@ module Bookshelf = struct
           h:: (get_bookshelf_ids t)
         else get_bookshelf_ids t
   
-  let list_bookshelfs =
+  let list_bookshelves =
     let all_files = Sys.readdir (Sys.getcwd ()) in
     get_bookshelf_ids (Array.to_list all_files)
+    
+  let get_bookshelf_path bookshelf_id =
+    (Sys.getcwd ()) ^ Filename.dir_sep ^ 
+      (string_of_int bookshelf_id)
   
   (* TODO(Greg): check for non-hyphen dashes at eol *)
   let rec list_to_string = function
@@ -79,8 +83,7 @@ module Bookshelf = struct
         list_to_string (List.rev !lines)
   
   let get_record_from_json bs_id f =
-    let j = Yojson.Basic.from_file ((Sys.getcwd ()) ^ Filename.dir_sep ^
-          (string_of_int bs_id) ^ Filename.dir_sep ^ f) in
+    let j = Yojson.Basic.from_file ((get_bookshelf_path bs_id) ^ Filename.dir_sep ^ f) in
     let id = (to_int (member "id" j)) in
     { title = (to_string (member "title" j));
       author = (to_string (member "author" j)); id = id;
@@ -99,8 +102,7 @@ module Bookshelf = struct
   
   (* Lists the books currently on the bookshelf with the given ID *)
   let list_books bookshelf_id =
-    let all_files = Sys.readdir ((Sys.getcwd ()) ^ Filename.dir_sep ^
-          (string_of_int bookshelf_id)) in
+    let all_files = Sys.readdir (get_bookshelf_path booshelf_id) in
     get_books bookshelf_id (Array.to_list all_files)
   
   (* Deprecated: use save_book_position instead. *)
@@ -114,8 +116,7 @@ module Bookshelf = struct
   
   (* Returns the data for a given book *)
   let get_book_data bookshelf_id book_id =
-    let j = Yojson.Basic.from_file ((Sys.getcwd ()) ^ Filename.dir_sep ^
-          (string_of_int bookshelf_id) ^ Filename.dir_sep ^
+    let j = Yojson.Basic.from_file ((get_bookshelf_path booshelf_id) ^ Filename.dir_sep ^
           ((string_of_int book_id) ^ ".json")) in
     let title = to_lc (to_string (member "title" j)) in
     let author = to_lc (to_string (member "author" j)) in
@@ -133,8 +134,7 @@ module Bookshelf = struct
     let json = `Assoc [ ("title", `String d.title); ("author", `String d.author);
       ("current_position", `Int cur_pos); ("total_chars", `Int d.total_chars);
       ("id", `Int d.id) ] in
-    Yojson.Basic.to_file ((Sys.getcwd ()) ^ Filename.dir_sep ^ 
-      (string_of_int bookshelf_id) ^ Filename.dir_sep ^
+    Yojson.Basic.to_file ((get_bookshelf_path booshelf_id) ^ Filename.dir_sep ^
       ((string_of_int book_id) ^ ".json")) json
   
 end
