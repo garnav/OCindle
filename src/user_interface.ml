@@ -9,16 +9,16 @@ module UserInterface = struct
   type t = DataController.t
 
   (* Window Constants *)
-  let char_height = 13
-  let char_width = 6
+  let char_height = 13 (* height of a character *)
+  let char_width = 6   (* width of a character *)
   let left_edge = 18   (* left edge of first char in any line *)
   let right_edge = 516 (* left edge of final char in any line *)
   let top_edge = 611   (* bottom of chars in the top line *)
   let bot_edge = 26    (* bottom of chars in the last line *)
   let chars_line = 83  (* max divisions in a line. chars are chars_line + 1 *)
-  let max_char = 3780 (* maximum number of characters on a page *)
+  let max_char = 3780  (* maximum number of characters on a page *)
   let window_size = " 540x650" (* width x height *)
-  let window_title = "OCindle - no, it's not the Kindle"
+  let window_title = "OCindle - no, it's not the Kindle" (* title *)
 
   let within_y_range y = (y / char_height) * char_height
 
@@ -272,42 +272,57 @@ module UserInterface = struct
       | Page_Undefined _ -> print_string "Can't draw page"; t
 
 
-  let open_book name =
-
+  let open_book bookshelf_id book_id =
     Graphics.open_graph window_size;
     Graphics.set_window_title window_title;
 
     (* call function in DataController *)
-    DataController.init_book
+    let t1 = DataController.init_book max_char bookshelf_id book_id in 
+    draw_page `Curr t1
 
-  let choose_book () = 
+  let rec print_lst counter bookshelf = 
+  match bookshelf with 
+  | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter; 
+  print_lst counter t;
+  | [] -> ();
+
+  let choose_book bookshelf_id = 
   (* print a list of books on this bookshelf given by a helper function *)
+  try
+    let lst_of_books = DataController.book_list bookshelf_id in 
+    print_endline "Choose a book"; print_lst (ref 0) lst_of_books;
+    print_endline "Please choose a book by entering the index before the book";
+    let int_input = read_int () in 
+    let array_of_bookshelves = Array.of_list lst_of_bookshelves in 
+    let reqd_bookshelf = array_of_bookshelves.(int_input) in 
+    open_book bookshelf_id (fst reqd_bookshelf)
 
+  with
+  | _ -> failwith "Unknown"
   (* take integer input corresponding to a bookshelf *)
   (* let choice = read_int () *)
 
   (* Call open_book function *)
-  failwith "Unimplemented"
-
-
-  let rec print_lst counter bookshelf = 
-  match bookshelf with 
-  | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter; print_lst t;
-  | [] -> ();
 
   let choose_bookshelf () = 
-  (* print a list of bookshelves given by a helper function *)
-  let lst_of_bookshelves = DataController.bookshelf_lst 20 () in 
-  print_endline "Choose a bookshelf"; print_lst (ref 1) lst_of_bookshelves;
+  try
+    let lst_of_bookshelves = DataController.bookshelf_list () in 
+    print_endline "Choose a bookshelf"; print_lst (ref 0) lst_of_bookshelves;
+    print_endline "Please choose a bookshelf by entering the index before the bookshelf";
+    let int_input = read_int () in 
+    let array_of_bookshelves = Array.of_list lst_of_bookshelves in 
+    let reqd_bookshelf = array_of_bookshelves.(int_input) in 
+    choose_book fst (reqd_bookshelf)
 
+  with
+  | _ -> failwith "Unknown"
+  
 
   (* take integer input corresponding to a bookshelf *)
   (* let choice = read_int () *)
 
   (* print a list of books in that bookshelf *)
   (* Call choose_book function *)
-  failwith "Unimplemented"
-
 
   let close_book t =
     failwith "Unimplemented"
@@ -320,15 +335,6 @@ module UserInterface = struct
 
     (* display message *)
     print_endline "You closed the book "; (* add book name here *)
-
-
-  (* Testing Purposes *)
-  let check a =
-    (* call function in perspective to add highlights to the current page *)
-    let first_pos = Graphics.wait_next_event [Button_down] in
-    let start_x = within_x_range first_pos.mouse_x in
-    let start_y = within_y_range first_pos.mouse_y in
-    print_int (relative_index start_x start_y) ;
 
 
 let rec repl colour t =
