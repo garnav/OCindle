@@ -42,4 +42,6 @@ module Bookshelf = sig
   val get_current_position : book_data -> int
   val get_total_chars : book_data -> int
   
+  val get_bookshelf_name : bookshelf_id -> string
+  
 end
