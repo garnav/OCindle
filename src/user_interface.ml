@@ -225,12 +225,12 @@ module UserInterface = struct
     (* return previous page on key press *)
     if (Graphics.key_pressed () = true) 
     (* Unsure how this works *)
-    then custom_print t.page_content left_edge top_edge;
+    then (custom_print t.page_content left_edge top_edge;)
   else ();
 
   with
-  | Word_Not_Found -> print_string "You didn't choose a single word " ^
-                      "or no meaning of the word exists"
+  | Word_Not_Found -> print_string ("You didn't choose a single word " ^
+                      "or no meaning of the word exists")
     
 
   (* Testing Purposes *)
