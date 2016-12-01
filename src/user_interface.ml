@@ -248,17 +248,14 @@ module UserInterface = struct
               draw_existing_notes t1;
     | [] -> Graphics.set_color black
 
-  let rec draw_existing_bookmark t1 = 
-    (* unsure of output format *)
+  let draw_existing_bookmark t1 = 
     match DataController.page_bookmarks t1 with
-    | (s, c)::t -> Graphics.set_color (colour_to_color c); 
-                   Graphics.fill_circle 510 636 10; 
-              draw_existing_bookmark t1;
-    | [] -> Graphics.set_color black;
+    | true -> Graphics.set_color (colour_to_color c); 
+              Graphics.fill_circle 510 636 10; 
+    | false -> ();
 
    let draw_page which t =
     try
-      (* match mouse click with polymorphic variants *)
       let new_t = 
       match which with 
       | `Prev -> DataController.prev_page max_char t
@@ -269,6 +266,7 @@ module UserInterface = struct
       (* add bookmarks, highlights and notes already there *)
       (* draw_existing_highlights new_t *)
       (* draw_existing_notes new_t *)
+      (* draw_existing_bookmark new_t *)
 
     with
       | Page_Undefined _ -> print_string "Can't draw page"; t
@@ -280,6 +278,16 @@ module UserInterface = struct
     Graphics.set_window_title window_title;
 
     (* call function in DataController *)
+    DataController.init_book
+
+  let choose_book () = 
+  (* print a list of books on this bookshelf given by a helper function *)
+
+  (* take integer input corresponding to a bookshelf *)
+  (* let choice = read_int () *)
+
+  (* Call open_book function *)
+  failwith "Unimplemented"
 
   let choose_bookshelf () = 
   (* print a list of bookshelves given by a helper function *)
@@ -291,16 +299,6 @@ module UserInterface = struct
   (* Call choose_book function *)
   failwith "Unimplemented"
 
-  let choose_book () = 
-  (* print a list of books on this bookshelf given by a helper function *)
-
-  (* take integer input corresponding to a bookshelf *)
-  (* let choice = read_int () *)
-
-  (* Call open_book function *)
-  failwith "Unimplemented"
-
-
 
   let close_book t =
     failwith "Unimplemented"
@@ -309,7 +307,7 @@ module UserInterface = struct
     DataController.close_book t;
 
     (* Graphics.close_graph () *)
-    Graphics.close_graph ()
+    Graphics.close_graph ();
 
     (* display message *)
     print_endline "You closed the book "; (* add book name here *)
