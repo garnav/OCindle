@@ -4,6 +4,7 @@ module UserInterface = struct
   open Colours
 
   exception Invalid_Colour
+  exception UI_Error
 
   type t = DataController.t
 
@@ -263,10 +264,9 @@ module UserInterface = struct
       | `Curr -> t in
       Graphics.clear_graph ();
       custom_print new_t.page_content left_edge top_edge; new_t
-      (* add bookmarks, highlights and notes already there *)
-      (* draw_existing_highlights new_t *)
-      (* draw_existing_notes new_t *)
-      (* draw_existing_bookmark new_t *)
+      draw_existing_highlights new_t;
+      draw_existing_notes new_t;
+      draw_existing_bookmark new_t;
 
     with
       | Page_Undefined _ -> print_string "Can't draw page"; t
@@ -289,8 +289,17 @@ module UserInterface = struct
   (* Call open_book function *)
   failwith "Unimplemented"
 
+
+  let rec print_lst bookshelf = 
+  match book_shelf with 
+  | (id, bs)::t -> print_string bs; print_lst t;
+  | [] -> ();
+
   let choose_bookshelf () = 
   (* print a list of bookshelves given by a helper function *)
+  match lst_of_bookshelves = DataController.bookshelf_lst 20 () with
+  |
+
 
   (* take integer input corresponding to a bookshelf *)
   (* let choice = read_int () *)
@@ -305,7 +314,7 @@ module UserInterface = struct
 
     (* save book data (type t) locally *)
     DataController.close_book t;
-
+`
     (* Graphics.close_graph () *)
     Graphics.close_graph ();
 
@@ -323,18 +332,22 @@ module UserInterface = struct
 
 
 let rec repl colour t =
-  match Graphics.wait_next_event [Key_pressed] with 
-  | 'd' -> let t1 = draw_page `Next in repl t1
-  | 'a' -> let t1 = draw_page `Prev in repl t1
-  | 'b' -> let t1 = draw_bookmark colour t in repl t1
-  | 'h' -> let t1 = draw_highlights colour t in repl t1
-  | 'n' -> let t1 = draw_notes colour t in repl t1
-  | 'q' -> let t1 = erase_bookmark t in repl t1
-  | 'w' -> let t1 = erase_highlights t in repl t1
-  | 'e' -> let t1 = erase_notes t in repl t1
-  | 'o' -> let t1 = open_book [name] in repl t1
-  | 'c' -> close_book t;
+  try
+    match Graphics.wait_next_event [Key_pressed] with 
+    | 'd' -> let t1 = draw_page `Next in repl t1
+    | 'a' -> let t1 = draw_page `Prev in repl t1
+    | 'b' -> let t1 = draw_bookmark colour t in repl t1
+    | 'h' -> let t1 = draw_highlights colour t in repl t1
+    | 'n' -> let t1 = draw_notes colour t in repl t1
+    | 'q' -> let t1 = erase_bookmark t in repl t1
+    | 'w' -> let t1 = erase_highlights t in repl t1
+    | 'e' -> let t1 = erase_notes t in repl t1
+    | 'o' -> let t1 = open_book [name] in repl t1
+    | 'c' -> close_book t;
 
+  with
+  | _ -> failwith "Unknown"
+  
 
 (*LIST OF POSSIBLE COMMANDS:
 (DOES IT DEPEND ON STATE THOUGH)
@@ -350,16 +363,6 @@ let rec repl colour t =
                     'n' : note
 'b' : go to list of bookshelves
 *)
-
-(*
-  let command = read_int () in
-  match command with
-  |   ->
-  |   ->
-  |   -> *)
-
-(* trigger input *)
-
 
 end
 
