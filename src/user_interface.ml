@@ -87,9 +87,9 @@ module UserInterface = struct
   let draw_notes colour t1 =
     (* call helper function in perspective to add these notes *)
     try
-      print_string "Please select on the window where you want to place the note";
+      print_endline "Please select on the window where you want to place the note
+      and after that type in the associated note here: ";
       let first_pos = Graphics.wait_next_event [Button_down] in
-      print_string "Please type in the associated note";
       let note_text = read_line () in 
       let start_x = within_x_range first_pos.mouse_x in
       let start_y = within_y_range first_pos.mouse_y - 5 in
@@ -106,7 +106,7 @@ module UserInterface = struct
   let erase_notes t1 =
     (* call helper function in perspective to add these notes *)
     try
-      print_string "Please select the note you want to delete";
+      print_endline "Please select the note you want to delete";
       let first_pos = Graphics.wait_next_event [Button_down] in
       let start_x = within_x_range first_pos.mouse_x in
       let start_y = within_y_range first_pos.mouse_y - 5 in
