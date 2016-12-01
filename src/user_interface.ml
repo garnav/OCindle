@@ -81,18 +81,18 @@ module UserInterface = struct
       Graphics.set_color black; (* original color *)
        new_t
     with
-      | Annotation_Error -> print_string "A bookmark doesn't exist" ; t1
+      | Annotation_Error -> print_string "The bookmark doesn't exist" ; t1
 
 
   let draw_notes colour t1 =
     (* call helper function in perspective to add these notes *)
     try
-      print_endline "Please select on the window where you want to place the note
-      and after that type in the associated note here: ";
+      print_endline ("Please select on the window where you want to place the note" 
+      ^ "and after that type in the associated note here: ");
       let first_pos = Graphics.wait_next_event [Button_down] in
       let note_text = read_line () in 
       let start_x = within_x_range first_pos.mouse_x in
-      let start_y = within_y_range first_pos.mouse_y - 5 in
+      let start_y = within_y_range (first_pos.mouse_y - 5) in
       let new_t = DataController.add_notes
                    (relative_index start_x start_y)
                    note_text
@@ -100,7 +100,7 @@ module UserInterface = struct
       Graphics.fill_circle start_x start_y 2;
       new_t
     with
-      | _ -> print_string "An error occured" ; t1
+      | Annotation_Error -> print_string "Notes can't be added at this point" ; t1
 
 
   let erase_notes t1 =
@@ -117,7 +117,7 @@ module UserInterface = struct
       Graphics.fill_circle start_x start_y 2;
       new_t
     with
-      | Annotation_Error -> print_string "A note doesn't exist" ; t1
+      | Annotation_Error -> print_string "The note doesn't exist" ; t1
 
 
   let draw_highlights colour t1 =
