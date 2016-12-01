@@ -30,6 +30,26 @@ module UserInterface = struct
 
   (* Graphics Colours to Colours module *)
   let color_to_colour c =
+    if c = Graphics.black then BLACK
+    else if c = Graphics.red then RED
+    else if c = Graphics.blue then BLUE
+    else if c = Graphics.yellow then YELLOW
+    else if c = Graphics.magenta then PURPLE
+    else if c = Graphics.green then GREEN
+    else raise Invalid_Colour
+
+  let colour_to_color c =
+    if c = BLACK then Graphics.black
+    else if c = RED then Graphics.red 
+    else if c = BLUE then Graphics.blue
+    else if c = YELLOW then Graphics.yellow
+    else if c = PURPLE then Graphics.magenta
+    else if c = GREEN then Graphics.green 
+    else raise Invalid_Colour
+
+
+  (* Using match instead of if...else
+  let color_to_colour c =
     match c with 
     | Graphics.black -> BLACK
     | Graphics.red -> RED
@@ -48,7 +68,7 @@ module UserInterface = struct
     | YELLOW -> Graphics.yellow
     | PURPLE -> Graphics.magenta
     | GREEN -> Graphics.green
-    | _ -> raise Invalid_Colour
+    | _ -> raise Invalid_Colour *)
 
 
   let rec custom_highlight x1 y1 x2 y2 =
