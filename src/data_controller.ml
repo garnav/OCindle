@@ -75,10 +75,12 @@ module DataController = struct
       | Not_found -> raise Annotation_Error
 
   let page_highlights t =
-    Marginalia.highlights_list (debox_ann (t.page_annotations))
+    List.rev_map (fun (i, (c,e)) -> (i - t.page_start, (c, e - t.page_start)))
+    (Marginalia.highlights_list (debox_ann (t.page_annotations)))
 
   let page_notes t =
-    Marginalia.notes_list (debox_ann (t.page_annotations))
+    List.rev_map (fun (i, (c,s)) -> (i - t.page_start, (c, s)))
+    (Marginalia.notes_list (debox_ann (t.page_annotations)))
 
   let next_page max_char t =
     (*Save all annotations on the current page*)
@@ -121,7 +123,7 @@ module DataController = struct
     let book_length = String.length book in
     (*Differentiating b/w page end indices if the book is > 1 page, = 1
     page or is empty*)
-    let page_end = if book_length = 0 then (Book_Error "Empty Book")
+    let page_end = if book_length = 0 then raise (Book_Error "Empty Book")
                    else if book_length < max_char then book_length - 1
                    else max_char - 1 in
     let new_content = String.sub book 0 (page_end + 1)  in
@@ -142,11 +144,11 @@ module DataController = struct
   let percent_read t =
     ((float_of_int t.page_start) /. (float_of_int (String.length t.book_text)))
 
-  let return_definition word =
+  (*let return_definition word =
     try
       Bookshelf.get_definition word
     with
-    | Word_Not_Found -> raise No_Annotation
+    | Word_Not_Found -> raise No_Annotation*)
 
 (*
 return current page string
