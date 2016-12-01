@@ -111,10 +111,16 @@ module Marginalia = struct
 	  let () = json_add t1 (string_of_int i) "notes" (decolorify c) "note" (`String note) in
 	  { t1 with notes = (i, (c, note))::t1.notes }
 	else raise Already_Exists
+  
+  let rec existing_highlight s t lst =
+    match lst with
+	| (i,(_,e)) :: tail -> if (s >= i && s <= e) || (t >= i && t <= e) then true
+	                       else existing_highlight s t tail
+	| _                 -> false
 	
   (*doesn't preserve order, just adds to the beginning of the list.*)
   let add_highlight i e c t1 =
-    if not (mem_assoc i t1.highlights) then
+    if not (mem_assoc i t1.highlights) && not (existing_highlight i e t1.highlights) then
 	  let () = json_add t1 (string_of_int i) "highlight" (decolorify c) "end" (`Int e) in
 	  { t1 with highlights = (i, (c, e))::t1.highlights }
 	else raise Already_Exists
