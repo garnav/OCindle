@@ -38,6 +38,7 @@ module UserInterface = struct
     else if c = Graphics.green then GREEN
     else raise Invalid_Colour
 
+  (* Colours to Graphics Colours module *)
   let colour_to_color c =
     if c = BLACK then Graphics.black
     else if c = RED then Graphics.red 
@@ -248,6 +249,7 @@ module UserInterface = struct
     | [] -> Graphics.set_color black
 
   let rec draw_existing_bookmark t1 = 
+    (* unsure of output format *)
     match DataController.page_bookmarks t1 with
     | (s, c)::t -> Graphics.set_color (colour_to_color c); 
                    Graphics.fill_circle 510 636 10; 
@@ -272,29 +274,45 @@ module UserInterface = struct
       | Page_Undefined _ -> print_string "Can't draw page"; t
 
 
-  (* Initialization *)
   let open_book name =
-
-    (* RAISE AND DEFINE exception *)
 
     Graphics.open_graph window_size;
     Graphics.set_window_title window_title;
 
-    let page_contents = [get_book_data name] in 
-    ;
+    let page_contents = [get_book_data name];
 
-    (* The user is presented with a list of bookshelves, each containing a list of books. *)
-    (* Display list of bookshelves; choose bookshelf; display list of books;
-    choose book; display first/last saved page of book *)
+  choose_book () = 
+  (* print a list of books on this bookshelf given by a helper function *)
 
-    (* initialize values *)
+  (* take integer input corresponding to a bookshelf *)
+  (* let choice = read_int () *)
+
+  (* Call open_book function *)
+  failwith "Unimplemented"
 
 
-  let close_book () =
+  choose_bookshelf () = 
+  (* print a list of bookshelves given by a helper function *)
+
+  (* take integer input corresponding to a bookshelf *)
+  (* let choice = read_int () *)
+
+  (* print a list of books in that bookshelf *)
+  (* Call choose_book function *)
+  failwith "Unimplemented"
+
+
+  let close_book t =
     failwith "Unimplemented"
+
     (* save book data (type t) locally *)
+    DataController.close_book t;
+
     (* Graphics.close_graph () *)
-    (* print_endline "You closed the book."; *)
+    Graphics.close_graph ()
+
+    (* display message *)
+    print_endline "You closed the book "; (* add book name here *)
 
 
   (* Testing Purposes *)
