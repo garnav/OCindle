@@ -19,7 +19,26 @@ module DataController = struct
     match ann with
     | Some x -> x
     | None   -> raise No_Annotation
+	
+  (* Initialize Book Content 
+  let init_book max_char shelf_id book_id =
+    let book = Bookshelf.get_book_text shelf_id book_id in
+    let book_length = String.length book in
+    (*Differentiating b/w page end indices if the book is > 1 page, = 1
+    page or is empty*)
+    let page_end = if book_length = 0 then raise (Book_Error "Empty Book")
+                   else if book_length < max_char then book_length - 1
+                   else max_char - 1 in
+    let new_content = String.sub book 0 (page_end + 1)  in
+    let new_ann = Marginalia.get_page_overlay book_id (0, page_end) in
+    { id = book_id ;
+      book_text = book ;
+      page_start = 0 ;
+      page_end = page_end ;
+      page_content = new_content ;
+      page_annotations = Some new_ann } *)
 
+  (* Highlight Data Control *)
   let add_highlights beg ending colour t1 =
     let absolute_start = t1.page_start + beg in
     let absolute_end = t1.page_start + ending in
@@ -41,7 +60,34 @@ module DataController = struct
       {t1 with page_annotations = Some new_ann}
     with
       | Not_found -> raise Annotation_Error
+  
+  (*check how this affects sorted order*)
+  let abs_to_rel_highlights lst =
+    List.rev_map (fun (i, (c,e)) -> (i - t.page_start, (c, e - t.page_start))) lst
+	  
+  (*check how this affects sorted order*)
+  let abs_to_rel_notes lst =
+    List.rev_map (fun (i, r) -> (i - t.page_start, r)) lst
+  
+  (*needed to split all sorts into different functions because they return
+  different types.*)
+  let sort_notes_colour id range =
+    let all_ann  = Perspective.create_range id range in
+    let sorted_base = Perspective.note_by_colour all_ann in
+	(*rather than giving page number, makes more sense to give some part
+	of the text with it*)
+	
+  let sort_notes_loc id range =
+    let all_ann  = Perspective.create_range id range in
+    let sorted_base = Perspective.note_by_loc all_ann in 
+	(*rather than giving the pag enumber, give the aspect of the book that its related to*)
+	(*For each of these get a string related to it.
+	Need a better strcuture to pass around things?*)
 
+  let page_highlights t =
+     abs_to_rel_highlights (Marginalia.highlights_list (debox_ann (t.page_annotations)))
+	 
+  (* Note Data Control *)
   let add_notes beg note colour t1 =
     let absolute_start = t1.page_start + beg in
     try
@@ -59,7 +105,11 @@ module DataController = struct
       {t1 with page_annotations = Some new_ann}
     with
       | Not_found -> raise Annotation_Error
-
+	  
+  let page_notes t =
+    abs_to_rel_notes (Marginalia.notes_list (debox_ann (t.page_annotations)))
+	
+  (* Bookmark Data Control *)
   let add_bookmarks t1 colour =
     try
       let new_ann = Marginalia.add_bookmark (debox_ann t1.page_annotations) colour in
@@ -73,15 +123,11 @@ module DataController = struct
       {t1 with page_annotations = Some new_ann}
     with
       | Not_found -> raise Annotation_Error
+	  
+  let page_bookmark t =
+    Marginalia.is_bookmarked (debox_ann t.page_annotations)
 
-  let page_highlights t =
-    List.rev_map (fun (i, (c,e)) -> (i - t.page_start, (c, e - t.page_start)))
-    (Marginalia.highlights_list (debox_ann (t.page_annotations)))
-
-  let page_notes t =
-    List.rev_map (fun (i, (c,s)) -> (i - t.page_start, (c, s)))
-    (Marginalia.notes_list (debox_ann (t.page_annotations)))
-
+  (* Page Content Control*)
   let next_page max_char t =
     (*Save all annotations on the current page*)
     Marginalia.save_page (debox_ann t.page_annotations) ;
@@ -118,28 +164,11 @@ module DataController = struct
              page_content = new_contents ;
              page_annotations = Some new_ann }
 
-  let initbook max_char shelf_id book_id =
-    let book = Bookshelf.get_book_text shelf_id book_id in
-    let book_length = String.length book in
-    (*Differentiating b/w page end indices if the book is > 1 page, = 1
-    page or is empty*)
-    let page_end = if book_length = 0 then raise (Book_Error "Empty Book")
-                   else if book_length < max_char then book_length - 1
-                   else max_char - 1 in
-    let new_content = String.sub book 0 (page_end + 1)  in
-    let new_ann = Marginalia.get_page_overlay book_id (0, page_end) in
-    { id = book_id ;
-      book_text = book ;
-      page_start = 0 ;
-      page_end = page_end ;
-      page_content = new_content ;
-      page_annotations = Some new_ann }
-
-  let close_book t =
+  (*let close_book t =
     Marginalia.save_page (debox_ann t.page_annotations) ;
     failwith "Unimplemented"
     (*Bookshelf close book gives the final position read but doesn't return
-    it in anyway later*)
+    it in anyway later*) *)
 
   let percent_read t =
     ((float_of_int t.page_start) /. (float_of_int (String.length t.book_text)))
@@ -155,15 +184,5 @@ return current page string
 all QA stuff
 bookshelves list
 books list in bookshelf
-
-*)
-(*
-
-let close_file t =
-    (* save data before erasing *)
-    Marginalia.save_page t;
-
-    (* actually erase text *)
-    Graphics.close_graph ();
 *)
 end
