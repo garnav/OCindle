@@ -172,8 +172,8 @@ module Marginalia = struct
 
   let is_bookmarked t1 =
     match t1.bookmark with
-	| Some _ -> true
-	| None   -> false
+	| Some (i, c) -> Some c 
+	| None        -> None
 
   (* In the context of changing content in books, due to changing font sizes, the term
   bookmark is loosely defined. We shall adhere to the conventional notion of a bookmark,
