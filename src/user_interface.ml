@@ -292,13 +292,13 @@ module UserInterface = struct
 
   let rec print_lst counter bookshelf = 
   match bookshelf with 
-  | (id, bs)::t -> print_int !counter; print_endline bs; incr counter; print_lst t;
+  | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter; print_lst t;
   | [] -> ();
 
   let choose_bookshelf () = 
   (* print a list of bookshelves given by a helper function *)
   let lst_of_bookshelves = DataController.bookshelf_lst 20 () in 
-  print_endline "Choose a bookshelf"; print_lst (ref 0) lst_of_bookshelves;
+  print_endline "Choose a bookshelf"; print_lst (ref 1) lst_of_bookshelves;
 
 
   (* take integer input corresponding to a bookshelf *)
