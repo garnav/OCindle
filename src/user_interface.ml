@@ -279,19 +279,9 @@ module UserInterface = struct
     Graphics.open_graph window_size;
     Graphics.set_window_title window_title;
 
-    let page_contents = [get_book_data name];
+    (* call function in DataController *)
 
-  choose_book () = 
-  (* print a list of books on this bookshelf given by a helper function *)
-
-  (* take integer input corresponding to a bookshelf *)
-  (* let choice = read_int () *)
-
-  (* Call open_book function *)
-  failwith "Unimplemented"
-
-
-  choose_bookshelf () = 
+  let choose_bookshelf () = 
   (* print a list of bookshelves given by a helper function *)
 
   (* take integer input corresponding to a bookshelf *)
@@ -300,6 +290,16 @@ module UserInterface = struct
   (* print a list of books in that bookshelf *)
   (* Call choose_book function *)
   failwith "Unimplemented"
+
+  let choose_book () = 
+  (* print a list of books on this bookshelf given by a helper function *)
+
+  (* take integer input corresponding to a bookshelf *)
+  (* let choice = read_int () *)
+
+  (* Call open_book function *)
+  failwith "Unimplemented"
+
 
 
   let close_book t =
@@ -322,6 +322,21 @@ module UserInterface = struct
     let start_x = within_x_range first_pos.mouse_x in
     let start_y = within_y_range first_pos.mouse_y in
     print_int (relative_index start_x start_y) ;
+
+
+let rec repl colour t =
+  match Graphics.wait_next_event [Key_pressed] with 
+  | 'd' -> let t1 = draw_page `Next in repl t1
+  | 'a' -> let t1 = draw_page `Prev in repl t1
+  | 'b' -> let t1 = draw_bookmark colour t in repl t1
+  | 'h' -> let t1 = draw_highlights colour t in repl t1
+  | 'n' -> let t1 = draw_notes colour t in repl t1
+  | 'q' -> let t1 = erase_bookmark t in repl t1
+  | 'w' -> let t1 = erase_highlights t in repl t1
+  | 'e' -> let t1 = erase_notes t in repl t1
+  | 'o' -> let t1 = open_book [name] in repl t1
+  | 'c' -> close_book t;
+
 
 (*LIST OF POSSIBLE COMMANDS:
 (DOES IT DEPEND ON STATE THOUGH)
