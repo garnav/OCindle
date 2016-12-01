@@ -39,7 +39,7 @@ module Bookshelf = sig
   val get_book_id : book_data -> book_id
   val get_title : book_data -> string
   val get_author : book_data -> string
-  val get_current_position : book_id -> int
-  val get_total_chars : book_id -> int
+  val get_current_position : book_data -> int
+  val get_total_chars : book_data -> int
   
 end
