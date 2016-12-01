@@ -125,7 +125,7 @@ module UserInterface = struct
       | Annotation_Error -> print_string "A bookmark doesn't exist" ; t1
 
 
-  let draw_notes color t1 =
+  let draw_notes colour t1 =
     (* call helper function in perspective to add these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in
     (* try/with, prompt with nice message *)
@@ -137,7 +137,6 @@ module UserInterface = struct
                    (relative_index start_x start_y)
                    note_text
                    (color_to_colour colour) t1 in
-       Graphics.set_color colour;
        Graphics.fill_circle start_x start_y 2;
        new_t
     with
@@ -208,7 +207,6 @@ module UserInterface = struct
     let start_y = within_y_range first_pos.mouse_y in
     let end_x = within_x_range second_pos.mouse_x in
     let end_y = within_y_range second_pos.mouse_y in
-    Graphics.set_color colour;
     custom_highlight start_x start_y end_x end_y;
 
     (* Convert to English word *)
