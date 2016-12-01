@@ -192,7 +192,7 @@ module UserInterface = struct
   | Word_Not_Found -> print_string ("You didn't choose a single word " ^
                       "or no meaning of the word exists")
 
-   let draw_page which color t =
+   let draw_page which t =
     try
       (* match mouse click with polymorphic variants *)
       let new_t = 
@@ -201,10 +201,10 @@ module UserInterface = struct
       | `Next -> DataController.next_page max_char t
       | `Curr -> t in
       Graphics.clear_graph ();
-      custom_print t.page_content left_edge top_edge; 
+      custom_print new_t.page_content left_edge top_edge; new_t
       (* add bookmarks, highlights and notes already there *)
     with
-      | Page_Undefined _ -> print_string "Can't draw page";
+      | Page_Undefined _ -> print_string "Can't draw page"; t
 
 
   (* Initialization *)
