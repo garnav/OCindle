@@ -81,6 +81,6 @@ module type Marginalia = sig
 	
 	(* [save_page t1] ensures that the page represent by [t1] is
 	stored in local memory. *)
-	val save_page : t -> ()
+	val save_page : t -> unit
 
 end
