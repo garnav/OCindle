@@ -290,15 +290,15 @@ module UserInterface = struct
   failwith "Unimplemented"
 
 
-  let rec print_lst bookshelf = 
-  match book_shelf with 
-  | (id, bs)::t -> print_string bs; print_lst t;
+  let rec print_lst counter bookshelf = 
+  match bookshelf with 
+  | (id, bs)::t -> print_int !counter; print_endline bs; incr counter; print_lst t;
   | [] -> ();
 
   let choose_bookshelf () = 
   (* print a list of bookshelves given by a helper function *)
-  match lst_of_bookshelves = DataController.bookshelf_lst 20 () with
-  |
+  let lst_of_bookshelves = DataController.bookshelf_lst 20 () in 
+  print_endline "Choose a bookshelf"; print_lst (ref 0) lst_of_bookshelves;
 
 
   (* take integer input corresponding to a bookshelf *)
