@@ -70,7 +70,7 @@ module UserInterface = struct
        Graphics.set_color black; (* original color *)
        new_t
     with
-      | Annotation_Error -> print_string "A bookmark already exists" ; 
+      | Annotation_Error -> print_string "A bookmark already exists" ; t1 
 
 
   let erase_bookmark t1 =
@@ -86,34 +86,36 @@ module UserInterface = struct
 
   let draw_notes colour t1 =
     (* call helper function in perspective to add these notes *)
-    let first_pos = Graphics.wait_next_event [Button_down] in
-    (* try/with, prompt with nice message *)
-    let note_text = read_line () in 
-    let start_x = within_x_range first_pos.mouse_x in
-    let start_y = within_y_range first_pos.mouse_y - 5 in
     try
+      print_string "Please select on the window where you want to place the note";
+      let first_pos = Graphics.wait_next_event [Button_down] in
+      print_string "Please type in the associated note";
+      let note_text = read_line () in 
+      let start_x = within_x_range first_pos.mouse_x in
+      let start_y = within_y_range first_pos.mouse_y - 5 in
       let new_t = DataController.add_notes
                    (relative_index start_x start_y)
                    note_text
                    (color_to_colour colour) t1 in
-       Graphics.fill_circle start_x start_y 2;
-       new_t
+      Graphics.fill_circle start_x start_y 2;
+      new_t
     with
-      | Annotation_Error -> print_string "A note already exists" ; t1
+      | _ -> print_string "An error occured" ; t1
 
 
   let erase_notes t1 =
     (* call helper function in perspective to add these notes *)
-    let first_pos = Graphics.wait_next_event [Button_down] in
-    let start_x = within_x_range first_pos.mouse_x in
-    let start_y = within_y_range first_pos.mouse_y - 5 in
     try
+      print_string "Please select the note you want to delete";
+      let first_pos = Graphics.wait_next_event [Button_down] in
+      let start_x = within_x_range first_pos.mouse_x in
+      let start_y = within_y_range first_pos.mouse_y - 5 in
       let new_t = DataController.delete_notes
                    (relative_index start_x start_y)
                    t1 in
-       Graphics.set_color white;
-       Graphics.fill_circle start_x start_y 2;
-       new_t
+      Graphics.set_color white;
+      Graphics.fill_circle start_x start_y 2;
+      new_t
     with
       | Annotation_Error -> print_string "A note doesn't exist" ; t1
 
