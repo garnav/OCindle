@@ -74,13 +74,13 @@ module DataController = struct
     let book_length = String.length t.book_text in
     (*Ensure that the current page is not the last page*)
     let new_start = if t.page_end = (book_length - 1)
-                      then raise Page_Undefined ("End of Book")
+                      then raise (Page_Undefined "End of Book")
                     else t.page_end + 1 in
     let potential_end = new_start + max_char - 1 in
     (*Ensure that there is enough characters to print on this new page*)
     let new_end = if potential_end + 1 <= book_length then potential_end
                   else book_length - 1 in
-    let new_contents = String.sub new_start (new_end - new_start + 1) t.book_text in
+    let new_contents = String.sub t.book_text new_start (new_end - new_start + 1) in
     let new_ann = Marginalia.get_page_overlay t.id (new_start, new_end) in
     { t with page_start = new_start ;
              page_end   = new_end ;
@@ -92,12 +92,12 @@ module DataController = struct
     Marginalia.save_page (debox_ann t.page_annotations) ;
     let book_length = String.length t.book_text in
     (*Ensure that the current page is not the first page*)
-    let new_end = if t.page_start = 0 then raise Page_Undefined ("Can't go back")
+    let new_end = if t.page_start = 0 then raise (Page_Undefined "Can't go back")
                   else t.page_start - 1 in
     let potential_start = new_end - max_char + 1 in
     let new_start = if potential_start < 0 then 0
                     else potential_start in
-    let new_contents = String.sub new_start (new_end - new_start + 1) t.book_text in
+    let new_contents = String.sub t.book_text new_start (new_end - new_start + 1) in
     let new_ann = Marginalia.get_page_overlay t.id (new_start, new_end) in
     { t with page_start = new_start ;
              page_end   = new_end ;
@@ -105,32 +105,40 @@ module DataController = struct
              page_annotations = Some new_ann }
 
   let initbook max_char shelf_id book_id =
-    let book = Bookshelf.get_book_text shelf_id book_id in
+    failwith "Unimplemented"
+    (*let book = Bookshelf.get_book_text shelf_id book_id in
     let book_length = String.length book in
-    (*Final index relative to the book depends on the length of the book*)
-    let page_end = if book_length = 0 then Book_Error "Empty Book"
+    (*Differentiating b/w page end indices if the book is > 1 page, = 1
+    page or is empty*)
+    let page_end = if book_length = 0 then (Book_Error "Empty Book")
                    else if book_length < max_char then book_length - 1
                    else max_char - 1 in
-    let new_content = String.sub 0 (page_end + 1) book in
+    let new_content = String.sub book 0 (page_end + 1)  in
     let new_ann = Marginalia.get_page_overlay book_id (0, page_end) in
     { id = book_id ;
       book_text = book ;
       page_start = 0 ;
       page_end = page_end ;
       page_content = new_content ;
-      page_annotations = Some new_ann }
+      page_annotations = Some new_ann }*)
 
   let close_book t =
     Marginalia.save_page (debox_ann t.page_annotations) ;
+    failwith "Unimplemented"
     (*Bookshelf close book gives the final position read but doesn't return
     it in anyway later*)
 
+  let percent_read t =
+    ((float_of_int t.page_start) /. (float_of_int (String.length t.book_text)))
 
 (*
 add bookmarks
 delete bookmarks
 return current page string
-m
+all QA stuff
+bookshelves list
+books list in bookshelf
+
 *)
 (*
 
@@ -151,10 +159,6 @@ let find_meaning word =
     (* IMPLEMENT: change position to write definition; erase page and display
     word definition until clicked again *)
     Graphics.draw_string word_def;
-
-let percent_read t =
-    ((float_of_int t.ind_pos) /. (float_of_int (String.length t.book_text)))
-    (* format string using printf *)
 
 let add_bookmark colour =
     (* call function in perspective to add a bookmark to the current page *)
