@@ -55,7 +55,7 @@ module type Marginalia = sig
 
   (* [is_bookmarked t1] is [true] if the page [t1]
   refers to is bookmarked. [false] otherwise. *)
-  val is_bookmarked : t -> bool 
+  val is_bookmarked : t -> Colours.t option
 
   (* [add_bookmark t1 c1] is [t2] with all the properties
   of [t1], only bookmarked with colour [c1]. Exception Already_Exists
@@ -81,6 +81,6 @@ module type Marginalia = sig
 	
 	(* [save_page t1] ensures that the page represent by [t1] is
 	stored in local memory. *)
-	val save_page : t -> ()
+	val save_page : t -> unit
 
 end
