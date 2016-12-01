@@ -1,11 +1,9 @@
 module DataController = struct
 
   exception Annotation_Error
-  exception Page_Undefined of string
   exception No_Annotation
+  exception Page_Undefined of string
   exception Book_Error of string
-
-  type possible_ann = None | Some of Marginalia.t
 
   (* [t] is a record containing important information about the book *)
   type t = {
@@ -14,7 +12,7 @@ module DataController = struct
             page_start : int ;
             page_end : int ;
             page_content : string ;
-            page_annotations : possible_ann
+            page_annotations : Marginalia.t option
            }
 
   let debox_ann ann =
@@ -62,6 +60,20 @@ module DataController = struct
     with
       | Not_found -> raise Annotation_Error
 
+  let add_bookmarks t1 colour =
+    try
+      let new_ann = Marginalia.add_bookmark (debox_ann t1.page_annotations) colour in
+      {t1 with page_annotations = Some new_ann}
+    with
+      | Marginalia.Already_Exists -> raise Annotation_Error
+
+  let delete_bookmarks t1 =
+    try
+      let new_ann = Marginalia.remove_bookmark (debox_ann t1.page_annotations) in
+      {t1 with page_annotations = Some new_ann}
+    with
+      | Not_found -> raise Annotation_Error
+
   let page_highlights t =
     Marginalia.highlights_list (debox_ann (t.page_annotations))
 
@@ -105,8 +117,7 @@ module DataController = struct
              page_annotations = Some new_ann }
 
   let initbook max_char shelf_id book_id =
-    failwith "Unimplemented"
-    (*let book = Bookshelf.get_book_text shelf_id book_id in
+    let book = Bookshelf.get_book_text shelf_id book_id in
     let book_length = String.length book in
     (*Differentiating b/w page end indices if the book is > 1 page, = 1
     page or is empty*)
@@ -120,7 +131,7 @@ module DataController = struct
       page_start = 0 ;
       page_end = page_end ;
       page_content = new_content ;
-      page_annotations = Some new_ann }*)
+      page_annotations = Some new_ann }
 
   let close_book t =
     Marginalia.save_page (debox_ann t.page_annotations) ;
@@ -131,9 +142,13 @@ module DataController = struct
   let percent_read t =
     ((float_of_int t.page_start) /. (float_of_int (String.length t.book_text)))
 
+  let return_definition word =
+    try
+      Bookshelf.get_definition word
+    with
+    | Word_Not_Found -> raise No_Annotation
+
 (*
-add bookmarks
-delete bookmarks
 return current page string
 all QA stuff
 bookshelves list
@@ -148,33 +163,5 @@ let close_file t =
 
     (* actually erase text *)
     Graphics.close_graph ();
-
-let find_meaning word =
-    let word_def =
-    (try
-        get_definition word
-     with
-     | Word_Not_Found -> failwith "Please type in a correct word") in
-
-    (* IMPLEMENT: change position to write definition; erase page and display
-    word definition until clicked again *)
-    Graphics.draw_string word_def;
-
-let add_bookmark colour =
-    (* call function in perspective to add a bookmark to the current page *)
-    Graphics.set_color colour;
-    Graphics.fill_circle 510 636 10;
-    Graphics.set_color black;
-
-let delete_bookmark t =
-    (* call function in perspective to delete a bookmark to the current page *)
-    Graphics.set_color white;
-    Graphics.fill_circle 510 636 10;
-    Graphics.set_color black;
-
-    (* This is a helper function to find the substring of [str] from index position
-[s] to index position [e] *)
-let actual_sub str s e = String.sub str s (e - s + 1)
-
 *)
 end
