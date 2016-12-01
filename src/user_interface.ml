@@ -64,10 +64,7 @@ module UserInterface = struct
 
   let draw_bookmark colour t1 =
     try
-       let new_t = DataController.add_bookmark
-                   (relative_index start_x start_y)
-                   (relative_index end_x end_y)
-                   (color_to_colour colour) t1 in
+       let new_t = DataController.add_bookmarks t1 (color_to_colour colour) in
        Graphics.set_color colour;
        Graphics.fill_circle 510 636 10;
        Graphics.set_color black; (* original color *)
@@ -78,8 +75,7 @@ module UserInterface = struct
 
   let erase_bookmark t1 =
     try
-       let new_t = DataController.delete_bookmark
-                   (relative_index start_x start_y) t1 in
+       let new_t = DataController.delete_bookmarks t1 in
       Graphics.set_color white;
       Graphics.fill_circle 510 636 10;
       Graphics.set_color black; (* original color *)
