@@ -249,10 +249,10 @@ module UserInterface = struct
     | [] -> Graphics.set_color black
 
   let draw_existing_bookmark t1 = 
-    match DataController.page_bookmarks t1 with
-    | true -> Graphics.set_color (colour_to_color c); 
+    match DataController.page_bookmark t1 with
+    | Some c -> Graphics.set_color (colour_to_color c); 
               Graphics.fill_circle 510 636 10; 
-    | false -> ();
+    | None -> ();
 
    let draw_page which t =
     try
