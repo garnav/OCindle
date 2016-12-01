@@ -200,7 +200,7 @@ module UserInterface = struct
 
   let draw_existing_highlights t1 = 
     match DataController.page_highlights t1 with
-    | (s, (e, c))::t -> Graphics.set_color c; (* relative or absolute; other coordinates? *)
+    | (s, (c, e))::t -> Graphics.set_color (Colours.decolorify c); (* relative or absolute; other coordinates? *)
               let (start_x, start_y) = rel_index_to_pixels s in 
               let (end_x, end_y) = rel_index_to_pixels e in 
               custom_highlight start_x start_y end_x end_y;
