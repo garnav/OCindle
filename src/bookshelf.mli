@@ -2,7 +2,7 @@
 module Bookshelf = sig
   
   (* The unique identifier for a bookshelf *)
-  type bookshelf_id = string
+  type bookshelf_id
   
   (* The unique identifier for a book *)
   type book_id
