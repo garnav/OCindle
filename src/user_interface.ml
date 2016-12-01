@@ -198,13 +198,28 @@ module UserInterface = struct
     let y = top_edge - char_height * ((ri - ri mod actual_line_number)/(chars_line + 1)) in
     (x, y)
 
-  let draw_existing_highlights t1 = 
+  let rec draw_existing_highlights t1 = 
     match DataController.page_highlights t1 with
-    | (s, (c, e))::t -> Graphics.set_color (Colours.decolorify c); (* relative or absolute; other coordinates? *)
+    | (s, (c, e))::t -> Graphics.set_color (c); 
               let (start_x, start_y) = rel_index_to_pixels s in 
               let (end_x, end_y) = rel_index_to_pixels e in 
               custom_highlight start_x start_y end_x end_y;
               draw_existing_highlights t1;
+    | [] -> Graphics.set_color black;
+
+  let rec draw_existing_notes t1 = 
+    match DataController.page_notes t1 with
+    | (s, c)::t -> Graphics.set_color (c); 
+              let (start_x, start_y) = rel_index_to_pixels s in 
+              Graphics.fill_circle start_x start_y 2;
+              draw_existing_notes t1;
+    | [] -> Graphics.set_color black
+
+  let rec draw_existing_bookmark t1 = 
+    match DataController.page_bookmarks t1 with
+    | (s, c)::t -> Graphics.set_color (c); 
+                   Graphics.fill_circle 510 636 10; 
+              draw_existing_bookmark t1;
     | [] -> Graphics.set_color black;
 
    let draw_page which t =
@@ -219,6 +234,7 @@ module UserInterface = struct
       custom_print new_t.page_content left_edge top_edge; new_t
       (* add bookmarks, highlights and notes already there *)
       (* draw_existing_highlights new_t *)
+      (* draw_existing_notes new_t *)
 
     with
       | Page_Undefined _ -> print_string "Can't draw page"; t
