@@ -241,7 +241,7 @@ module UserInterface = struct
 
   let rec draw_existing_notes t1 = 
     match DataController.page_notes t1 with
-    | (s, c)::t -> Graphics.set_color (colour_to_color c); 
+    | (s, (c, n_t))::t -> Graphics.set_color (colour_to_color c); 
               let (start_x, start_y) = rel_index_to_pixels s in 
               Graphics.fill_circle start_x start_y 2;
               draw_existing_notes t1;
