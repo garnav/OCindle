@@ -38,6 +38,39 @@ module UserInterface = struct
     else if c = Graphics.green then GREEN
     else raise Invalid_Colour
 
+  (* Colours to Graphics Colours module *)
+  let colour_to_color c =
+    if c = BLACK then Graphics.black
+    else if c = RED then Graphics.red 
+    else if c = BLUE then Graphics.blue
+    else if c = YELLOW then Graphics.yellow
+    else if c = PURPLE then Graphics.magenta
+    else if c = GREEN then Graphics.green 
+    else raise Invalid_Colour
+
+
+  (* Using match instead of if...else
+  let color_to_colour c =
+    match c with 
+    | Graphics.black -> BLACK
+    | Graphics.red -> RED
+    | Graphics.blue -> BLUE
+    | Graphics.yellow -> YELLOW
+    | Graphics.magenta -> PURPLE
+    | Graphics.green -> GREEN
+    | _ -> raise Invalid_Colour
+
+
+  let colour_to_color c =
+    match c with 
+    | BLACK -> Graphics.black
+    | RED -> Graphics.red
+    | BLUE -> Graphics.blue
+    | YELLOW -> Graphics.yellow
+    | PURPLE -> Graphics.magenta
+    | GREEN -> Graphics.green
+    | _ -> raise Invalid_Colour *)
+
 
   let rec custom_highlight x1 y1 x2 y2 =
     if y2 < y1
@@ -200,7 +233,7 @@ module UserInterface = struct
 
   let rec draw_existing_highlights t1 = 
     match DataController.page_highlights t1 with
-    | (s, (c, e))::t -> Graphics.set_color (c); 
+    | (s, (c, e))::t -> Graphics.set_color (colour_to_color c); 
               let (start_x, start_y) = rel_index_to_pixels s in 
               let (end_x, end_y) = rel_index_to_pixels e in 
               custom_highlight start_x start_y end_x end_y;
@@ -209,15 +242,16 @@ module UserInterface = struct
 
   let rec draw_existing_notes t1 = 
     match DataController.page_notes t1 with
-    | (s, c)::t -> Graphics.set_color (c); 
+    | (s, (c, n_t))::t -> Graphics.set_color (colour_to_color c); 
               let (start_x, start_y) = rel_index_to_pixels s in 
               Graphics.fill_circle start_x start_y 2;
               draw_existing_notes t1;
     | [] -> Graphics.set_color black
 
   let rec draw_existing_bookmark t1 = 
+    (* unsure of output format *)
     match DataController.page_bookmarks t1 with
-    | (s, c)::t -> Graphics.set_color (c); 
+    | (s, c)::t -> Graphics.set_color (colour_to_color c); 
                    Graphics.fill_circle 510 636 10; 
               draw_existing_bookmark t1;
     | [] -> Graphics.set_color black;
@@ -240,29 +274,45 @@ module UserInterface = struct
       | Page_Undefined _ -> print_string "Can't draw page"; t
 
 
-  (* Initialization *)
   let open_book name =
-
-    (* RAISE AND DEFINE exception *)
 
     Graphics.open_graph window_size;
     Graphics.set_window_title window_title;
 
-    let page_contents = [get_book_data name] in 
-    ;
+    (* call function in DataController *)
 
-    (* The user is presented with a list of bookshelves, each containing a list of books. *)
-    (* Display list of bookshelves; choose bookshelf; display list of books;
-    choose book; display first/last saved page of book *)
+  let choose_bookshelf () = 
+  (* print a list of bookshelves given by a helper function *)
 
-    (* initialize values *)
+  (* take integer input corresponding to a bookshelf *)
+  (* let choice = read_int () *)
+
+  (* print a list of books in that bookshelf *)
+  (* Call choose_book function *)
+  failwith "Unimplemented"
+
+  let choose_book () = 
+  (* print a list of books on this bookshelf given by a helper function *)
+
+  (* take integer input corresponding to a bookshelf *)
+  (* let choice = read_int () *)
+
+  (* Call open_book function *)
+  failwith "Unimplemented"
 
 
-  let close_book () =
+
+  let close_book t =
     failwith "Unimplemented"
+
     (* save book data (type t) locally *)
+    DataController.close_book t;
+
     (* Graphics.close_graph () *)
-    (* print_endline "You closed the book."; *)
+    Graphics.close_graph ()
+
+    (* display message *)
+    print_endline "You closed the book "; (* add book name here *)
 
 
   (* Testing Purposes *)
@@ -272,6 +322,21 @@ module UserInterface = struct
     let start_x = within_x_range first_pos.mouse_x in
     let start_y = within_y_range first_pos.mouse_y in
     print_int (relative_index start_x start_y) ;
+
+
+let rec repl colour t =
+  match Graphics.wait_next_event [Key_pressed] with 
+  | 'd' -> let t1 = draw_page `Next in repl t1
+  | 'a' -> let t1 = draw_page `Prev in repl t1
+  | 'b' -> let t1 = draw_bookmark colour t in repl t1
+  | 'h' -> let t1 = draw_highlights colour t in repl t1
+  | 'n' -> let t1 = draw_notes colour t in repl t1
+  | 'q' -> let t1 = erase_bookmark t in repl t1
+  | 'w' -> let t1 = erase_highlights t in repl t1
+  | 'e' -> let t1 = erase_notes t in repl t1
+  | 'o' -> let t1 = open_book [name] in repl t1
+  | 'c' -> close_book t;
+
 
 (*LIST OF POSSIBLE COMMANDS:
 (DOES IT DEPEND ON STATE THOUGH)
