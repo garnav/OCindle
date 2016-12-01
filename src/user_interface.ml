@@ -62,43 +62,6 @@ module UserInterface = struct
         (Graphics.moveto x y;
         Graphics.draw_string str)
 
-
-  (* Initialization *)
-  let open_book name =
-
-    (* RAISE AND DEFINE exception *)
-
-    Graphics.open_graph window_size;
-    Graphics.set_window_title window_title;
-
-    let page_contents = [get_book_data name] in 
-    ;
-
-    (* The user is presented with a list of bookshelves, each containing a list of books. *)
-    (* Display list of bookshelves; choose bookshelf; display list of books;
-    choose book; display first/last saved page of book *)
-
-    (* initialize values *)
-
-
-  let close_book () =
-    failwith "Unimplemented"
-
-   let draw_page which color t =
-    try
-      (* match mouse click with polymorphic variants *)
-      let new_t = 
-      match which with 
-      | `Prev -> DataController.prev_page max_char t
-      | `Next -> DataController.next_page max_char t
-      | `Curr -> t in
-      Graphics.clear_graph ();
-      custom_print t.page_content left_edge top_edge; 
-      (* add bookmarks, highlights and notes already there *)
-    with
-      | Page_Undefined _ -> print_string "Can't draw page";
-
-
   let draw_bookmark colour t1 =
     try
        let new_t = DataController.add_bookmark
@@ -230,7 +193,43 @@ module UserInterface = struct
   with
   | Word_Not_Found -> print_string ("You didn't choose a single word " ^
                       "or no meaning of the word exists")
-    
+
+   let draw_page which color t =
+    try
+      (* match mouse click with polymorphic variants *)
+      let new_t = 
+      match which with 
+      | `Prev -> DataController.prev_page max_char t
+      | `Next -> DataController.next_page max_char t
+      | `Curr -> t in
+      Graphics.clear_graph ();
+      custom_print t.page_content left_edge top_edge; 
+      (* add bookmarks, highlights and notes already there *)
+    with
+      | Page_Undefined _ -> print_string "Can't draw page";
+
+
+  (* Initialization *)
+  let open_book name =
+
+    (* RAISE AND DEFINE exception *)
+
+    Graphics.open_graph window_size;
+    Graphics.set_window_title window_title;
+
+    let page_contents = [get_book_data name] in 
+    ;
+
+    (* The user is presented with a list of bookshelves, each containing a list of books. *)
+    (* Display list of bookshelves; choose bookshelf; display list of books;
+    choose book; display first/last saved page of book *)
+
+    (* initialize values *)
+
+
+  let close_book () =
+    failwith "Unimplemented"
+
 
   (* Testing Purposes *)
   let check a =
