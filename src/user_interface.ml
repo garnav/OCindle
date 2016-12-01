@@ -152,7 +152,6 @@ module UserInterface = struct
       let new_t = DataController.delete_notes
                    (relative_index start_x start_y)
                    t1 in
-       Graphics.set_color colour;
        Graphics.set_color white;
        Graphics.fill_circle start_x start_y 2;
        new_t
