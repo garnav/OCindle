@@ -24,7 +24,7 @@ module UserInterface = struct
   let within_x_range x = (x / char_width) * char_width
 
   let relative_index x y =
-    let line_number = (top_edge - y) / 13 in (*0-indexed*)
+    let line_number = (top_edge - y) / char_height in (* 0-indexed *)
     let within_line = (x - left_edge) / char_width in
     (line_number * chars_line) + within_line + line_number
 
@@ -192,6 +192,21 @@ module UserInterface = struct
   | Word_Not_Found -> print_string ("You didn't choose a single word " ^
                       "or no meaning of the word exists")
 
+  let rel_index_to_pixels ri =
+    let actual_line_number = ri mod 84 in 
+    let x = char_width * (ri mod actual_line_number) + left_edge in 
+    let y = top_edge - char_height * ((ri - ri mod actual_line_number)/(chars_line + 1)) in
+    (x, y)
+
+  let draw_existing_highlights t1 = 
+    match DataController.page_highlights t1 with
+    | (s, (e, c))::t -> Graphics.set_color c; (* relative or absolute; other coordinates? *)
+              let (start_x, start_y) = rel_index_to_pixels s in 
+              let (end_x, end_y) = rel_index_to_pixels e in 
+              custom_highlight start_x start_y end_x end_y;
+              draw_existing_highlights t1;
+    | [] -> Graphics.set_color black;
+
    let draw_page which t =
     try
       (* match mouse click with polymorphic variants *)
@@ -203,6 +218,8 @@ module UserInterface = struct
       Graphics.clear_graph ();
       custom_print new_t.page_content left_edge top_edge; new_t
       (* add bookmarks, highlights and notes already there *)
+      (* draw_existing_highlights new_t *)
+
     with
       | Page_Undefined _ -> print_string "Can't draw page"; t
 
@@ -227,6 +244,9 @@ module UserInterface = struct
 
   let close_book () =
     failwith "Unimplemented"
+    (* save book data (type t) locally *)
+    (* Graphics.close_graph () *)
+    (* print_endline "You closed the book."; *)
 
 
   (* Testing Purposes *)
