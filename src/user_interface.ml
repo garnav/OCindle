@@ -129,9 +129,9 @@ module UserInterface = struct
     (* call helper function in perspective to add these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in
     (* try/with, prompt with nice message *)
-    let note_text = read_line ();
-    let start_x = within_range first_pos.mouse_x in
-    let start_y = within_range first_pos.mouse_y - 5 in
+    let note_text = read_line () in 
+    let start_x = within_x_range first_pos.mouse_x in
+    let start_y = within_y_range first_pos.mouse_y - 5 in
     try
       let new_t = DataController.add_notes
                    (relative_index start_x start_y)
@@ -147,8 +147,8 @@ module UserInterface = struct
   let erase_notes t1 =
     (* call helper function in perspective to add these notes *)
     let first_pos = Graphics.wait_next_event [Button_down] in
-    let start_x = within_range first_pos.mouse_x in
-    let start_y = within_range first_pos.mouse_y - 5 in
+    let start_x = within_x_range first_pos.mouse_x in
+    let start_y = within_y_range first_pos.mouse_y - 5 in
     try
       let new_t = DataController.delete_notes
                    (relative_index start_x start_y)
