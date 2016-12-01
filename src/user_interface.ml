@@ -96,7 +96,7 @@ module UserInterface = struct
       custom_print t.page_content left_edge top_edge; 
       (* add bookmarks, highlights and notes already there *)
     with
-      | Page_Undefined -> print_string "Can't draw page";
+      | Page_Undefined _ -> print_string "Can't draw page";
 
 
   let draw_bookmark colour t1 =
