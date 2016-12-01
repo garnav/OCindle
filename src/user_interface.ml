@@ -30,13 +30,25 @@ module UserInterface = struct
 
   (* Graphics Colours to Colours module *)
   let color_to_colour c =
-    if c = Graphics.black then BLACK
-    else if c = Graphics.red then RED
-    else if c = Graphics.blue then BLUE
-    else if c = Graphics.yellow then YELLOW
-    else if c = Graphics.magenta then PURPLE
-    else if c = Graphics.green then GREEN
-    else raise Invalid_Colour
+    match c with 
+    | Graphics.black -> BLACK
+    | Graphics.red -> RED
+    | Graphics.blue -> BLUE
+    | Graphics.yellow -> YELLOW
+    | Graphics.magenta -> PURPLE
+    | Graphics.green -> GREEN
+    | _ -> raise Invalid_Colour
+
+
+  let colour_to_color c =
+    match c with 
+    | BLACK -> Graphics.black
+    | RED -> Graphics.red
+    | BLUE -> Graphics.blue
+    | YELLOW -> Graphics.yellow
+    | PURPLE -> Graphics.magenta
+    | GREEN -> Graphics.green
+    | _ -> raise Invalid_Colour
 
 
   let rec custom_highlight x1 y1 x2 y2 =
@@ -200,7 +212,7 @@ module UserInterface = struct
 
   let rec draw_existing_highlights t1 = 
     match DataController.page_highlights t1 with
-    | (s, (c, e))::t -> Graphics.set_color (c); 
+    | (s, (c, e))::t -> Graphics.set_color (colour_to_color c); 
               let (start_x, start_y) = rel_index_to_pixels s in 
               let (end_x, end_y) = rel_index_to_pixels e in 
               custom_highlight start_x start_y end_x end_y;
@@ -209,7 +221,7 @@ module UserInterface = struct
 
   let rec draw_existing_notes t1 = 
     match DataController.page_notes t1 with
-    | (s, c)::t -> Graphics.set_color (c); 
+    | (s, c)::t -> Graphics.set_color (colour_to_color c); 
               let (start_x, start_y) = rel_index_to_pixels s in 
               Graphics.fill_circle start_x start_y 2;
               draw_existing_notes t1;
@@ -217,7 +229,7 @@ module UserInterface = struct
 
   let rec draw_existing_bookmark t1 = 
     match DataController.page_bookmarks t1 with
-    | (s, c)::t -> Graphics.set_color (c); 
+    | (s, c)::t -> Graphics.set_color (colour_to_color c); 
                    Graphics.fill_circle 510 636 10; 
               draw_existing_bookmark t1;
     | [] -> Graphics.set_color black;
