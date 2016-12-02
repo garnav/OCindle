@@ -180,10 +180,12 @@ module DataController = struct
 	let checking_function = (fun (i, m) -> (i, m, note_surroundings i max_num t1)) in
 	List.map checking_function retrieved_lst
 	
-  let sort_highlights_loc t1 all_ann id range =
+  let sort_highlights_loc t1 all_ann =
     let retrieved_lst = Perspective.highlight_by_loc all_ann in
 	let internal_function = (fun (i, (c, e)) -> (i, c, highlight_surroundings i e t1)) in
 	List.map internal_function retrieved_lst
+	
+  let search term all_ann = Perspective.search_notes all_ann term
   
 (**************************** BOOKSHELF & BOOKS *****************************************)
 
