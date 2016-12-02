@@ -78,11 +78,11 @@ module UserInterface = struct
 (************** PRINTING & HIGHLIGHTING ON THE GRAPHICS WINDOWS ***************)
 
   let rec custom_highlight x1 y1 x2 y2 =
-    if y2 < y1
+    if (y2 < y1)
     then (Graphics.moveto x1 y1 ;
-           Graphics.lineto right_edge y1 ;
-           custom_highlight left_edge (y1 - char_height) x2 y2)
-  else (Graphics.moveto x1 y1 ; Graphics.lineto x2 y1)
+           Graphics.lineto right_edge y1;
+           custom_highlight left_edge (y1 - char_height) x2 y2;)
+  else Graphics.moveto x1 y1 ; Graphics.lineto x2 y1;
 
 
   let rec custom_print str x y =
