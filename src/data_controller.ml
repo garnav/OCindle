@@ -129,6 +129,8 @@ module DataController = struct
     let new_contents = String.sub t.book_text new_start (new_end - new_start + 1) in
     let new_ann = Marginalia.get_page_overlay t.id (new_start, new_end) in
 	create_page_info new_start new_end new_contents new_ann t
+	
+  let page_number t = t.page_end / (String.length t.book_text - 1)
 
   (*let return_definition word =
     try
