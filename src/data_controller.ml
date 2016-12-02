@@ -49,7 +49,8 @@ module DataController = struct
     with
       | Not_found -> raise Annotation_Error
 	
-(**************************** PAGE HIGHLIGHTS ************************************)  
+(**************************** PAGE HIGHLIGHTS ************************************)
+
   let add_highlights beg ending colour t1 =
     let absolute_start = t1.page_start + beg in
     let absolute_end = t1.page_start + ending in
@@ -64,6 +65,7 @@ module DataController = struct
      abs_to_rel_highlights (Marginalia.highlights_list (debox_ann (t.page_annotations))) t
 	 
 (**************************** PAGE NOTES ********************************************)
+
   let add_notes beg note colour t1 =
     let absolute_start = t1.page_start + beg in
 	general_add absolute_start note colour t1 Marginalia.add_note
@@ -76,6 +78,7 @@ module DataController = struct
     abs_to_rel_notes (Marginalia.notes_list (debox_ann (t.page_annotations))) t
 	
 (**************************** PAGE BOOKMARK *****************************************)
+
   let add_bookmarks t1 colour =
     try
       let new_ann = Marginalia.add_bookmark (debox_ann t1.page_annotations) colour in
@@ -94,6 +97,7 @@ module DataController = struct
     Marginalia.is_bookmarked (debox_ann t.page_annotations)
 
 (**************************** PAGE CONTENT CONTROL ***********************************)
+
   let create_page_info start ending contents ann t =
     { t with page_start = start ;
              page_end   = ending ;
@@ -130,15 +134,19 @@ module DataController = struct
     let new_ann = Marginalia.get_page_overlay t.id (new_start, new_end) in
 	create_page_info new_start new_end new_contents new_ann t
 	
-  let page_number t = t.page_end / (String.length t.book_text - 1)
-
-  (*let return_definition word =
+  let page_number t max_char = t.page_end / max_char
+  
+   let percent_read t =
+      (/.) (float_of_int t.page_end) (float_of_int ((String.length t.book_text) - 1))
+	  
+	    (*let return_definition word =
     try
       Bookshelf.get_definition word
     with
     | Word_Not_Found -> raise No_Annotation*)
 	
 (**************************** META BOOK DATA *****************************************)
+
   let meta_annotations t = Perspective.create_range t.id (0, String.length t.book_text)
 	
   let highlight_surroundings i e t1 = String.sub t1.book_text i (e - i + 1)
@@ -177,7 +185,8 @@ module DataController = struct
 	let internal_function = (fun (i, (c, e)) -> (i, c, highlight_surroundings i e t1)) in
 	List.map internal_function retrieved_lst
   
-(**************************** BOOKSHELF & BOOKS *****************************************) 
+(**************************** BOOKSHELF & BOOKS *****************************************)
+
    let bookshelf_list () =
      let bs_lst = list_bookshelves in
 	 List.map (fun x -> (x, get_bookshelf_name x)) bs_lst
