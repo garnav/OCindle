@@ -7,7 +7,8 @@ module UserInterface = struct
 
   type t = DataController.t
 
-  (* Window Constants *)
+(**************************** WINDOW CONSTANTS *******************************)
+
   let char_height = 13 (* height of a character *)
   let char_width = 6   (* width of a character *)
   let left_edge = 18   (* left edge of first char in any line *)
@@ -19,6 +20,9 @@ module UserInterface = struct
   let window_size = " 540x650" (* width x height *)
   let window_title = "OCindle - no, it's not the Kindle" (* title *)
 
+
+(**************************** WINDOW HELPERS *******************************)
+
   let within_y_range y = (y / char_height) * char_height
 
   let within_x_range x = (x / char_width) * char_width
@@ -27,6 +31,12 @@ module UserInterface = struct
     let line_number = (top_edge - y) / char_height in (* 0-indexed *)
     let within_line = (x - left_edge) / char_width in
     (line_number * chars_line) + within_line + line_number
+
+  let rel_index_to_pixels ri =
+    let actual_line_number = ri mod 84 in 
+    let x = (char_width * actual_line_number) + left_edge in 
+    let y = top_edge - char_height * (ri - ri mod 84)/(chars_line + 1) in
+    (x, y)
 
   (* Graphics Colours to Colours module *)
   let color_to_colour c =
@@ -48,6 +58,25 @@ module UserInterface = struct
     else if c = GREEN then Graphics.green 
     else raise Invalid_Colour
 
+  let rec print_lst counter bookshelf = 
+    match bookshelf with 
+    | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter; 
+    print_lst counter t;
+    | [] -> ();
+
+  let rec rec_thru_list counter lst = 
+  match lst with 
+  | (b, context)::t -> custom_print context 18 !counter; counter := !counter - 13; rec_thru_list t; 
+  | [] -> ();
+
+  let rec color_parts all_parts =
+  match all_parts with 
+  | (colour, other_part)::t1 -> Graphics.set_color colour; rec_thru_list (ref 611) other_part;
+                             color_highlights t1;
+  | [] -> ();
+
+(************** PRINTING & HIGHLIGHTING ON THE GRAPHICS WINDOWS ***************)
+
   let rec custom_highlight x1 y1 x2 y2 =
     if y2 < y1
     then (Graphics.moveto x1 y1 ;
@@ -56,7 +85,6 @@ module UserInterface = struct
   else (Graphics.moveto x1 y1 ; Graphics.lineto x2 y1)
 
 
-  (* Printing *)
   let rec custom_print str x y =
     Graphics.set_color Graphics.black ;
     let print_chars = chars_line + 1 in
@@ -71,13 +99,16 @@ module UserInterface = struct
         (Graphics.moveto x y;
         Graphics.draw_string str)
 
-let draw_page_data t = 
-  let page_number = DataController.page_number t max_char in 
-  let percent_read = DataController.percent_read t in 
-  let page_number_string = string_to_int page_number in 
-  let percent_read_string = string_to_int (int_to_float percent_read) in 
-  Graphics.set_color blue; Graphics.moveto 270 13; 
-  Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%");
+
+(****************** DRAWING PAGES, ANNOTATIONS & MEANING *********************)
+
+  let draw_page_data t = 
+    let page_number = DataController.page_number t max_char in 
+    let percent_read = DataController.percent_read t in 
+    let page_number_string = string_to_int page_number in 
+    let percent_read_string = string_to_int (int_to_float percent_read) in 
+    Graphics.set_color blue; Graphics.moveto 270 13; 
+    Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%"); Graphics.set_color black;
 
   let draw_bookmark colour t1 =
     try
@@ -87,7 +118,7 @@ let draw_page_data t =
        Graphics.set_color black; (* original color *)
        new_t
     with
-      | Annotation_Error -> print_string "A bookmark already exists" ; t1 
+      | DataController.Annotation_Error -> print_string "A bookmark already exists" ; t1 
 
 
   let erase_bookmark t1 =
@@ -98,7 +129,7 @@ let draw_page_data t =
       Graphics.set_color black; (* original color *)
        new_t
     with
-      | Annotation_Error -> print_string "The bookmark doesn't exist" ; t1
+      | DataController.Annotation_Error -> print_string "The bookmark doesn't exist" ; t1
 
 
   let draw_notes colour t1 =
@@ -116,7 +147,7 @@ let draw_page_data t =
       Graphics.fill_circle start_x start_y 2;
       new_t
     with
-      | Annotation_Error -> print_string "Notes can't be added at this point" ; t1
+      | DataController.Annotation_Error -> print_string "Notes can't be added at this point" ; t1
 
 
   let erase_notes t1 =
@@ -133,7 +164,7 @@ let draw_page_data t =
       Graphics.fill_circle start_x start_y 2;
       new_t
     with
-      | Annotation_Error -> print_string "The note doesn't exist" ; t1
+      | DataController.Annotation_Error -> print_string "The note doesn't exist" ; t1
 
 
   let draw_highlights colour t1 =
@@ -152,7 +183,7 @@ let draw_page_data t =
        custom_highlight start_x start_y end_x end_y;
        new_t
     with
-      | Annotation_Error -> print_string "A highlight already exists" ; t1
+      | DataController.Annotation_Error -> print_string "A highlight already exists" ; t1
 
 
   let erase_highlights t =
@@ -168,9 +199,9 @@ let draw_page_data t =
       custom_highlight s_x s_y e_x e_y ;
       new_t
     with
-      | Annotation_Error -> print_string "No highlight starts at this position." ; t
+      | DataController.Annotation_Error -> print_string "No highlight starts at this position." ; t
 
-
+  (* TEST *)
   let draw_meaning word t =
   try
     (* Highlight word *)
@@ -202,14 +233,8 @@ let draw_page_data t =
   else ();
 
   with
-  | Word_Not_Found -> print_string ("You didn't choose a single word " ^
+  | _ -> print_string ("You didn't choose a single word " ^
                       "or no meaning of the word exists")
-
-  let rel_index_to_pixels ri =
-    let actual_line_number = ri mod 84 in 
-    let x = char_width * (ri mod actual_line_number) + left_edge in 
-    let y = top_edge - char_height * ((ri - ri mod actual_line_number)/(chars_line + 1)) in
-    (x, y)
 
 
   let rec draw_existing_highlights t1 = 
@@ -236,7 +261,7 @@ let draw_page_data t =
               Graphics.fill_circle 510 636 10; 
     | None -> ();
 
-   let draw_page which t =
+  let draw_page which t =
     try
       let new_t = 
       match which with 
@@ -251,20 +276,25 @@ let draw_page_data t =
       draw_page_data new_t;
 
     with
-      | Page_Undefined _ -> print_string "Can't draw page"; t
+      | DataController.Page_Undefined _ -> print_string "Can't draw page"; t
 
+  let rec display_notes t =
+    let all_ann = DataController.meta_annotations t in 
+    let all_notes = DataController.sort_notes_color t all_ann in 
+    color_parts all_notes
+
+  let display_highlights t =
+    let all_ann = DataController.meta_annotations t in 
+    let all_highlights = DataController.sort_highlights_colour t all_ann in 
+    color_parts all_highlights
+
+(****************** OPENING AND CLOSING THE BOOK ***************************)
 
   let open_book bookshelf_id book_id =
     Graphics.open_graph window_size;
     Graphics.set_window_title window_title;
     let t1 = DataController.init_book max_char bookshelf_id book_id in 
     draw_page `Curr t1
-
-  let rec print_lst counter bookshelf = 
-    match bookshelf with 
-    | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter; 
-    print_lst counter t;
-    | [] -> ();
 
   let choose_book bookshelf_id = 
   (* print a list of books on this bookshelf given by a helper function *)
@@ -279,10 +309,6 @@ let draw_page_data t =
 
   with
     | _ -> print_endline "Can't open book"
-  (* take integer input corresponding to a bookshelf *)
-  (* let choice = read_int () *)
-
-  (* Call open_book function *)
 
   let choose_bookshelf () = 
   try
@@ -309,27 +335,11 @@ let draw_page_data t =
 
     (* display message *)
     print_endline "You closed the book "; (* add book name here *)
- 
-let rec rec_thru_list counter lst = 
-  match lst with 
-  | (b, context)::t -> custom_print context 18 !counter; counter := !counter - 13; rec_thru_list t; 
-  | [] -> ();
 
-let rec color_parts all_parts =
-  match all_parts with 
-  | (colour, other_part)::t1 -> Graphics.set_color colour; rec_thru_list (ref 611) other_part;
-                             color_highlights t1;
-  | [] -> ();
+  (* searching notes *)
 
-let rec display_notes t =
-  let all_ann = DataController.meta_annotations t in 
-  let all_notes = DataController.sort_notes_color t all_ann in 
-  color_parts all_notes
+(******************************** REPL ***********************************)
 
-let display_highlights t =
-  let all_ann = DataController.meta_annotations t in 
-  let all_highlights = DataController.sort_highlights_colour t all_ann in 
-  color_parts all_highlights
 
   let rec repl () =
     try
@@ -350,21 +360,7 @@ let display_highlights t =
 
   let main () =
     repl ();
-
-(*LIST OF POSSIBLE COMMANDS:
-(DOES IT DEPEND ON STATE THOUGH)
-'w' : next page in a book
-'s' : previous page in a book
-'a' : intention to add something
-      FOLLOWED BY - 'b' : book mark
-                    'h' : highlight
-                    'n' : note
-'d' : intention to delete something
-      FOLLOWED BY - 'b' : book mark
-                    'h' : highlight
-                    'n' : note
-'b' : go to list of bookshelves
-*)
+    exit 0
 
 end
 

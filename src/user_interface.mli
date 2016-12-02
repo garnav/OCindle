@@ -1,9 +1,8 @@
-open DataController
 module type UserInterface = sig
-
+    open DataController
 
   (* the type of the data structure that stores relevant information
-  about the book including, but not limited to the book id, book text and 
+  about the book including, but not limited to the book ID, book text and 
   page content. *)
   type t 
 
