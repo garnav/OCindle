@@ -33,8 +33,8 @@ module UserInterface = struct
     (line_number * chars_line) + within_line + line_number
 
   let rel_index_to_pixels ri =
-    let actual_line_number = ri mod 84 in 
-    let x = (char_width * actual_line_number) + left_edge in 
+    let actual_line_number = ri mod 84 in
+    let x = (char_width * actual_line_number) + left_edge in
     let y = top_edge - char_height * (ri - ri mod 84)/(chars_line + 1) in
     (x, y)
 
@@ -51,26 +51,26 @@ module UserInterface = struct
   (* Colours to Graphics Colours module *)
   let colour_to_color c =
     if c = BLACK then Graphics.black
-    else if c = RED then Graphics.red 
+    else if c = RED then Graphics.red
     else if c = BLUE then Graphics.blue
     else if c = YELLOW then Graphics.yellow
     else if c = PURPLE then Graphics.magenta
-    else if c = GREEN then Graphics.green 
+    else if c = GREEN then Graphics.green
     else raise Invalid_Colour
 
-  let rec print_lst counter bookshelf = 
-    match bookshelf with 
-    | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter; 
+  let rec print_lst counter bookshelf =
+    match bookshelf with
+    | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter;
     print_lst counter t;
     | [] -> ();
 
-  let rec rec_thru_list counter lst = 
-  match lst with 
-  | (b, context)::t -> custom_print context 18 !counter; counter := !counter - 13; rec_thru_list t; 
+  let rec rec_thru_list counter lst =
+  match lst with
+  | (b, context)::t -> custom_print context 18 !counter; counter := !counter - 13; rec_thru_list t;
   | [] -> ();
 
   let rec color_parts all_parts =
-  match all_parts with 
+  match all_parts with
   | (colour, other_part)::t1 -> Graphics.set_color colour; rec_thru_list (ref 611) other_part;
                              color_highlights t1;
   | [] -> ();
@@ -86,7 +86,7 @@ module UserInterface = struct
 
 
   let rec custom_print str x y =
-    Graphics.set_color Graphics.black ;
+    Graphics.set_color black ;
     let print_chars = chars_line + 1 in
     if (String.length str > print_chars)
       then
@@ -102,12 +102,12 @@ module UserInterface = struct
 
 (****************** DRAWING PAGES, ANNOTATIONS & MEANING *********************)
 
-  let draw_page_data t = 
-    let page_number = DataController.page_number t max_char in 
-    let percent_read = DataController.percent_read t in 
-    let page_number_string = string_to_int page_number in 
-    let percent_read_string = string_to_int (int_to_float percent_read) in 
-    Graphics.set_color blue; Graphics.moveto 270 13; 
+  let draw_page_data t =
+    let page_number = DataController.page_number t max_char in
+    let percent_read = DataController.percent_read t in
+    let page_number_string = string_to_int page_number in
+    let percent_read_string = string_to_int (int_to_float percent_read) in
+    Graphics.set_color blue; Graphics.moveto 270 13;
     Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%"); Graphics.set_color black;
 
   let draw_bookmark colour t1 =
@@ -118,7 +118,7 @@ module UserInterface = struct
        Graphics.set_color black; (* original color *)
        new_t
     with
-      | DataController.Annotation_Error -> print_string "A bookmark already exists" ; t1 
+      | DataController.Annotation_Error -> print_string "A bookmark already exists" ; t1
 
 
   let erase_bookmark t1 =
@@ -134,10 +134,10 @@ module UserInterface = struct
 
   let draw_notes colour t1 =
     try
-      print_endline ("Please select on the window where you want to place the note" 
+      print_endline ("Please select on the window where you want to place the note"
       ^ "and after that type in the associated note here: ");
       let first_pos = Graphics.wait_next_event [Button_down] in
-      let note_text = read_line () in 
+      let note_text = read_line () in
       let start_x = within_x_range first_pos.mouse_x in
       let start_y = within_y_range (first_pos.mouse_y - 5) in
       let new_t = DataController.add_notes
@@ -214,8 +214,8 @@ module UserInterface = struct
     custom_highlight start_x start_y end_x end_y;
 
     (* Convert to English word *)
-    let start_pos = relative_index start_x start_y in 
-    let end_pos = relative_index end_x end_y in 
+    let start_pos = relative_index start_x start_y in
+    let end_pos = relative_index end_x end_y in
     let extr_str = String.sub t.page_content start_pos (end_pos - start_pos + 1) in
     (* Don't know whether this is a single word or not *)
 
@@ -227,7 +227,7 @@ module UserInterface = struct
     custom_print ("Definition: " ^ extr_str) left_edge top_edge;
 
     (* return previous page on key press *)
-    if (Graphics.key_pressed () = true) 
+    if (Graphics.key_pressed () = true)
     (* Unsure how this works *)
     then (custom_print t.page_content left_edge top_edge;)
   else ();
@@ -237,34 +237,34 @@ module UserInterface = struct
                       "or no meaning of the word exists")
 
 
-  let rec draw_existing_highlights t1 = 
+  let rec draw_existing_highlights t1 =
     match DataController.page_highlights t1 with
-    | (s, (c, e))::t -> Graphics.set_color (colour_to_color c); 
-              let (start_x, start_y) = rel_index_to_pixels s in 
-              let (end_x, end_y) = rel_index_to_pixels e in 
+    | (s, (c, e))::t -> Graphics.set_color (colour_to_color c);
+              let (start_x, start_y) = rel_index_to_pixels s in
+              let (end_x, end_y) = rel_index_to_pixels e in
               custom_highlight start_x start_y end_x end_y;
               draw_existing_highlights t1;
     | [] -> Graphics.set_color black;
 
 
-  let rec draw_existing_notes t1 = 
+  let rec draw_existing_notes t1 =
     match DataController.page_notes t1 with
-    | (s, (c, n_t))::t -> Graphics.set_color (colour_to_color c); 
-              let (start_x, start_y) = rel_index_to_pixels s in 
+    | (s, (c, n_t))::t -> Graphics.set_color (colour_to_color c);
+              let (start_x, start_y) = rel_index_to_pixels s in
               Graphics.fill_circle start_x start_y 2;
               draw_existing_notes t1;
     | [] -> Graphics.set_color black
 
-  let draw_existing_bookmark t1 = 
+  let draw_existing_bookmark t1 =
     match DataController.page_bookmark t1 with
-    | Some c -> Graphics.set_color (colour_to_color c); 
-              Graphics.fill_circle 510 636 10; 
+    | Some c -> Graphics.set_color (colour_to_color c);
+              Graphics.fill_circle 510 636 10;
     | None -> ();
 
   let draw_page which t =
     try
-      let new_t = 
-      match which with 
+      let new_t =
+      match which with
       | `Prev -> DataController.prev_page max_char t
       | `Next -> DataController.next_page max_char t
       | `Curr -> t in
@@ -279,13 +279,13 @@ module UserInterface = struct
       | DataController.Page_Undefined _ -> print_string "Can't draw page"; t
 
   let rec display_notes t =
-    let all_ann = DataController.meta_annotations t in 
-    let all_notes = DataController.sort_notes_color t all_ann in 
+    let all_ann = DataController.meta_annotations t in
+    let all_notes = DataController.sort_notes_color t all_ann in
     color_parts all_notes
 
   let display_highlights t =
-    let all_ann = DataController.meta_annotations t in 
-    let all_highlights = DataController.sort_highlights_colour t all_ann in 
+    let all_ann = DataController.meta_annotations t in
+    let all_highlights = DataController.sort_highlights_colour t all_ann in
     color_parts all_highlights
 
 (****************** OPENING AND CLOSING THE BOOK ***************************)
@@ -293,36 +293,36 @@ module UserInterface = struct
   let open_book bookshelf_id book_id =
     Graphics.open_graph window_size;
     Graphics.set_window_title window_title;
-    let t1 = DataController.init_book max_char bookshelf_id book_id in 
+    let t1 = DataController.init_book max_char bookshelf_id book_id in
     draw_page `Curr t1
 
-  let choose_book bookshelf_id = 
+  let choose_book bookshelf_id =
   (* print a list of books on this bookshelf given by a helper function *)
   try
-    let lst_of_books = DataController.book_list bookshelf_id in 
+    let lst_of_books = DataController.book_list bookshelf_id in
     print_endline "Choose a book"; print_lst (ref 0) lst_of_books;
     print_endline "Please choose a book by entering the index before the book";
-    let int_input = read_int () in 
-    let array_of_bookshelves = Array.of_list lst_of_bookshelves in 
-    let reqd_bookshelf = array_of_bookshelves.(int_input) in 
+    let int_input = read_int () in
+    let array_of_bookshelves = Array.of_list lst_of_bookshelves in
+    let reqd_bookshelf = array_of_bookshelves.(int_input) in
     open_book bookshelf_id (fst reqd_bookshelf)
 
   with
     | _ -> print_endline "Can't open book"
 
-  let choose_bookshelf () = 
+  let choose_bookshelf () =
   try
-    let lst_of_bookshelves = DataController.bookshelf_list () in 
+    let lst_of_bookshelves = DataController.bookshelf_list () in
     print_endline "Choose a bookshelf"; print_lst (ref 0) lst_of_bookshelves;
     print_endline "Please choose a bookshelf by entering the index before the bookshelf";
-    let int_input = read_int () in 
-    let array_of_bookshelves = Array.of_list lst_of_bookshelves in 
-    let reqd_bookshelf = array_of_bookshelves.(int_input) in 
+    let int_input = read_int () in
+    let array_of_bookshelves = Array.of_list lst_of_bookshelves in
+    let reqd_bookshelf = array_of_bookshelves.(int_input) in
     choose_book fst (reqd_bookshelf)
 
   with
     | _ -> failwith "Can't open bookshelf"
-  
+
 
   let close_book t =
     failwith "Unimplemented"
@@ -343,7 +343,7 @@ module UserInterface = struct
 
   let rec repl () =
     try
-      match Graphics.wait_next_event [Key_pressed] with 
+      match Graphics.wait_next_event [Key_pressed] with
       | 'd' -> let t1 = draw_page `Next in repl t1
       | 'a' -> let t1 = draw_page `Prev in repl t1
       | 'b' -> let t1 = draw_bookmark colour t in repl t1
