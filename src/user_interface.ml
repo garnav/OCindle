@@ -50,10 +50,10 @@ module UserInterface = struct
 
   let rec custom_highlight x1 y1 x2 y2 =
     if y2 < y1
-    then ( Graphics.moveto x1 y1 ;
+    then (Graphics.moveto x1 y1 ;
            Graphics.lineto right_edge y1 ;
-           custom_highlight left_edge (y1 - char_height) x2 y2 )
-  else ( Graphics.moveto x1 y1 ; Graphics.lineto x2 y1 )
+           custom_highlight left_edge (y1 - char_height) x2 y2)
+  else (Graphics.moveto x1 y1 ; Graphics.lineto x2 y1)
 
 
   (* Printing *)
@@ -76,7 +76,8 @@ let draw_page_data t =
   let percent_read = DataController.percent_read t in 
   let page_number_string = string_to_int page_number in 
   let percent_read_string = string_to_int (int_to_float percent_read) in 
-  draw_string (page_number_string ^ " | " ^ percent_read_string) 270 13;
+  Graphics.set_color blue; Graphics.moveto 270 13; 
+  Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%");
 
   let draw_bookmark colour t1 =
     try
@@ -101,7 +102,6 @@ let draw_page_data t =
 
 
   let draw_notes colour t1 =
-    (* call helper function in perspective to add these notes *)
     try
       print_endline ("Please select on the window where you want to place the note" 
       ^ "and after that type in the associated note here: ");
@@ -153,9 +153,6 @@ let draw_page_data t =
        new_t
     with
       | Annotation_Error -> print_string "A highlight already exists" ; t1
-
-  (*NOTE: Technically only needs the start index to begin. Uses, the second
-  index to understand what line to draw too.*)
 
 
   let erase_highlights t =
@@ -260,8 +257,6 @@ let draw_page_data t =
   let open_book bookshelf_id book_id =
     Graphics.open_graph window_size;
     Graphics.set_window_title window_title;
-
-    (* call function in DataController *)
     let t1 = DataController.init_book max_char bookshelf_id book_id in 
     draw_page `Curr t1
 
@@ -283,7 +278,7 @@ let draw_page_data t =
     open_book bookshelf_id (fst reqd_bookshelf)
 
   with
-    | _ -> failwith "Unknown"
+    | _ -> print_endline "Can't open book"
   (* take integer input corresponding to a bookshelf *)
   (* let choice = read_int () *)
 
@@ -300,14 +295,8 @@ let draw_page_data t =
     choose_book fst (reqd_bookshelf)
 
   with
-    | _ -> failwith "Unknown"
+    | _ -> failwith "Can't open bookshelf"
   
-
-  (* take integer input corresponding to a bookshelf *)
-  (* let choice = read_int () *)
-
-  (* print a list of books in that bookshelf *)
-  (* Call choose_book function *)
 
   let close_book t =
     failwith "Unimplemented"
