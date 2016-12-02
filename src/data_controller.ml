@@ -185,13 +185,13 @@ module DataController = struct
 	else (String.sub t1.book_text (i - (max_num/2) + 1) (max_num/2)) ^ (String.sub t1.book_text i (max_num/2))
 	
   let highlight_surroundings i e t1 = String.sub t1.book_text i (e - i + 1)
-  
-  let meta_annotations id range = Perspective.create_range id range
+
+  let meta_annotations t = Perspective.create_range t.id (0, String.length t.book_text)
   
   (*the first List.map is O(1) because we only have 7 elements in that list at a maximum.*)
   let sort_highlights_colour t1 all_ann =
     let retrieved_lst = Perspective.highlight_by_colour all_ann in
-	let internal_function = (fun (s,e) -> (s, e, highlight_surroundings s e t1)) in
+	let internal_function = (fun (s,e) -> (s, highlight_surroundings s e t1)) in
 	List.map (fun (c,lst) -> (c, List.map internal_function lst)) retrieved_lst
 			 
   let sort_notes_colour t1 all_ann max_num =
@@ -206,7 +206,7 @@ module DataController = struct
 	
   let sort_highlights_loc t1 all_ann id range =
     let retrieved_lst = Perspective.highlight_by_loc all_ann in
-	let internal_function = (fun (i, (c, e)) -> (i, (c,e), highlight_surroundings i e t1)) in
+	let internal_function = (fun (i, (c, e)) -> (i, c, highlight_surroundings i e t1)) in
 	List.map internal_function retrieved_lst
   
    (*Bookshelf and Book Control*)
@@ -222,10 +222,9 @@ module DataController = struct
   let close_book t =
     Marginalia.save_page (debox_ann t.page_annotations) ;
 	save_book_position t.bookshelf t.id t.page_start 
-  
 
 (*
-return current page string
+return current page strings
 all QA stuff
 *)
 end

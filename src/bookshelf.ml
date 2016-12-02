@@ -143,6 +143,7 @@ module Bookshelf = struct
   let get_current_position bd = bd.current_position
   let get_book_id bd = bd.id
   let get_title bd = bd.title
+  let get_total_chars bd = bd.total_chars
   
   
 end
