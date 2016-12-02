@@ -4,7 +4,6 @@ module UserInterface = struct
   open Colours
 
   exception Invalid_Colour
-  exception UI_Error
 
   type t = DataController.t
 
@@ -49,30 +48,6 @@ module UserInterface = struct
     else if c = GREEN then Graphics.green 
     else raise Invalid_Colour
 
-
-  (* Using match instead of if...else
-  let color_to_colour c =
-    match c with 
-    | Graphics.black -> BLACK
-    | Graphics.red -> RED
-    | Graphics.blue -> BLUE
-    | Graphics.yellow -> YELLOW
-    | Graphics.magenta -> PURPLE
-    | Graphics.green -> GREEN
-    | _ -> raise Invalid_Colour
-
-
-  let colour_to_color c =
-    match c with 
-    | BLACK -> Graphics.black
-    | RED -> Graphics.red
-    | BLUE -> Graphics.blue
-    | YELLOW -> Graphics.yellow
-    | PURPLE -> Graphics.magenta
-    | GREEN -> Graphics.green
-    | _ -> raise Invalid_Colour *)
-
-
   let rec custom_highlight x1 y1 x2 y2 =
     if y2 < y1
     then ( Graphics.moveto x1 y1 ;
@@ -95,6 +70,13 @@ module UserInterface = struct
     else
         (Graphics.moveto x y;
         Graphics.draw_string str)
+
+let draw_page_data t = 
+  let page_number = DataController.page_number t max_char in 
+  let percent_read = DataController.percent_read t in 
+  let page_number_string = string_to_int page_number in 
+  let percent_read_string = string_to_int (int_to_float percent_read) in 
+  draw_string (page_number_string ^ " | " ^ percent_read_string) 270 13;
 
   let draw_bookmark colour t1 =
     try
@@ -232,6 +214,7 @@ module UserInterface = struct
     let y = top_edge - char_height * ((ri - ri mod actual_line_number)/(chars_line + 1)) in
     (x, y)
 
+
   let rec draw_existing_highlights t1 = 
     match DataController.page_highlights t1 with
     | (s, (c, e))::t -> Graphics.set_color (colour_to_color c); 
@@ -240,6 +223,7 @@ module UserInterface = struct
               custom_highlight start_x start_y end_x end_y;
               draw_existing_highlights t1;
     | [] -> Graphics.set_color black;
+
 
   let rec draw_existing_notes t1 = 
     match DataController.page_notes t1 with
@@ -267,6 +251,7 @@ module UserInterface = struct
       draw_existing_highlights new_t;
       draw_existing_notes new_t;
       draw_existing_bookmark new_t;
+      draw_page_data new_t;
 
     with
       | Page_Undefined _ -> print_string "Can't draw page"; t
@@ -281,10 +266,10 @@ module UserInterface = struct
     draw_page `Curr t1
 
   let rec print_lst counter bookshelf = 
-  match bookshelf with 
-  | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter; 
-  print_lst counter t;
-  | [] -> ();
+    match bookshelf with 
+    | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter; 
+    print_lst counter t;
+    | [] -> ();
 
   let choose_book bookshelf_id = 
   (* print a list of books on this bookshelf given by a helper function *)
@@ -298,7 +283,7 @@ module UserInterface = struct
     open_book bookshelf_id (fst reqd_bookshelf)
 
   with
-  | _ -> failwith "Unknown"
+    | _ -> failwith "Unknown"
   (* take integer input corresponding to a bookshelf *)
   (* let choice = read_int () *)
 
@@ -315,7 +300,7 @@ module UserInterface = struct
     choose_book fst (reqd_bookshelf)
 
   with
-  | _ -> failwith "Unknown"
+    | _ -> failwith "Unknown"
   
 
   (* take integer input corresponding to a bookshelf *)
@@ -335,25 +320,47 @@ module UserInterface = struct
 
     (* display message *)
     print_endline "You closed the book "; (* add book name here *)
+ 
+let rec rec_thru_list counter lst = 
+  match lst with 
+  | (b, context)::t -> custom_print context 18 !counter; counter := !counter - 13; rec_thru_list t; 
+  | [] -> ();
 
+let rec color_parts all_parts =
+  match all_parts with 
+  | (colour, other_part)::t1 -> Graphics.set_color colour; rec_thru_list (ref 611) other_part;
+                             color_highlights t1;
+  | [] -> ();
 
-let rec repl colour t =
-  try
-    match Graphics.wait_next_event [Key_pressed] with 
-    | 'd' -> let t1 = draw_page `Next in repl t1
-    | 'a' -> let t1 = draw_page `Prev in repl t1
-    | 'b' -> let t1 = draw_bookmark colour t in repl t1
-    | 'h' -> let t1 = draw_highlights colour t in repl t1
-    | 'n' -> let t1 = draw_notes colour t in repl t1
-    | 'q' -> let t1 = erase_bookmark t in repl t1
-    | 'w' -> let t1 = erase_highlights t in repl t1
-    | 'e' -> let t1 = erase_notes t in repl t1
-    | 'o' -> let t1 = open_book [name] in repl t1
-    | 'c' -> close_book t;
+let rec display_notes t =
+  let all_ann = DataController.meta_annotations t in 
+  let all_notes = DataController.sort_notes_color t all_ann in 
+  color_parts all_notes
 
-  with
-  | _ -> failwith "Unknown"
-  
+let display_highlights t =
+  let all_ann = DataController.meta_annotations t in 
+  let all_highlights = DataController.sort_highlights_colour t all_ann in 
+  color_parts all_highlights
+
+  let rec repl () =
+    try
+      match Graphics.wait_next_event [Key_pressed] with 
+      | 'd' -> let t1 = draw_page `Next in repl t1
+      | 'a' -> let t1 = draw_page `Prev in repl t1
+      | 'b' -> let t1 = draw_bookmark colour t in repl t1
+      | 'h' -> let t1 = draw_highlights colour t in repl t1
+      | 'n' -> let t1 = draw_notes colour t in repl t1
+      | 'q' -> let t1 = erase_bookmark t in repl t1
+      | 'w' -> let t1 = erase_highlights t in repl t1
+      | 'e' -> let t1 = erase_notes t in repl t1
+      | 'o' -> let t1 = choose_bookshelf () in repl t1
+      | 'c' -> close_book t;
+
+      with
+      | _ -> print_endline "You pressed an incorrect key"
+
+  let main () =
+    repl ();
 
 (*LIST OF POSSIBLE COMMANDS:
 (DOES IT DEPEND ON STATE THOUGH)
