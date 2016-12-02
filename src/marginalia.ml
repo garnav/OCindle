@@ -121,7 +121,7 @@ module Marginalia = struct
 	  let final = `Assoc (addition :: without_assoc) in
 	  t1.file_json <- final
 
-  let add_note note i c t1 =
+  let add_note i note c t1 =
     if not (mem_assoc i t1.notes) then
 	  let () = json_add t1 (string_of_int i) "notes" (decolorify c) "note" (`String note) in
 	  { t1 with notes = (i, (c, note))::t1.notes }

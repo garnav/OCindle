@@ -51,7 +51,7 @@ module Perspective = struct
 	search_through_lst custom_reg lst_of_words
 	
   let search_notes t1 note =
-    fold_left (fun acc (i, (c, s)) -> if search_in_string (String.lowercase_ascii note)
+    fold_left (fun acc (i, (c, s)) -> if search_in_string (String.lowercase_ascii note) s
 	                                    then (i, (c, s)) :: acc
 									  else acc) [] (notes_list t1)
 
