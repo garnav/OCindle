@@ -35,6 +35,8 @@ module DataController = struct
   let abs_to_rel_notes lst t =
     List.rev_map (fun (i, r) -> (i - t.page_start, r)) lst
 	
+(**************************** HIGHER ORDER ADD & DELETE ***********************)
+	
   let general_add beg additional colour t1 f =
     try
 	  let new_ann = f beg additional colour (debox_ann t1.page_annotations) in
@@ -98,11 +100,16 @@ module DataController = struct
 
 (**************************** PAGE CONTENT CONTROL ***********************************)
 
-  let create_page_info start ending contents ann t =
-    { t with page_start = start ;
-             page_end   = ending ;
-             page_content = contents ;
-             page_annotations = Some ann }
+  let create_page_info start ending text shelf_id book_id =
+    let new_contents = String.sub text start (ending - start + 1) in
+    let new_ann = Marginalia.get_page_overlay book_id (start, ending) in
+    { bookshelf = shelf_id ;
+	  id = book_id ;
+	  book_text = text ;
+	  page_start = start ;
+      page_end   = ending ;
+      page_content = new_contents ;
+      page_annotations = Some new_ann }
   
   let next_page max_char t =
     (*Save all annotations on the current page*)
@@ -116,9 +123,7 @@ module DataController = struct
     (*Ensure that there is enough characters to print on this new page*)
     let new_end = if potential_end + 1 <= book_length then potential_end
                   else book_length - 1 in
-    let new_contents = String.sub t.book_text new_start (new_end - new_start + 1) in
-    let new_ann = Marginalia.get_page_overlay t.id (new_start, new_end) in
-	create_page_info new_start new_end new_contents new_ann t
+	create_page_info new_start new_end t.book_text t.bookshelf t.id
 
   let prev_page max_char t =
     (*Save all annotations on the current page*)
@@ -130,16 +135,26 @@ module DataController = struct
     let potential_start = new_end - max_char + 1 in
     let new_start = if potential_start < 0 then 0
                     else potential_start in
-    let new_contents = String.sub t.book_text new_start (new_end - new_start + 1) in
-    let new_ann = Marginalia.get_page_overlay t.id (new_start, new_end) in
-	create_page_info new_start new_end new_contents new_ann t
+	create_page_info new_start new_end t.book_text t.bookshelf t.id
 	
   let page_number t max_char = t.page_end / max_char
   
-   let percent_read t =
-      (/.) (float_of_int t.page_end) (float_of_int ((String.length t.book_text) - 1))
+  let percent_read t =
+    (/.) (float_of_int t.page_end) (float_of_int ((String.length t.book_text) - 1))
 	  
-	    (*let return_definition word =
+  (*returns [t] for the page that contains index. Index may not necessarily be the beginning
+  of the page. Is an existing t being kept track of.*)
+  let get_page index max_char book_id shelf_id=
+    (*division by max_char returns the highest multiple of max_char lower than index
+	and thus, the 'page number' of the book.*)
+    let page_start = (index / max_char) * max_char in
+	let book = get_book_text shelf_id book_id in
+	let book_length = String.length book in
+	let page_end = if page_start + max_char > book_length then book_length - 1
+	               else page_start + max_char - 1 in
+	create_page_info page_start page_end book shelf_id book_id
+	    
+	(*let return_definition word =
     try
       Bookshelf.get_definition word
     with
@@ -174,16 +189,6 @@ module DataController = struct
     let retrieved_lst = Perspective.note_by_colour all_ann in
 	let checking_function = (fun (i, s) -> (i, s, note_surroundings i max_num t1)) in
 	List.map (fun (c,lst) -> (c,List.map checking_function lst)) retrieved_lst	
-  
-  let sort_notes_loc t1 all_ann max_num =
-    let retrieved_lst = Perspective.note_by_loc all_ann in
-	let checking_function = (fun (i, m) -> (i, m, note_surroundings i max_num t1)) in
-	List.map checking_function retrieved_lst
-	
-  let sort_highlights_loc t1 all_ann =
-    let retrieved_lst = Perspective.highlight_by_loc all_ann in
-	let internal_function = (fun (i, (c, e)) -> (i, c, highlight_surroundings i e t1)) in
-	List.map internal_function retrieved_lst
 	
   let search term all_ann = Perspective.search_notes all_ann term
   
