@@ -205,7 +205,8 @@ module DataController = struct
   let init_book max_char shelf_id book_id =
     let book = Bookshelf.get_book_text shelf_id book_id in
     let book_length = String.length book in
-	let curr_pos = get_current_position (get_book_data shelf_id book_id) in
+	(*get the beginning of the page in which the saved position belongs*)
+	let curr_pos = ((get_current_position (get_book_data shelf_id book_id)) / max_char) * max_char in
 	let (actual_start, actual_end) =
 	  (*empty book*)
 	  if book_length = 0 then raise (Book_Error "Empty Book")
