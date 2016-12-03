@@ -180,7 +180,7 @@ module UserInterface = struct
       let e_x = within_x_range second_pos.mouse_x in
       let e_y = within_y_range second_pos.mouse_y in
       Graphics.set_color Graphics.white ;
-      custom_highlight s_x s_y e_x e_y ;
+      custom_highlight s_x s_y e_x e_y
       new_t
     with
       | DataController.Annotation_Error -> print_string "No highlight starts at this position." ; t
@@ -214,7 +214,7 @@ module UserInterface = struct
     if (Graphics.key_pressed () = true)
     (* Unsure how this works *)
     then (custom_print t.page_content left_edge top_edge;)
-  else ();
+  else ()
 
   with
   | _ -> print_string ("You didn't choose a single word " ^
@@ -223,19 +223,19 @@ module UserInterface = struct
   let rec print_lst counter bookshelf =
     match bookshelf with
     | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter;
-    print_lst counter t;
+    print_lst counter t
     | [] -> ()
 
   let rec rec_thru_list counter lst =
   match lst with
   | (b, context)::t -> custom_print context 18 !counter; counter := !counter - 13;
-  rec_thru_list counter t;
+  rec_thru_list counter t
   | [] -> ()
 
   let rec color_parts all_parts =
   match all_parts with
   | (colour, other_part)::t1 -> Graphics.set_color colour; rec_thru_list (ref 611) other_part;
-                             color_highlights t1;
+                             color_highlights t1
   | [] -> ()
 
   let rec draw_existing_highlights t1 =
@@ -244,7 +244,7 @@ module UserInterface = struct
               let (start_x, start_y) = rel_index_to_pixels s in
               let (end_x, end_y) = rel_index_to_pixels e in
               custom_highlight start_x start_y end_x end_y;
-              draw_existing_highlights t1;
+              draw_existing_highlights t1
     | [] -> Graphics.set_color black
 
 
@@ -253,13 +253,13 @@ module UserInterface = struct
     | (s, (c, n_t))::t -> Graphics.set_color (colour_to_color c);
               let (start_x, start_y) = rel_index_to_pixels s in
               Graphics.fill_circle start_x start_y 2;
-              draw_existing_notes t1;
+              draw_existing_notes t1
     | [] -> Graphics.set_color black
 
   let draw_existing_bookmark t1 =
     match DataController.page_bookmark t1 with
     | Some c -> Graphics.set_color (colour_to_color c);
-              Graphics.fill_circle 510 636 10;
+              Graphics.fill_circle 510 636 10
     | None -> ()
 
   let draw_page which t =
@@ -274,7 +274,7 @@ module UserInterface = struct
       draw_existing_highlights new_t;
       draw_existing_notes new_t;
       draw_existing_bookmark new_t;
-      draw_page_data new_t;
+      draw_page_data new_t
 
     with
       | DataController.Page_Undefined _ -> print_string "Can't draw page"; t
@@ -335,7 +335,7 @@ module UserInterface = struct
     Graphics.close_graph ();
 
     (* display message *)
-    print_endline "You closed the book "; (* add book name here *)
+    print_endline "You closed the book " (* add book name here *)
 
   (* searching notes *)
 
@@ -357,7 +357,7 @@ module UserInterface = struct
       | 'c' -> close_book t
 
       with
-      | _ -> print_endline "You pressed an incorrect key";
+      | _ -> print_endline "You pressed an incorrect key"
 
   let main () =
     repl ()
