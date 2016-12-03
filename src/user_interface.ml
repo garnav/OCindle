@@ -112,11 +112,11 @@ module UserInterface = struct
 
   let draw_bookmark colour t1 =
     try
-       let new_t = DataController.add_bookmarks t1 (color_to_colour colour) in
+       (let new_t = DataController.add_bookmarks t1 (color_to_colour colour) in
        Graphics.set_color colour;
        Graphics.fill_circle 510 636 10;
        Graphics.set_color black; (* original color *)
-       new_t
+       new_t)
     with
       | DataController.Annotation_Error -> print_string "A bookmark already exists"; t1
 
