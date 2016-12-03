@@ -1,14 +1,14 @@
 (* Controls and stores data about available books *)
 module Bookshelf = struct
   
+  (* The type of the text that represents the content of a book *)
+  type book_text = string
+  
   (* The unique identifier for a bookshelf *)
   type bookshelf_id = string
   
   (* The unique identifier for a book *)
   type book_id = int
-  
-  (* The type of the text that represents the content of a book *)
-  type book_text = string
   
   (* The data contained by an individual book *)
   type book_data = { id : book_id; title : string; author : string;
@@ -49,8 +49,7 @@ module Bookshelf = struct
     get_bookshelf_ids (Array.to_list all_files)
     
   let get_bookshelf_path bookshelf_id =
-    (Sys.getcwd ()) ^ Filename.dir_sep ^ 
-      (string_of_int bookshelf_id)
+    (Sys.getcwd ()) ^ Filename.dir_sep ^ bookshelf_id
   
   (* TODO(Greg): check for non-hyphen dashes at eol *)
   let rec list_to_string = function
@@ -68,9 +67,9 @@ module Bookshelf = struct
   (* after looking at the following page on Stack Overflow:                *)
   (* http://stackoverflow.com/questions/5774934/[...]                      *)
   (* [...]how-do-i-read-in-lines-from-a-text-file-in-ocaml                 *)
-  let get_book_text bookshelf_id book_id =
+  let get_book_text bookshelf_id book_id : book_text =
     let lines = ref [] in
-    let in_chan = Pervasives.open_in ((string_of_int bookshelf_id) ^
+    let in_chan = Pervasives.open_in (bookshelf_id ^
       Filename.dir_sep ^ (string_of_int book_id) ^ ".txt") in
     try
       while true; do
