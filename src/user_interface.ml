@@ -281,7 +281,7 @@ module UserInterface = struct
 
   let rec display_notes t =
     let all_ann = DataController.meta_annotations t in
-    let all_notes = DataController.sort_notes_color t all_ann in
+    let all_notes = DataController.sort_notes_colour t all_ann in
     color_parts all_notes
 
   let display_highlights t =
