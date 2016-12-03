@@ -325,19 +325,19 @@ module UserInterface = struct
     | _ -> failwith "Can't open bookshelf" *)
 
 
-  let close_book t =
+(*   let close_book t =
     failwith "Unimplemented"
 
     (* save book data (type t) locally *)
     DataController.close_book t;
 `
-    (* Graphics.close_graph () *)
+    Graphics.close_graph ()
     Graphics.close_graph ();
 
     (* display message *)
     print_endline "You closed the book " (* add book name here *)
 
-  (* searching notes *)
+  (* searching notes *) *)
 
 (******************************** REPL ***********************************)
 
