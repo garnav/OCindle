@@ -270,11 +270,11 @@ module UserInterface = struct
       | `Next -> DataController.next_page max_char t
       | `Curr -> t in
       Graphics.clear_graph ();
-      custom_print new_t.page_content left_edge top_edge; new_t
+      custom_print new_t.page_content left_edge top_edge;
       draw_existing_highlights new_t;
       draw_existing_notes new_t;
       draw_existing_bookmark new_t;
-      draw_page_data new_t
+      draw_page_data new_t; new_t
 
     with
       | DataController.Page_Undefined _ -> print_string "Can't draw page"; t
