@@ -77,7 +77,7 @@ module UserInterface = struct
 
 (************** PRINTING & HIGHLIGHTING ON THE GRAPHICS WINDOWS ***************)
 
-  let rec custom_highlight x1 y1 x2 y2 =
+ (*  let rec custom_highlight x1 y1 x2 y2 =
     if (y2 < y1)
     then (Graphics.moveto x1 y1 ;
            Graphics.lineto right_edge y1;
@@ -109,7 +109,7 @@ module UserInterface = struct
     let percent_read_string = string_of_int (int_of_float percent_read) in
     Graphics.set_color blue; Graphics.moveto 270 13;
     Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%");
-    Graphics.set_color black; *)
+    Graphics.set_color black; *) *)
 
   let draw_bookmark colour t1 =
     try
