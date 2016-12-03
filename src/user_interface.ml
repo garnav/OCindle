@@ -111,7 +111,7 @@ module UserInterface = struct
     Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%");
     Graphics.set_color black;
 
-  let draw_bookmark colour t1 =
+(*   let draw_bookmark colour t1 =
     try
        Graphics.set_color colour;
        Graphics.fill_circle 510 636 10;
@@ -119,10 +119,10 @@ module UserInterface = struct
        let new_t = DataController.add_bookmarks t1 (color_to_colour colour) in
        new_t
     with
-      | DataController.Annotation_Error -> print_string "A bookmark already exists"; t1
+      | DataController.Annotation_Error -> print_string "A bookmark already exists"; t1 *)
 
 
-(*   let erase_bookmark t1 =
+  let erase_bookmark t1 =
     try
        let new_t = DataController.delete_bookmarks t1 in
       Graphics.set_color white;
@@ -130,7 +130,7 @@ module UserInterface = struct
       Graphics.set_color black; (* original color *)
        new_t
     with
-      | DataController.Annotation_Error -> print_string "The bookmark doesn't exist" ; t1 *)
+      | DataController.Annotation_Error -> print_string "The bookmark doesn't exist" ; t1
 
 
   let draw_notes colour t1 =
