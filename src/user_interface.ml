@@ -279,11 +279,11 @@ module UserInterface = struct
     with
       | DataController.Page_Undefined _ -> print_string "Can't draw page"; t
 
-  let rec display_notes t =
+(*   let display_notes t =
     let all_ann = DataController.meta_annotations t in
     let all_notes = DataController.sort_notes_colour t all_ann in
     color_parts all_notes
-
+ *)
   let display_highlights t =
     let all_ann = DataController.meta_annotations t in
     let all_highlights = DataController.sort_highlights_colour t all_ann in
