@@ -94,10 +94,10 @@ module UserInterface = struct
         Graphics.draw_string (String.sub str 0 print_chars);
         custom_print (String.sub str print_chars
                      (String.length str - print_chars))
-                     left_edge (y - char_height))
+                     left_edge (y - char_height;))
     else
-        (Graphics.moveto x y;
-        Graphics.draw_string str)
+        Graphics.moveto x y;
+        Graphics.draw_string str;
 
 
 (****************** DRAWING PAGES, ANNOTATIONS & MEANING *********************)
@@ -105,8 +105,8 @@ module UserInterface = struct
   let draw_page_data t =
     let page_number = DataController.page_number t max_char in
     let percent_read = DataController.percent_read t in
-    let page_number_string = string_to_int page_number in
-    let percent_read_string = string_to_int (int_to_float percent_read) in
+    let page_number_string = string_of_int page_number in
+    let percent_read_string = string_of_int (int_of_float percent_read) in
     Graphics.set_color blue; Graphics.moveto 270 13;
     Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%"); Graphics.set_color black;
 
