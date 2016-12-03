@@ -344,7 +344,8 @@ module UserInterface = struct
 
   let rec repl () =
     try
-      match Graphics.wait_next_event [Key_pressed] with
+      let keys = Graphics.wait_next_event [Key_pressed] in
+      match keys.key_pressed with
       | 'd' -> let t1 = draw_page `Next in repl t1
       | 'a' -> let t1 = draw_page `Prev in repl t1
       | 'b' -> let t1 = draw_bookmark colour t in repl t1
