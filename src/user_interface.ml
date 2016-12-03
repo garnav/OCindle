@@ -180,7 +180,7 @@ module UserInterface = struct
       let e_x = within_x_range second_pos.mouse_x in
       let e_y = within_y_range second_pos.mouse_y in
       Graphics.set_color Graphics.white ;
-      custom_highlight s_x s_y e_x e_y
+      custom_highlight s_x s_y e_x e_y;
       new_t
     with
       | DataController.Annotation_Error -> print_string "No highlight starts at this position." ; t
@@ -213,7 +213,7 @@ module UserInterface = struct
     (* return previous page on key press *)
     if (Graphics.key_pressed () = true)
     (* Unsure how this works *)
-    then (custom_print t.page_content left_edge top_edge;)
+    then (custom_print t.page_content left_edge top_edge)
   else ()
 
   with
