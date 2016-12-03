@@ -291,12 +291,12 @@ module UserInterface = struct
  *)
 (****************** OPENING AND CLOSING THE BOOK ***************************)
 
-  let open_book bookshelf_id book_id =
+(*   let open_book bookshelf_id book_id =
     Graphics.open_graph window_size;
     Graphics.set_window_title window_title;
     let t1 = DataController.init_book max_char bookshelf_id book_id in
     draw_page `Curr t1
-(*
+
   let choose_book bookshelf_id =
   (* print a list of books on this bookshelf given by a helper function *)
   try
@@ -309,7 +309,7 @@ module UserInterface = struct
     open_book bookshelf_id (fst reqd_bookshelf)
 
   with
-    | _ -> print_endline "Can't open book";  *)
+    | _ -> print_endline "Can't open book";
 
   let choose_bookshelf () =
   try
@@ -322,7 +322,7 @@ module UserInterface = struct
     choose_book fst (reqd_bookshelf)
 
   with
-    | _ -> failwith "Can't open bookshelf"
+    | _ -> failwith "Can't open bookshelf" *)
 
 
   let close_book t =
