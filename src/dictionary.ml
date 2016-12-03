@@ -10,7 +10,7 @@ module Dictionary = struct
   (* [get_definition word] Returns the definition of [word],
   or raises Word_Not_Found exception if the word was not found *)
   let get_definition word =
-    "definition placeholder"
+    "placeholder definition for: " ^ word
      (* Wordnet.getWord "chair" Wordnet.NOUN *)
     
 end
