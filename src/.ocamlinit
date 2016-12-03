@@ -5,3 +5,6 @@
 #use "marginalia.ml";;
 #use "perspective.ml";;
 #use "data_controller.ml";;
+#require "graphics";;
+open Graphics;;
+#use "user_interface";;
