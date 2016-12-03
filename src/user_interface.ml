@@ -77,7 +77,7 @@ module UserInterface = struct
 
 (************** PRINTING & HIGHLIGHTING ON THE GRAPHICS WINDOWS ***************)
 
- (*  let rec custom_highlight x1 y1 x2 y2 =
+  let rec custom_highlight x1 y1 x2 y2 =
     if (y2 < y1)
     then (Graphics.moveto x1 y1 ;
            Graphics.lineto right_edge y1;
@@ -94,7 +94,7 @@ module UserInterface = struct
         Graphics.draw_string (String.sub str 0 print_chars);
         custom_print (String.sub str print_chars
                      (String.length str - print_chars))
-                     left_edge (y - char_height;))
+                     left_edge (y - char_height);)
     else
         Graphics.moveto x y;
         Graphics.draw_string str;
@@ -102,14 +102,14 @@ module UserInterface = struct
 
 (****************** DRAWING PAGES, ANNOTATIONS & MEANING *********************)
 
-(*   let draw_page_data t =
+  let draw_page_data t =
     let page_number = DataController.page_number t max_char in
     let percent_read = DataController.percent_read t in
     let page_number_string = string_of_int page_number in
     let percent_read_string = string_of_int (int_of_float percent_read) in
     Graphics.set_color blue; Graphics.moveto 270 13;
     Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%");
-    Graphics.set_color black; *) *)
+    Graphics.set_color black;
 
   let draw_bookmark colour t1 =
     try
@@ -122,7 +122,7 @@ module UserInterface = struct
       | DataController.Annotation_Error -> print_string "A bookmark already exists"; t1
 
 
-  let erase_bookmark t1 =
+(*   let erase_bookmark t1 =
     try
        let new_t = DataController.delete_bookmarks t1 in
       Graphics.set_color white;
@@ -130,7 +130,7 @@ module UserInterface = struct
       Graphics.set_color black; (* original color *)
        new_t
     with
-      | DataController.Annotation_Error -> print_string "The bookmark doesn't exist" ; t1
+      | DataController.Annotation_Error -> print_string "The bookmark doesn't exist" ; t1 *)
 
 
   let draw_notes colour t1 =
