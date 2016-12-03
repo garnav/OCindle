@@ -3,7 +3,7 @@
 #use "bookshelf.ml";;
 open Bookshelf;;
 #use "colours.ml";;
-open COlours;;
+open Colours;;
 #use "marginalia.ml";;
 open Marginalia;;
 #use "perspective.ml";;
