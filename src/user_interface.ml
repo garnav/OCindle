@@ -228,7 +228,8 @@ module UserInterface = struct
 
   let rec rec_thru_list counter lst =
   match lst with
-  | (b, context)::t -> custom_print context 18 !counter; counter := !counter - 13; rec_thru_list t;
+  | (b, context)::t -> custom_print context 18 !counter; counter := !counter - 13;
+  rec_thru_list counter t;
   | [] -> ()
 
   let rec color_parts all_parts =
@@ -244,7 +245,7 @@ module UserInterface = struct
               let (end_x, end_y) = rel_index_to_pixels e in
               custom_highlight start_x start_y end_x end_y;
               draw_existing_highlights t1;
-    | [] -> Graphics.set_color black;
+    | [] -> Graphics.set_color black
 
 
   let rec draw_existing_notes t1 =
@@ -259,7 +260,7 @@ module UserInterface = struct
     match DataController.page_bookmark t1 with
     | Some c -> Graphics.set_color (colour_to_color c);
               Graphics.fill_circle 510 636 10;
-    | None -> ();
+    | None -> ()
 
   let draw_page which t =
     try
