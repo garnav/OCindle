@@ -283,12 +283,12 @@ module UserInterface = struct
     let all_ann = DataController.meta_annotations t in
     let all_notes = DataController.sort_notes_colour t all_ann in
     color_parts all_notes
- *)
+
   let display_highlights t =
     let all_ann = DataController.meta_annotations t in
     let all_highlights = DataController.sort_highlights_colour t all_ann in
     color_parts all_highlights
-
+ *)
 (****************** OPENING AND CLOSING THE BOOK ***************************)
 
   let open_book bookshelf_id book_id =
