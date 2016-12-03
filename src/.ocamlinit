@@ -7,4 +7,4 @@
 #use "data_controller.ml";;
 #require "graphics";;
 open Graphics;;
-#use "user_interface";;
+#use "user_interface.ml";;
