@@ -129,7 +129,6 @@ module DataController = struct
   let prev_page max_char t =
     (*Save all annotations on the current page*)
     Marginalia.save_page (debox_ann t.page_annotations) ;
-    let book_length = String.length t.book_text in
     (*Ensure that the current page is not the first page*)
     let new_end = if t.page_start = 0 then raise (Page_Undefined "Can't go back")
                   else t.page_start - 1 in
