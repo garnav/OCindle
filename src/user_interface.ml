@@ -354,14 +354,13 @@ module UserInterface = struct
       | 'w' -> let t1 = erase_highlights t in repl t1
       | 'e' -> let t1 = erase_notes t in repl t1
       | 'o' -> let t1 = choose_bookshelf () in repl t1
-      | 'c' -> close_book t;
+      | 'c' -> close_book t
 
       with
-      | _ -> print_endline "You pressed an incorrect key"
+      | _ -> print_endline "You pressed an incorrect key";
 
   let main () =
-    repl ();
-    exit 0
+    repl ()
 
 end
 
