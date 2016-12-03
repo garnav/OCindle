@@ -304,7 +304,7 @@ module UserInterface = struct
     print_endline "Choose a book"; print_lst (ref 0) lst_of_books;
     print_endline "Please choose a book by entering the index before the book";
     let int_input = read_int () in
-    let array_of_bookshelves = Array.of_list lst_of_bookshelves in
+    let array_of_bookshelves = Array.of_list lst_of_books in
     let reqd_bookshelf = array_of_bookshelves.(int_input) in
     open_book bookshelf_id (fst reqd_bookshelf)
 
