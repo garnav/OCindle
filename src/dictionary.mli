@@ -1,9 +1,6 @@
 (* Controls interactions with the WordNet Dictionary API *)
 module Dictionary = sig
 	
-	(* exception - no definition was found for the given string *)
-	exception Word_Not_Found
-	
 	(* The type of a definition *)
   type definition
 
