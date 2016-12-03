@@ -102,21 +102,22 @@ module UserInterface = struct
 
 (****************** DRAWING PAGES, ANNOTATIONS & MEANING *********************)
 
-  let draw_page_data t =
+(*   let draw_page_data t =
     let page_number = DataController.page_number t max_char in
     let percent_read = DataController.percent_read t in
     let page_number_string = string_of_int page_number in
     let percent_read_string = string_of_int (int_of_float percent_read) in
     Graphics.set_color blue; Graphics.moveto 270 13;
-    Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%"); Graphics.set_color black;
+    Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%");
+    Graphics.set_color black; *)
 
   let draw_bookmark colour t1 =
     try
-       (let new_t = DataController.add_bookmarks t1 (color_to_colour colour) in
        Graphics.set_color colour;
        Graphics.fill_circle 510 636 10;
        Graphics.set_color black; (* original color *)
-       new_t)
+       let new_t = DataController.add_bookmarks t1 (color_to_colour colour) in
+       new_t
     with
       | DataController.Annotation_Error -> print_string "A bookmark already exists"; t1
 
