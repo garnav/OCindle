@@ -1,10 +1,16 @@
 #require "yojson";;
 #require "str";;
 #use "bookshelf.ml";;
+open Bookshelf;;
 #use "colours.ml";;
+open COlours;;
 #use "marginalia.ml";;
+open Marginalia;;
 #use "perspective.ml";;
+open Perspective;;
 #use "data_controller.ml";;
+open DataController;;
 #require "graphics";;
 open Graphics;;
 #use "user_interface.ml";;
+open UserInterface;;
