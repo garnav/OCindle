@@ -118,7 +118,7 @@ module UserInterface = struct
        Graphics.set_color black; (* original color *)
        new_t
     with
-      | DataController.Annotation_Error -> print_string "A bookmark already exists" ; t1
+      | DataController.Annotation_Error -> print_string "A bookmark already exists"; t1
 
 
   let erase_bookmark t1 =
