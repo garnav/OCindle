@@ -194,11 +194,11 @@ module DataController = struct
   
 (**************************** BOOKSHELF & BOOKS *****************************************)
 
-   let bookshelf_list () =
-     let bs_lst = list_bookshelves in
-	 List.map (fun x -> (x, get_bookshelf_name x)) bs_lst
+  let bookshelf_list () =
+    let bs_lst = list_bookshelves in
+	List.map (fun x -> (x, get_bookshelf_name x)) bs_lst
    
-   let book_list shelf_id =
+  let book_list shelf_id =
     let returned_lst = list_books shelf_id in
 	List.map (fun x -> (get_book_id x, get_title x)) returned_lst
 	
