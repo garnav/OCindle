@@ -186,7 +186,7 @@ module UserInterface = struct
       | DataController.Annotation_Error -> print_string "No highlight starts at this position." ; t
 
   (* TEST *)
-  let draw_meaning word t =
+(*   let draw_meaning word t =
   try
     (* Highlight word *)
     let first_pos = Graphics.wait_next_event [Button_down] in
@@ -218,7 +218,7 @@ module UserInterface = struct
 
   with
   | _ -> print_string ("You didn't choose a single word " ^
-                      "or no meaning of the word exists")
+                      "or no meaning of the word exists") *)
 
   let rec print_lst counter bookshelf =
     match bookshelf with
