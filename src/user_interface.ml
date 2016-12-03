@@ -58,22 +58,6 @@ module UserInterface = struct
     else if c = GREEN then Graphics.green
     else raise Invalid_Colour
 
-  let rec print_lst counter bookshelf =
-    match bookshelf with
-    | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter;
-    print_lst counter t;
-    | [] -> ();
-
-  let rec rec_thru_list counter lst =
-  match lst with
-  | (b, context)::t -> custom_print context 18 !counter; counter := !counter - 13; rec_thru_list t;
-  | [] -> ();
-
-  let rec color_parts all_parts =
-  match all_parts with
-  | (colour, other_part)::t1 -> Graphics.set_color colour; rec_thru_list (ref 611) other_part;
-                             color_highlights t1;
-  | [] -> ();
 
 (************** PRINTING & HIGHLIGHTING ON THE GRAPHICS WINDOWS ***************)
 
@@ -81,8 +65,8 @@ module UserInterface = struct
     if (y2 < y1)
     then (Graphics.moveto x1 y1 ;
            Graphics.lineto right_edge y1;
-           custom_highlight left_edge (y1 - char_height) x2 y2;)
-  else Graphics.moveto x1 y1 ; Graphics.lineto x2 y1;
+           custom_highlight left_edge (y1 - char_height) x2 y2)
+  else Graphics.moveto x1 y1 ; Graphics.lineto x2 y1
 
 
   let rec custom_print str x y =
@@ -94,10 +78,10 @@ module UserInterface = struct
         Graphics.draw_string (String.sub str 0 print_chars);
         custom_print (String.sub str print_chars
                      (String.length str - print_chars))
-                     left_edge (y - char_height);)
+                     left_edge (y - char_height))
     else
-        Graphics.moveto x y;
-        Graphics.draw_string str;
+        (Graphics.moveto x y;
+        Graphics.draw_string str)
 
 
 (****************** DRAWING PAGES, ANNOTATIONS & MEANING *********************)
@@ -109,26 +93,25 @@ module UserInterface = struct
     let percent_read_string = string_of_int (int_of_float percent_read) in
     Graphics.set_color blue; Graphics.moveto 270 13;
     Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%");
-    Graphics.set_color black;
+    Graphics.set_color black
 
-(*   let draw_bookmark colour t1 =
+  let draw_bookmark colour t1 =
     try
        Graphics.set_color colour;
        Graphics.fill_circle 510 636 10;
        Graphics.set_color black; (* original color *)
        let new_t = DataController.add_bookmarks t1 (color_to_colour colour) in
-       new_t
+       new_t;
     with
-      | DataController.Annotation_Error -> print_string "A bookmark already exists"; t1 *)
+      | DataController.Annotation_Error -> print_string "A bookmark already exists"; t1
 
 
   let erase_bookmark t1 =
     try
-       let new_t = DataController.delete_bookmarks t1 in
       Graphics.set_color white;
       Graphics.fill_circle 510 636 10;
       Graphics.set_color black; (* original color *)
-       new_t
+      let new_t = DataController.delete_bookmarks t1 in new_t
     with
       | DataController.Annotation_Error -> print_string "The bookmark doesn't exist" ; t1
 
@@ -237,6 +220,22 @@ module UserInterface = struct
   | _ -> print_string ("You didn't choose a single word " ^
                       "or no meaning of the word exists")
 
+  let rec print_lst counter bookshelf =
+    match bookshelf with
+    | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter;
+    print_lst counter t;
+    | [] -> ()
+
+  let rec rec_thru_list counter lst =
+  match lst with
+  | (b, context)::t -> custom_print context 18 !counter; counter := !counter - 13; rec_thru_list t;
+  | [] -> ()
+
+  let rec color_parts all_parts =
+  match all_parts with
+  | (colour, other_part)::t1 -> Graphics.set_color colour; rec_thru_list (ref 611) other_part;
+                             color_highlights t1;
+  | [] -> ()
 
   let rec draw_existing_highlights t1 =
     match DataController.page_highlights t1 with
