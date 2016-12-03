@@ -235,7 +235,7 @@ module UserInterface = struct
   let rec color_parts all_parts =
   match all_parts with
   | (colour, other_part)::t1 -> Graphics.set_color colour; rec_thru_list (ref 611) other_part;
-                             color_highlights t1
+                             color_parts t1
   | [] -> ()
 
   let rec draw_existing_highlights t1 =
