@@ -217,8 +217,8 @@ module DataController = struct
 	  (*last page of book*)
 	  else if curr_pos + max_char > book_length then (curr_pos, book_length - 1)
 	  (*anywhere else in a book*)
-	  else (curr_pos, curr_pos + max_char - 1) in 
-    let new_content = String.sub book actual_start (actual_end + 1)  in
+	  else (curr_pos, curr_pos + max_char - 1) in
+    let new_content = String.sub book actual_start (actual_end - actual_start + 1)  in
     let new_ann = Marginalia.get_page_overlay book_id (actual_start, actual_end) in
     { bookshelf = shelf_id ;
 	  id = book_id ;
