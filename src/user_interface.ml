@@ -318,36 +318,36 @@ module UserInterface = struct
     let ans = wait_next_event [Key_pressed] in
     if ans.keypressed = true then draw_page `Curr t else t
 
-     let draw_meaning t =
-  try
-    (* Highlight word *)
-    let first_pos = Graphics.wait_next_event [Button_down] in
-    let second_pos = Graphics.wait_next_event [Button_down] in
-    let start_x = within_x_range first_pos.mouse_x in
-    let start_y = within_y_range first_pos.mouse_y in
-    let end_x = within_x_range second_pos.mouse_x in
-    let end_y = within_y_range second_pos.mouse_y in
-    custom_highlight start_x start_y end_x end_y;
+  let draw_meaning t =
+    try
+      (* Highlight word *)
+      let first_pos = Graphics.wait_next_event [Button_down] in
+      let second_pos = Graphics.wait_next_event [Button_down] in
+      let start_x = within_x_range first_pos.mouse_x in
+      let start_y = within_y_range first_pos.mouse_y in
+      let end_x = within_x_range second_pos.mouse_x in
+      let end_y = within_y_range second_pos.mouse_y in
+      custom_highlight start_x start_y end_x end_y;
 
-    (* Convert to English word *)
-    let start_pos = relative_index start_x start_y in
-    let end_pos = relative_index end_x end_y in
-    let extr_str = String.sub t.page_content start_pos (end_pos - start_pos + 1) in
-    (* Don't know whether this is a single word or not *)
+      (* Convert to English word *)
+      let start_pos = relative_index start_x start_y in
+      let end_pos = relative_index end_x end_y in
+      let extr_str = String.sub t.page_content start_pos (end_pos - start_pos + 1) in
+      (* Don't know whether this is a single word or not *)
 
-    (* Find word meaning *)
-    let word_meaning = DataController.return_definition extr_str in
+      (* Find word meaning *)
+      let word_meaning = DataController.return_definition extr_str in
 
-    (* Clear page and print definition if it exists *)
-    Graphics.clear_graph ();
-    custom_print ("Definition: " ^ extr_str) left_edge top_edge;
-    (* return current page on key press *)
-    let ans = wait_next_event [Key_pressed] in
-    if ans.keypressed = true then draw_page `Curr t else t
+      (* Clear page and print definition if it exists *)
+      Graphics.clear_graph ();
+      custom_print ("Definition: " ^ extr_str) left_edge top_edge;
+      (* return current page on key press *)
+      let ans = wait_next_event [Key_pressed] in
+      if ans.keypressed = true then draw_page `Curr t else t
 
-  with
-  | _ -> print_string ("You didn't choose a single word " ^
-                      "or no meaning of the word exists")
+    with
+    | _ -> print_string ("You didn't choose a single word " ^
+                        "or no meaning of the word exists"); t
 
   (* helper function to recurse throught a list *)
   let rec print_lst counter bookshelf =
