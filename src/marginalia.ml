@@ -2,11 +2,10 @@ module Marginalia = struct
   
   exception Already_Exists
   exception Corrupted_Data
-  		
+  	
   open List
   open Yojson
   open Yojson.Basic.Util
-  open Colours
   		
   type notes_list = (int * (Colours.t *  string)) list
   
@@ -40,14 +39,14 @@ module Marginalia = struct
   let single_note j_index =
     try
 	  let single = List.assoc "notes" j_index |> to_assoc in
-	  Some (List.assoc "colour" single |> to_string |> colorify, List.assoc "note" single |> to_string)
+	  Some (List.assoc "colour" single |> to_string |> Colours.colorify, List.assoc "note" single |> to_string)
 	with
 	| _ -> None
   
   let single_highlight j_index =
     try 
       let single = List.assoc "highlight" j_index |> to_assoc in
-	  Some (List.assoc "colour" single |> to_string |> colorify, List.assoc "end" single |> to_int)
+	  Some (List.assoc "colour" single |> to_string |> Colours.colorify, List.assoc "end" single |> to_int)
 	with
 	| _ -> None
 	
@@ -89,7 +88,7 @@ module Marginalia = struct
 	    let without_assoc = t.file_json |> to_assoc in
 	    let within_index = List.assoc (string_of_int i) without_assoc |> to_assoc in
 		let tag = List.assoc "bookmarks" within_index |> to_assoc in
-		let actual_colour = List.assoc "colour" tag |> to_string |> colorify in
+		let actual_colour = List.assoc "colour" tag |> to_string |> Colours.colorify in
 		Some (i, actual_colour)
 	  with
 	    | _ -> None
@@ -128,7 +127,7 @@ module Marginalia = struct
 
   let add_note i note c t1 =
     if not (mem_assoc i t1.notes) then
-	  let () = json_add t1 (string_of_int i) "notes" (decolorify c) "note" (`String note) in
+	  let () = json_add t1 (string_of_int i) "notes" (Colours.decolorify c) "note" (`String note) in
 	  { t1 with notes = (i, (c, note))::t1.notes }
 	else raise Already_Exists
   
@@ -141,7 +140,7 @@ module Marginalia = struct
   (*doesn't preserve order, just adds to the beginning of the list.*)
   let add_highlight i e c t1 =
     if not (mem_assoc i t1.highlights) && not (existing_highlight i e t1.highlights) then
-	  let () = json_add t1 (string_of_int i) "highlight" (decolorify c) "end" (`Int e) in
+	  let () = json_add t1 (string_of_int i) "highlight" (Colours.decolorify c) "end" (`Int e) in
 	  { t1 with highlights = (i, (c, e))::t1.highlights }
 	else raise Already_Exists
 	(*also have to add to JSON structure, note that it could also be empty*)
@@ -217,7 +216,7 @@ module Marginalia = struct
     if t1.bookmark <> None then raise Already_Exists
 	else
 	  let loc = ((fst t1.page) + (snd t1.page)) / 2 in
-	  let colour = (decolorify c) in
+	  let colour = (Colours.decolorify c) in
 	  let () = json_add_bookmark t1 (string_of_int loc) colour in
 	  { t1 with bookmark = Some (loc, c) }
 	  

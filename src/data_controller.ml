@@ -233,4 +233,6 @@ module DataController = struct
     Marginalia.save_page (debox_ann t.page_annotations) t.bookshelf ;
 	save_book_position t.bookshelf t.id t.page_start
 	
+  let book_author t1 = Bookshelf.get_author (Bookshelf.get_book_data t1.bookshelf t1.id)
+	
 end
