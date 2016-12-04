@@ -1,49 +1,78 @@
-module type UserInterface = sig
-    open DataController
+module UserInterface :
+    (* [custom_highlight start_x start_y end_x end_y] underlines all text
+      between (start_x, start_y) and (end_x, end_y)*)                                                           sig                                                                               exception Invalid_Colour
+    val custom_highlight : int -> int -> int -> int -> unit
 
-  (* the type of the data structure that stores relevant information
-  about the book including, but not limited to the book ID, book text and 
-  page content. *)
-  type t 
 
-  (* Opens the book with the same name as the string passed to it. Raises
-  exception Book_Does_Not_Exist if such a book is not in the current bookshelf. *)
-  val open_book: string -> unit
+    (* [custom_print str start_x start_y] draws string [str] on the Graphics
+    window starting from (start_x, start_y), taking into account the margin on
+    all sides *)
+    val custom_print : string -> int -> int -> unit
 
-  (* Closes the current book, returning the user to the terminal. *)
-  val close_book: t -> unit
 
-  (* Displays the meaning of the given word; raises exception [Word_Not_Found] if 
-  word is incorrectly spelt or not in the dictionary. *)
-  val draw_meaning: string -> t -> word
+    (* [draw_bookmark colour t] puts a bookmark of color [colour] on the current
+    page represented by [t] and returns an updated [t] type *)
+    val draw_bookmark : int -> t -> t
 
-  (* Draws the content of the current page. *)
-  val draw_page: t -> unit
-  
-  (* Allows the user to add and draw a bookmark to this page. Raises 
-  [Annotation_Error] if bookmark is already present there. *)
-  val draw_bookmark: Graphics.color -> t -> t
-  
-  (* Allows the user to delete a bookmark from this page. Raises 
-  [Annotation_Error] if no bookmark is present. *)
-  val erase_bookmark: t -> t
 
-  (* Allows the user to add notes regarding some text on the page. Raises 
-  [Annotation_Error] if note is already present there. *)
-  val draw_notes: Graphics.color -> t -> t
-  
-  (* Allows the user to delete notes regarding this page. Raises 
-  [Annotation_Error] if no note is present.*)
-  val erase_notes: t -> t
-  
-  (* Allows the user to add and draw highlights regarding text on this page. 
-  Raises [Annotation_Error] if higlight is already present there. *)
-  val draw_highlights: Graphics.color -> t -> t
-  
-  (* Allows the user to delete notes regarding this page. Raises 
-  [Annotation_Error] if no highligh is present. *)
-  val erase_highlights: t -> t
- 
-end
+    (* [erase_bookmark t] erases the bookmark on the current page
+    represented by [t] and returns an updated [t] type *)
+    val erase_bookmark : t -> t
 
-end
+
+    (* [draw_notes colour t] puts a note of color [colour] related to a word
+     on the current page represented by [t]. The presence of a note is repres
+     -ented by a small dot below the letter from where the note starts. This
+     function returns an updated [t] type *)
+    val draw_notes : int -> t -> t
+
+
+    (* [erase_notes t] erases a note that exists on the current page
+      represented by [t] and returns a new [t] type *)
+    val erase_notes : t -> t
+
+
+    (* [draw_highlights colour t] highlights a string on the page represented by
+    [t] with color [colour] and returns an updated [t] type *)
+    val draw_highlights : int -> t -> t
+
+
+    (* [erase_highlights  t] highlights the string on the page represented by
+    [t] and returns an updated [t] type *)
+    val erase_highlights : t -> t
+
+
+    (* [display_highlights t] displays all the highlights that exist in the
+    current book represented by [t], sorted by color and displayed on a fresh
+     page. Returns the last read page after the highlights have been seen *)
+    val display_highlights : t -> t
+
+
+    (* [display_notes t] displays all the notes that exist in the
+    current book represneted by [t], sorted by color and displayed on a fresh
+    page. Returns the last read page after the notes have been seen *)
+    val display_notes : t -> t
+
+
+    (* [draw_meaning t] draws the meaning of a word highlighted by the user on
+    the current page represented by [t] *)
+    val draw_meaning : t -> t
+
+
+    (* [search_notes t] searches the current set of notes with search text
+    entered by the user *)
+    val search_notes : t -> t
+
+
+    (* [open_book bookshelf_id book_id] opens the book corresponding to
+    bookshelf ID [bookshelf_id] and book ID [book_id] and displays the last read
+    page *)
+    val open_book : string -> int -> t
+
+
+    (* [close_book t] closes the current book reprenseted by [t] and allows the
+    user to either open another existing book or quit the program *)
+    val close_book : t -> unit
+
+
+  end

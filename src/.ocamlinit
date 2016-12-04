@@ -2,6 +2,7 @@
 open Wordnet;;
 #require "yojson";;
 #require "str";;
+#require "ANSITerminal";;
 #use "dictionary.ml";;
 open Dictionary;;
 #use "bookshelf.ml";;
@@ -18,4 +19,5 @@ open DataController;;
 open Graphics;;
 #use "user_interface.ml";;
 open UserInterface;;
+
 

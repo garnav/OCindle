@@ -18,7 +18,8 @@ module DataController = struct
             page_start : int ;
             page_end : int ;
             page_content : string ;
-            page_annotations : Marginalia.t option
+            page_annotations : Marginalia.t option ;
+			page_length : int
            }
 		   
 (**************************** GENERAL HELPERS ************************************)
@@ -35,6 +36,10 @@ module DataController = struct
   (*check how this affects sorted order*)
   let abs_to_rel_notes lst t =
     List.rev_map (fun (i, r) -> (i - t.page_start, r)) lst
+	
+  let i_to_page_num index max_char = index / max_char
+  
+  let num_to_i num max_char = num * max_char
 	
 (**************************** HIGHER ORDER ADD & DELETE ***********************)
 	
@@ -101,7 +106,7 @@ module DataController = struct
 
 (**************************** PAGE CONTENT CONTROL ***********************************)
 
-  let create_page_info start ending text shelf_id book_id =
+  let create_page_info start ending text shelf_id book_id max_char =
     let new_contents = String.sub text start (ending - start + 1) in
     let new_ann = Marginalia.get_page_overlay shelf_id  book_id (start, ending) in
     { bookshelf = shelf_id ;
@@ -110,7 +115,8 @@ module DataController = struct
 	  page_start = start ;
       page_end   = ending ;
       page_content = new_contents ;
-      page_annotations = Some new_ann }
+      page_annotations = Some new_ann ;
+	  page_length = max_char }
   
   let next_page max_char t =
     (*Save all annotations on the current page*)
@@ -124,7 +130,7 @@ module DataController = struct
     (*Ensure that there is enough characters to print on this new page*)
     let new_end = if potential_end + 1 <= book_length then potential_end
                   else book_length - 1 in
-	create_page_info new_start new_end t.book_text t.bookshelf t.id
+	create_page_info new_start new_end t.book_text t.bookshelf t.id max_char
 
   let prev_page max_char t =
     (*Save all annotations on the current page*)
@@ -135,24 +141,27 @@ module DataController = struct
     let potential_start = new_end - max_char + 1 in
     let new_start = if potential_start < 0 then 0
                     else potential_start in
-	create_page_info new_start new_end t.book_text t.bookshelf t.id
+	create_page_info new_start new_end t.book_text t.bookshelf t.id max_char
 	
-  let page_number t max_char = t.page_end / max_char
+  let page_number t = i_to_page_num t.page_start t.page_length
   
   let percent_read t =
     (/.) (float_of_int t.page_end) (float_of_int ((String.length t.book_text) - 1))
 	  
   (*returns [t] for the page that contains index. Index may not necessarily be the beginning
   of the page. Is an existing t being kept track of.*)
-  let get_page index max_char shelf_id book_id =
+  let get_page number t =
+    let max_char = t.page_length in
+	let shelf_id = t.bookshelf in
+	let book_id = t.id in
     (*division by max_char returns the highest multiple of max_char lower than index
 	and thus, the 'page number' of the book.*)
-    let page_start = (index / max_char) * max_char in
+    let page_start = num_to_i number max_char in
 	let book = get_book_text shelf_id book_id in
 	let book_length = String.length book in
 	let page_end = if page_start + max_char > book_length then book_length - 1
 	               else page_start + max_char - 1 in
-	create_page_info page_start page_end book shelf_id book_id
+	create_page_info page_start page_end book shelf_id book_id max_char
 	    
   let return_definition word =
     try
@@ -183,12 +192,12 @@ module DataController = struct
   (*the first List.map is O(1) because we only have 7 elements in that list at a maximum.*)
   let sort_highlights_colour t1 all_ann =
     let retrieved_lst = Perspective.highlight_by_colour all_ann in
-	let internal_function = (fun (s,e) -> (s, highlight_surroundings s e t1)) in
+	let internal_function = (fun (s,e) -> (i_to_page_num s t1.page_length, highlight_surroundings s e t1)) in
 	List.map (fun (c,lst) -> (c, List.map internal_function lst)) retrieved_lst
 			 
   let sort_notes_colour t1 all_ann max_num =
     let retrieved_lst = Perspective.note_by_colour all_ann in
-	let checking_function = (fun (i, s) -> (i, s, note_surroundings i max_num t1)) in
+	let checking_function = (fun (i, s) -> (i_to_page_num i t1.page_length, s, note_surroundings i max_num t1)) in
 	List.map (fun (c,lst) -> (c,List.map checking_function lst)) retrieved_lst	
 	
   let search term all_ann = Perspective.search_notes all_ann term
@@ -201,7 +210,7 @@ module DataController = struct
    
   let book_list shelf_id =
     let returned_lst = list_books shelf_id in
-	List.map (fun x -> (get_book_id x, get_title x)) returned_lst
+	List.map (fun x -> (get_book_id x, get_title x, get_author x)) returned_lst
 	
   let init_book max_char shelf_id book_id =
     let book = Bookshelf.get_book_text shelf_id book_id in
@@ -226,7 +235,8 @@ module DataController = struct
       page_start = actual_start ;
       page_end = actual_end ;
       page_content = new_content ;
-      page_annotations = Some new_ann }
+      page_annotations = Some new_ann ;
+	  page_length = max_char }
 	
   (*saves the absolute index of the current page as the reading position*)	
   let close_book t =
