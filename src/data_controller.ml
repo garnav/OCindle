@@ -103,7 +103,7 @@ module DataController = struct
 
   let create_page_info start ending text shelf_id book_id =
     let new_contents = String.sub text start (ending - start + 1) in
-    let new_ann = Marginalia.get_page_overlay book_id (start, ending) in
+    let new_ann = Marginalia.get_page_overlay shelf_id  book_id (start, ending) in
     { bookshelf = shelf_id ;
 	  id = book_id ;
 	  book_text = text ;
@@ -114,7 +114,7 @@ module DataController = struct
   
   let next_page max_char t =
     (*Save all annotations on the current page*)
-    Marginalia.save_page (debox_ann t.page_annotations) ;
+    Marginalia.save_page (debox_ann t.page_annotations) t.bookshelf;
     let book_length = String.length t.book_text in
     (*Ensure that the current page is not the last page*)
     let new_start = if t.page_end = (book_length - 1)
@@ -128,7 +128,7 @@ module DataController = struct
 
   let prev_page max_char t =
     (*Save all annotations on the current page*)
-    Marginalia.save_page (debox_ann t.page_annotations) ;
+    Marginalia.save_page (debox_ann t.page_annotations) t.bookshelf ;
     (*Ensure that the current page is not the first page*)
     let new_end = if t.page_start = 0 then raise (Page_Undefined "Can't go back")
                   else t.page_start - 1 in
@@ -154,15 +154,15 @@ module DataController = struct
 	               else page_start + max_char - 1 in
 	create_page_info page_start page_end book shelf_id book_id
 	    
-  let return_definition word =
+  (*let return_definition word =
     try
       Dictionary.get_definition word
     with
-    | Dictionary.Word_Not_Found -> raise No_Annotation
+    | Dictionary.Word_Not_Found -> raise No_Annotation*)
 	
 (**************************** META BOOK DATA *****************************************)
 
-  let meta_annotations t = Perspective.create_range t.id (0, String.length t.book_text)
+  let meta_annotations t = Perspective.create_range t.bookshelf t.id (0, String.length t.book_text)
 	
   (*what if the highlight goes beyond the bounds of the book*)	
   let highlight_surroundings i e t1 = String.sub t1.book_text i (e - i + 1)
@@ -219,7 +219,7 @@ module DataController = struct
 	  (*anywhere else in a book*)
 	  else (curr_pos, curr_pos + max_char - 1) in
     let new_content = String.sub book actual_start (actual_end - actual_start + 1)  in
-    let new_ann = Marginalia.get_page_overlay book_id (actual_start, actual_end) in
+    let new_ann = Marginalia.get_page_overlay shelf_id book_id (actual_start, actual_end) in
     { bookshelf = shelf_id ;
 	  id = book_id ;
       book_text = book ;
