@@ -217,6 +217,24 @@ module UserInterface = struct
       | DataController.Annotation_Error ->
       print_endline "No highlight starts at this position." ; t
 
+  (* Draws the page, complete with formatted text and all annotations *)
+  let draw_page which t =
+    try
+      let new_t =
+      match which with
+      | `Prev -> DataController.prev_page max_char t
+      | `Next -> DataController.next_page max_char t
+      | `Curr -> t in
+      Graphics.clear_graph ();
+      custom_print new_t.page_content left_edge top_edge;
+      draw_existing_highlights (DataController.page_highlights new_t);
+      draw_existing_notes (DataController.page_notes new_t);
+      draw_existing_bookmark (DataController.page_bookmark new_t);
+      draw_page_data new_t; new_t
+
+    with
+      | DataController.Page_Undefined _ -> print_string "Can't draw page"; t
+
   (* Takes the start and end position from the user and tries to find the
   meaning of that word, displaying it on the Graphics window*)
 
@@ -283,24 +301,6 @@ module UserInterface = struct
     | Some c -> Graphics.set_color (colour_to_color c);
               Graphics.fill_circle 510 636 10
     | None -> ()
-
-  (* Draws the page, complete with formatted text and all annotations *)
-  let draw_page which t =
-    try
-      let new_t =
-      match which with
-      | `Prev -> DataController.prev_page max_char t
-      | `Next -> DataController.next_page max_char t
-      | `Curr -> t in
-      Graphics.clear_graph ();
-      custom_print new_t.page_content left_edge top_edge;
-      draw_existing_highlights (DataController.page_highlights new_t);
-      draw_existing_notes (DataController.page_notes new_t);
-      draw_existing_bookmark (DataController.page_bookmark new_t);
-      draw_page_data new_t; new_t
-
-    with
-      | DataController.Page_Undefined _ -> print_string "Can't draw page"; t
 
   (* helper function to recurse through a list *)
   let rec highlights_rec counter lst =
