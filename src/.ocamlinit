@@ -18,4 +18,6 @@ open DataController;;
 open Graphics;;
 #use "user_interface.ml";;
 open UserInterface;;
+#require "ANSITerminal";;
+open ANSITerminal;;
 
