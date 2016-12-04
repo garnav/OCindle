@@ -158,7 +158,7 @@ module DataController = struct
     try
       Dictionary.get_definition word
     with
-    | Word_Not_Found -> raise No_Annotation
+    | Dictionary.Word_Not_Found -> raise No_Annotation
 	
 (**************************** META BOOK DATA *****************************************)
 
