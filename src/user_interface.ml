@@ -100,7 +100,7 @@ module UserInterface = struct
     let page_number = DataController.page_number t1 max_char in
     let percent_read = DataController.percent_read t1 in
     let page_number_string = string_of_int page_number in
-    let percent_read_string = string_of_int (int_of_float percent_read) in
+    let percent_read_string = string_of_int (int_of_float percent_read * 100) in
     Graphics.set_color blue; Graphics.moveto 270 13;
     Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%");
     Graphics.set_color black
@@ -243,17 +243,14 @@ module UserInterface = struct
     (* Clear page and print definition if it exists *)
     Graphics.clear_graph ();
     custom_print ("Definition: " ^ extr_str) left_edge top_edge;
-
-    (* return previous page on key press *)
-    if (Graphics.key_pressed () = true)
-    (* Unsure how this works *)
-    then (custom_print t.page_content left_edge top_edge)
-  else ()
+    (* return current page on key press *)
+    let ans = wait_next_event [Key_pressed] in
+    if ans.keypressed = true then draw_page `Curr t else t
 
   with
   | _ -> print_string ("You didn't choose a single word " ^
-                      "or no meaning of the word exists") *)
-
+                      "or no meaning of the word exists")
+ *)
   (* helper function to recurse throught a list *)
   let rec print_lst counter bookshelf =
     match bookshelf with
@@ -395,12 +392,12 @@ module UserInterface = struct
   try
     let lst_of_bookshelves = DataController.bookshelf_list () in
     print_endline "Choose a bookshelf"; print_lst (ref 0) lst_of_bookshelves;
-    print_endline "Please choose a bookshelf by entering the index before the
-    bookshelf";
+    print_endline ("Please choose a bookshelf by entering the index before the"
+    ^ "bookshelf");
     let int_input = read_int () in
     let array_of_bookshelves = Array.of_list lst_of_bookshelves in
     let reqd_bookshelf = array_of_bookshelves.(int_input) in
-    choose_book (int_of_string (fst reqd_bookshelf))
+    choose_book (fst reqd_bookshelf)
 
   with
     | _ -> failwith "Can't open bookshelf"
@@ -421,27 +418,36 @@ module UserInterface = struct
 
   (* The REPL is a loop that ensures the user can continously interact with
   the OCindle interface *)
-  let rec repl t =
-      let colour = black in
+  let rec repl t colour =
       let keys = Graphics.wait_next_event [Key_pressed] in
       match keys.key with
-      | 'd' -> let t1 = draw_page `Next t in repl t1
-      | 'a' -> let t1 = draw_page `Prev t in repl t1
-      | 'b' -> let t1 = draw_bookmark colour t  in repl t1
-      | 'h' -> let t1 = draw_highlights colour t in repl t1
-      | 'n' -> let t1 = draw_notes colour t in repl t1
-      | 'q' -> let t1 = erase_bookmark t in repl t1
-      | 'w' -> let t1 = erase_highlights t in repl t1
-      | 'e' -> let t1 = erase_notes t in repl t1
-      | 'o' -> let t1 = choose_bookshelf () in repl t1
-      | 'c' -> close_book t; let t1 = choose_bookshelf () in repl t1
+      | 'd' -> Graphics.set_color black; let t1 = draw_page `Next t in repl t1 colour
+      | 'a' -> Graphics.set_color black; let t1 = draw_page `Prev t in repl t1 colour
+      | 'b' -> let t1 = draw_bookmark colour t  in repl t1 colour
+      | 'h' -> let t1 = draw_highlights colour t in repl t1 colour
+      | 'n' -> let t1 = draw_notes colour t in repl t1 colour
+      | 'q' -> let t1 = erase_bookmark t in repl t1 colour
+      | 'w' -> let t1 = erase_highlights t in repl t1 colour
+      | 'e' -> let t1 = erase_notes t in repl t1 colour
+      | 'o' -> let t1 = choose_bookshelf () in repl t1 colour
+      | 'c' -> close_book t;
+        print_string "Press o to open another book or q to quit: ";
+        let ans = read_line () in
+        if ans = "o" then let t1 = choose_bookshelf () in repl t1 black
+      else exit 0
+      | '1' -> repl t black
+      | '2' -> repl t red
+      | '3' -> repl t blue
+      | '4' -> repl t yellow
+      | '5' -> repl t green
+      | '6' -> repl t white
       | _ -> print_string "You pressed an incorrect key. Press again!";
-      repl t
+      repl t colour
 
   (* Allows the user to open a book and passes control to the REPL to perform
   further actions *)
   let main () =
     let t = choose_bookshelf () in
-    repl t;
+    repl t black;
 
 end
