@@ -137,7 +137,7 @@ module DataController = struct
                     else potential_start in
 	create_page_info new_start new_end t.book_text t.bookshelf t.id
 	
-  let page_number t max_char = t.page_end / max_char
+  let page_number t max_char = t.page_start / max_char
   
   let percent_read t =
     (/.) (float_of_int t.page_end) (float_of_int ((String.length t.book_text) - 1))
@@ -201,7 +201,7 @@ module DataController = struct
    
   let book_list shelf_id =
     let returned_lst = list_books shelf_id in
-	List.map (fun x -> (get_book_id x, get_title x)) returned_lst
+	List.map (fun x -> (get_book_id x, get_title x, get_author x)) returned_lst
 	
   let init_book max_char shelf_id book_id =
     let book = Bookshelf.get_book_text shelf_id book_id in
@@ -232,7 +232,5 @@ module DataController = struct
   let close_book t =
     Marginalia.save_page (debox_ann t.page_annotations) t.bookshelf ;
 	save_book_position t.bookshelf t.id t.page_start
-	
-  let book_author t1 = Bookshelf.get_author (Bookshelf.get_book_data t1.bookshelf t1.id)
 	
 end
