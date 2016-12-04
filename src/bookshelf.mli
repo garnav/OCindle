@@ -1,5 +1,5 @@
 (* Controls and stores data about available books *)
-module Bookshelf = sig
+module type Bookshelf = sig
   
   (* The unique identifier for a bookshelf *)
   type bookshelf_id

@@ -1,5 +1,5 @@
 (* Controls interactions with the WordNet Dictionary API *)
-module Dictionary = sig
+module type Dictionary = sig
 	
 	(* The type of a definition *)
   type definition
