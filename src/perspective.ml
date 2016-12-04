@@ -28,7 +28,7 @@ module Perspective = struct
 	let inner_sorted = rev_map (fun (c, t) -> (c, sorting t)) sorted in
 	List.sort (fun (i, _) (j,_) -> Colours.compare_colours i j) inner_sorted
 
-  let create_range id page = get_page_overlay id page
+  let create_range shelf_id id page = get_page_overlay shelf_id id page
 
   let note_by_colour t1 = general_colour_sort (notes_list t1)
 
