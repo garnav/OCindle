@@ -117,7 +117,7 @@ module Bookshelf = struct
         let extension = string_after h last_dot_pos in
         (match extension with
           | ".json" -> 
-            if not String.contains h '_' then
+            if (not (String.contains h '_')) then
               (get_record_from_json bs_id h):: (get_books bs_id t)
             else get_books bs_id t
           | _ -> get_books bs_id t
