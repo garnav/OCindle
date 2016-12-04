@@ -34,6 +34,10 @@ module Bookshelf = struct
     else
       let len = String.length str in
       string_after str (len - 1)
+      
+  let get_bookshelves_path =
+    let parent_folder = to_sub (Sys.getcwd ()) 0 ((String.rindex (Sys.getcwd ()) '/') + 1) in
+    parent_folder ^ "bookshelves"
   
   let rec get_bookshelf_ids bookshelf_folder = function
     | [] -> []
@@ -49,15 +53,20 @@ module Bookshelf = struct
         | Sys_error e -> failwith ("Bookshelf not found: " ^ e) 
   
   let list_bookshelves =
-    let parent_folder = to_sub (Sys.getcwd ()) 0 ((String.rindex (Sys.getcwd ()) '/') + 1) in
-    let bookshelf_folder = parent_folder ^ "bookshelves" in
+    let bookshelf_folder = get_bookshelves_path in
     let all_files = Sys.readdir (bookshelf_folder) in
     get_bookshelf_ids bookshelf_folder (Array.to_list all_files)
     
   let get_bookshelf_path bookshelf_id =
-    (Sys.getcwd ()) ^ Filename.dir_sep ^ bookshelf_id
+    get_bookshelves_path ^ Filename.dir_sep ^ bookshelf_id
+    
+  let rec get_spaces n =
+    if n > 0 then
+      " " ^ get_spaces (n-1)
+    else 
+      ""
   
-  let rec list_to_string = function
+  let rec list_to_string line_width = function
     | [] -> ""
     | h:: t ->
         let h = String.trim h in
@@ -68,25 +77,30 @@ module Bookshelf = struct
         (*   let h = to_sub h 0 (len - 1) in *)
         (*   h ^ (list_to_string t)          *)
         (* else                              *)
-        h ^ " " ^ (list_to_string t)
-  
+        if String.length h = 0 then
+          let h = get_spaces line_width in
+          h ^ (list_to_string line_width t)
+        else
+          let h = h ^ (get_spaces (line_width - (String.length h))) in
+          h ^ (list_to_string line_width t)
+    
   (* Returns the text of a book given a book id I wrote this function      *)
   (* after looking at the following page on Stack Overflow:                *)
   (* http://stackoverflow.com/questions/5774934/[...]                      *)
   (* [...]how-do-i-read-in-lines-from-a-text-file-in-ocaml                 *)
-  let get_book_text bookshelf_id book_id : book_text =
+  let get_book_text bookshelf_id book_id line_width : book_text =
     let lines = ref [] in
-    let in_chan = Pervasives.open_in (bookshelf_id ^
+    let in_chan = Pervasives.open_in (get_bookshelf_path bookshelf_id ^
       Filename.dir_sep ^ (string_of_int book_id) ^ ".txt") in
     try
       while true; do
         lines := Pervasives.input_line in_chan :: !lines
       done;
-      list_to_string !lines
+      list_to_string line_width !lines
     with
     | End_of_file ->
         Pervasives.close_in in_chan;
-        list_to_string (List.rev !lines)
+        list_to_string line_width (List.rev !lines)
   
   let get_record_from_json bs_id f =
     let j = Yojson.Basic.from_file ((get_bookshelf_path bs_id) ^ Filename.dir_sep ^ f) in
@@ -143,13 +157,15 @@ module Bookshelf = struct
     Yojson.Basic.to_file ((get_bookshelf_path bookshelf_id) ^ Filename.dir_sep ^
       ((string_of_int book_id) ^ ".json")) json
       
-  let get_bookshelf_name bookshelf_id =
-    bookshelf_id
-	
+  (* Getters for book_data, to maintain type abstraction *)
   let get_current_position bd = bd.current_position
   let get_book_id bd = bd.id
   let get_title bd = bd.title
+  let get_author bd = bd.author
+  let get_current_position bd = bd.current_position
   let get_total_chars bd = bd.total_chars
   
+  let get_bookshelf_name bookshelf_id =
+     bookshelf_id
   
 end
