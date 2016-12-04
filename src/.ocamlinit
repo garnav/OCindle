@@ -1,3 +1,5 @@
+#load "Wordnet.cma";;
+open Wordnet;;
 #require "yojson";;
 #require "str";;
 #use "bookshelf.ml";;
@@ -14,3 +16,4 @@ open DataController;;
 open Graphics;;
 #use "user_interface.ml";;
 open UserInterface;;
+
