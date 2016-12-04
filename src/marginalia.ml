@@ -1,3 +1,5 @@
+open Colours
+
 module type Marginalia = functor (C: Colours) -> sig
 
   type t
