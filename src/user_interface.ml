@@ -217,64 +217,10 @@ module UserInterface = struct
       | DataController.Annotation_Error ->
       print_endline "No highlight starts at this position." ; t
 
-  (* Draws the page, complete with formatted text and all annotations *)
-  let draw_page which t =
-    try
-      let new_t =
-      match which with
-      | `Prev -> DataController.prev_page max_char t
-      | `Next -> DataController.next_page max_char t
-      | `Curr -> t in
-      Graphics.clear_graph ();
-      custom_print new_t.page_content left_edge top_edge;
-      draw_existing_highlights (DataController.page_highlights new_t);
-      draw_existing_notes (DataController.page_notes new_t);
-      draw_existing_bookmark (DataController.page_bookmark new_t);
-      draw_page_data new_t; new_t
-
-    with
-      | DataController.Page_Undefined _ -> print_string "Can't draw page"; t
-
   (* Takes the start and end position from the user and tries to find the
   meaning of that word, displaying it on the Graphics window*)
 
-  let draw_meaning t =
-  try
-    (* Highlight word *)
-    let first_pos = Graphics.wait_next_event [Button_down] in
-    let second_pos = Graphics.wait_next_event [Button_down] in
-    let start_x = within_x_range first_pos.mouse_x in
-    let start_y = within_y_range first_pos.mouse_y in
-    let end_x = within_x_range second_pos.mouse_x in
-    let end_y = within_y_range second_pos.mouse_y in
-    custom_highlight start_x start_y end_x end_y;
 
-    (* Convert to English word *)
-    let start_pos = relative_index start_x start_y in
-    let end_pos = relative_index end_x end_y in
-    let extr_str = String.sub t.page_content start_pos (end_pos - start_pos + 1) in
-    (* Don't know whether this is a single word or not *)
-
-    (* Find word meaning *)
-    let word_meaning = DataController.return_definition extr_str in
-
-    (* Clear page and print definition if it exists *)
-    Graphics.clear_graph ();
-    custom_print ("Definition: " ^ extr_str) left_edge top_edge;
-    (* return current page on key press *)
-    let ans = wait_next_event [Key_pressed] in
-    if ans.keypressed = true then draw_page `Curr t else t
-
-  with
-  | _ -> print_string ("You didn't choose a single word " ^
-                      "or no meaning of the word exists")
-
-  (* helper function to recurse throught a list *)
-  let rec print_lst counter bookshelf =
-    match bookshelf with
-    | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter;
-    print_lst counter t
-    | [] -> ()
 
   (* Draws the current highlights, if any, of the page on the Graphics window *)
   let rec draw_existing_highlights lst =
@@ -301,6 +247,24 @@ module UserInterface = struct
     | Some c -> Graphics.set_color (colour_to_color c);
               Graphics.fill_circle 510 636 10
     | None -> ()
+
+  (* Draws the page, complete with formatted text and all annotations *)
+  let draw_page which t =
+    try
+      let new_t =
+      match which with
+      | `Prev -> DataController.prev_page max_char t
+      | `Next -> DataController.next_page max_char t
+      | `Curr -> t in
+      Graphics.clear_graph ();
+      custom_print new_t.page_content left_edge top_edge;
+      draw_existing_highlights (DataController.page_highlights new_t);
+      draw_existing_notes (DataController.page_notes new_t);
+      draw_existing_bookmark (DataController.page_bookmark new_t);
+      draw_page_data new_t; new_t
+
+    with
+      | DataController.Page_Undefined _ -> print_string "Can't draw page"; t
 
   (* helper function to recurse through a list *)
   let rec highlights_rec counter lst =
@@ -353,6 +317,44 @@ module UserInterface = struct
     color_notes (ref 611) all_notes;
     let ans = wait_next_event [Key_pressed] in
     if ans.keypressed = true then draw_page `Curr t else t
+
+     let draw_meaning t =
+  try
+    (* Highlight word *)
+    let first_pos = Graphics.wait_next_event [Button_down] in
+    let second_pos = Graphics.wait_next_event [Button_down] in
+    let start_x = within_x_range first_pos.mouse_x in
+    let start_y = within_y_range first_pos.mouse_y in
+    let end_x = within_x_range second_pos.mouse_x in
+    let end_y = within_y_range second_pos.mouse_y in
+    custom_highlight start_x start_y end_x end_y;
+
+    (* Convert to English word *)
+    let start_pos = relative_index start_x start_y in
+    let end_pos = relative_index end_x end_y in
+    let extr_str = String.sub t.page_content start_pos (end_pos - start_pos + 1) in
+    (* Don't know whether this is a single word or not *)
+
+    (* Find word meaning *)
+    let word_meaning = DataController.return_definition extr_str in
+
+    (* Clear page and print definition if it exists *)
+    Graphics.clear_graph ();
+    custom_print ("Definition: " ^ extr_str) left_edge top_edge;
+    (* return current page on key press *)
+    let ans = wait_next_event [Key_pressed] in
+    if ans.keypressed = true then draw_page `Curr t else t
+
+  with
+  | _ -> print_string ("You didn't choose a single word " ^
+                      "or no meaning of the word exists")
+
+  (* helper function to recurse throught a list *)
+  let rec print_lst counter bookshelf =
+    match bookshelf with
+    | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs); incr counter;
+    print_lst counter t
+    | [] -> ()
 
 
 (****************** OPENING AND CLOSING THE BOOK ***************************)
