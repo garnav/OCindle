@@ -157,15 +157,15 @@ module DataController = struct
     (*division by max_char returns the highest multiple of max_char lower than index
 	and thus, the 'page number' of the book.*)
     let page_start = num_to_i number max_char in
-	let book = get_book_text shelf_id book_id in
+	let book = get_book_text shelf_id book_id 84 in
 	let book_length = String.length book in
 	let page_end = if page_start + max_char > book_length then book_length - 1
 	               else page_start + max_char - 1 in
 	create_page_info page_start page_end book shelf_id book_id max_char
 	    
-  let return_definition word =
-    try
-      Dictionary.get_definition word
+   let return_definition word =
+   try
+      Dictionary.get_definition word 84
     with
     | Dictionary.Word_Not_Found -> raise No_Annotation
 	
@@ -213,7 +213,7 @@ module DataController = struct
 	List.map (fun x -> (get_book_id x, get_title x, get_author x)) returned_lst
 	
   let init_book max_char shelf_id book_id =
-    let book = Bookshelf.get_book_text shelf_id book_id in
+    let book = Bookshelf.get_book_text shelf_id book_id 84 in
     let book_length = String.length book in
 	(*get the beginning of the page in which the saved position belongs*)
 	let curr_pos = ((get_current_position (get_book_data shelf_id book_id)) / max_char) * max_char in
