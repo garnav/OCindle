@@ -24,5 +24,5 @@ make install
 
 cd $DIR
 rm wordnet.cmi
-ocamlbuild 'wordnet.cmi'
+ocamlbuild 'wordnet.cma'
 cp _build/wordnet.cmi .
