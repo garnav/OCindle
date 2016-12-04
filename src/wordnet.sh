@@ -18,5 +18,7 @@ echo "export WNHOME=$DIR/wordnet" >> ~/.bash_profile
 echo "export WNSEARCHDIR=$DIR/WordNet-3.0/dict" >> ~/.bash_profile
 echo "export PATH=\$PATH:\${exec_prefix}/bin:$DIR/wordnet/bin" >> ~/.bash_profile
 
+. ~/.bash_profile
+
 make
 make install
