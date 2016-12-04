@@ -4,7 +4,9 @@ module type QA = sig
   Answer (A)*)
   type t' = Q | A
   
-  val get_questions : int ->
+  type qa_data
+  
+  (* val get_questions : int -> *)
   
   
   (* [post t1 str] is [true] if the
@@ -13,11 +15,10 @@ module type QA = sig
   [false] otherwise.*)
   val post : t' -> string -> bool
 
-  (* [post t1 i] is [str], the question or answer
-  with id [i] in the database. [t1] determines
-  whether the retrieved [str] is a question
-  or answer.*)
-  val get : t' -> int -> string 
+  (* [get book_id from to] is a list of the question and answer data *)
+  (* stored on the database between character positions from and to for book *)
+  (* with book id book_id *)
+  val get : int -> int -> int -> qa_data list
 
   (* [delete t1 i] is [true], if the the question or answer
   with id [i] is successfully deleted from the database.

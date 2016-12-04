@@ -18,8 +18,13 @@ module type Bookshelf = sig
   (* Lists the books currently on the bookshelf with the given ID *)
   val list_books : bookshelf_id -> book_data list
   
-  (* Returns the text of a book given a book id *)
-  val get_book_text : bookshelf_id -> book_id -> book_text
+  (* Formats a book text to a specified line width *)
+  (* val format_book_text : book_text -> num_chars_per_line -> book_text *)
+  
+  (* [get_book_text bs_id b_id chars_per_line] Returns the text of a book with *)
+  (* book_id b_id on bookshelf with bookshelf_id bs_id and formatted to fit *)
+  (* line width chars_per_line *)
+  val get_book_text : bookshelf_id -> book_id -> int -> book_text
   
   (* [close_book bid position] Closes the book with book id [bid] and saves
   current reading position at [position]. Returns true if save was 
