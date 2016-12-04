@@ -45,7 +45,9 @@ module Bookshelf = struct
         else get_bookshelf_ids t
   
   let list_bookshelves =
-    let all_files = Sys.readdir (Sys.getcwd ()) in
+    let bookshelf_folder = Sys.getcwd () ^ Filename.dir_sep ^ ".." ^ 
+      Filename.dir_sep ^ "bookshelves" in 
+    let all_files = Sys.readdir (bookshelf_folder) in
     get_bookshelf_ids (Array.to_list all_files)
     
   let get_bookshelf_path bookshelf_id =
