@@ -1,4 +1,4 @@
-#load "Wordnet.cma";;
+#load "_build/wordnet.cma";;
 open Wordnet;;
 #require "yojson";;
 #require "str";;

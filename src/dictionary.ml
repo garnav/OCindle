@@ -1,7 +1,7 @@
-open Wordnet
-
 module Dictionary = struct
 
+  open Wordnet
+  
   (* exception - no definition was found for the given string *)
   exception Word_Not_Found
   
