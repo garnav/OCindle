@@ -72,10 +72,10 @@ module Bookshelf = struct
     else
       let cur_char = String.get str cur_idx in
       if last_char = ' ' && cur_char = ' ' then
-        remove_multiple_spaces str (cur_idx + 1) cur_char
+        remove_multiple_spaces_helper str (cur_idx + 1) cur_char
       else
         Char.escaped cur_char ^ 
-          remove_multiple_spaces str (cur_idx + 1) cur_char
+          remove_multiple_spaces_helper str (cur_idx + 1) cur_char
           
   let remove_multiple_spaces str =
     remove_multiple_spaces_helper str 0 '-'
