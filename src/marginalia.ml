@@ -193,18 +193,22 @@ module Marginalia = struct
   because adding bookmarks to each would eventually cause conflicts if the size was returned to normal.*)
 
   let json_add_bookmark t1 is c =
-    let without_assoc = t1.file_json |> to_assoc in
-	let prepare = ("bookmarks", `Assoc [("colour", `String c)]) in
-	if mem_assoc is without_assoc then
-	  let to_alter = assoc is without_assoc |> to_assoc in
-	  let altered = `Assoc (prepare :: to_alter) in
-	  let removed = delete_helper without_assoc is in
-	  let changed = `Assoc ((is, altered) :: removed) in
-	  t1.file_json <- changed
-	else
+    let prepare = ("bookmarks", `Assoc [("colour", `String c)]) in
+	if t1.file_json = `Null then
 	  let addition = (is, `Assoc [prepare]) in
-	  let final = `Assoc (addition :: without_assoc) in
-	  t1.file_json <- final
+	  t1.file_json <- `Assoc [addition]
+	else
+     let without_assoc = t1.file_json |> to_assoc in
+	 if mem_assoc is without_assoc then
+	   let to_alter = assoc is without_assoc |> to_assoc in
+       let altered = `Assoc (prepare :: to_alter) in
+	   let removed = delete_helper without_assoc is in
+	   let changed = `Assoc ((is, altered) :: removed) in
+	   t1.file_json <- changed
+	 else
+	   let addition = (is, `Assoc [prepare]) in
+	   let final = `Assoc (addition :: without_assoc) in
+	   t1.file_json <- final
 
   (*can't add a bookmark if t1 is already bookmarked*)
   let add_bookmark t1 c =
