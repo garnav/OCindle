@@ -2,6 +2,8 @@
 open Wordnet;;
 #require "yojson";;
 #require "str";;
+#use "dictionary.ml";;
+open Dictionary;;
 #use "bookshelf.ml";;
 open Bookshelf;;
 #use "colours.ml";;
