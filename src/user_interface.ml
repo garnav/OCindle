@@ -21,20 +21,24 @@ module UserInterface = struct
   let window_title = "OCindle - no, it's not the Kindle" (* title *)
 
 
-(**************************** WINDOW HELPERS *******************************)
+(**************************** WINDOW HELPERS *********************************)
+
   (* maps all points within a certain range of the y coordinate to a single
   point. Helps in drawing and erasing points/lines *)
   let within_y_range y = (y / char_height) * char_height
 
+
   (* maps all points within a certain range of the x coordinate to a single
   point. Helps in drawing and erasing points/lines *)
   let within_x_range x = (x / char_width) * char_width
+
 
   (* maps a point [(x,y)] to its relative index on the current page *)
   let relative_index x y =
     let line_number = (top_edge - y) / char_height in
     let within_line = (x - left_edge) / char_width in
     (line_number * chars_line) + within_line + line_number
+
 
   (* maps a relative index [ri] on the current page to a point (x, y). Inverse
   function of [relative_index] *)
@@ -43,6 +47,7 @@ module UserInterface = struct
     let x = (char_width * actual_line_number) + left_edge in
     let y = top_edge - char_height * (ri - ri mod 84)/(chars_line + 1) in
     (x, y)
+
 
   (* Converts a Graphics.colour to Colours.t *)
   let color_to_colour c =
@@ -53,6 +58,7 @@ module UserInterface = struct
     else if c = Graphics.magenta then PURPLE
     else if c = Graphics.green then GREEN
     else raise Invalid_Colour
+
 
   (* Converts a Colours.t to a Graphics.colour. Inverse of [color_to_colour] *)
   let colour_to_color c =
@@ -65,7 +71,7 @@ module UserInterface = struct
     else raise Invalid_Colour
 
 
-(************** PRINTING & HIGHLIGHTING ON THE GRAPHICS WINDOWS ***************)
+(************** PRINTING & HIGHLIGHTING ON THE GRAPHICS WINDOWS **************)
 
   (* Custom function to underline all points from [(x1, y1)] to [(x2, y2)] in
   the Graphics window *)
@@ -75,6 +81,7 @@ module UserInterface = struct
            Graphics.lineto right_edge y1;
            custom_highlight left_edge (y1 - char_height) x2 y2)
   else Graphics.moveto x1 y1 ; Graphics.lineto x2 y2
+
 
   (* Custom function to print [str] starting from [(x, y)] in the Graphics
   window, taking care of margin considerations and other formatting *)
@@ -92,7 +99,69 @@ module UserInterface = struct
         Graphics.draw_string str)
 
 
-(****************** DRAWING PAGES, ANNOTATIONS & MEANING *********************)
+(************************ HELPERS FOR MAIN FUNCTIONS *************************)
+
+  (* helper function for [color_highlights] *)
+  let rec highlights_rec counter lst =
+    match lst with
+    | (start, content)::t -> custom_print content 18 !counter;
+    let str_length = String.length content in
+    counter := !counter - 13 * ((str_length / max_char) + 1);
+    highlights_rec counter t
+    | [] -> ()
+
+
+(*   helper function for [display_highlights] *)
+  let rec color_highlights counter all_parts =
+    match all_parts with
+    | (colour, other_part)::t -> Graphics.set_color (colour_to_color colour);
+      moveto left_edge !counter ;lineto right_edge !counter;
+      Graphics.set_color black; counter := !counter - 26;
+      highlights_rec counter other_part; color_highlights counter t
+    | [] -> ()
+
+
+  (* helper function for color_notes *)
+  let rec notes_rec counter lst =
+    match lst with
+    | (start, info, content)::t -> custom_print content 18 !counter;
+    let str_length = String.length content in
+    counter := !counter - 13 * ((str_length / max_char) + 1);
+    notes_rec counter t
+    | [] -> ()
+
+
+(*   helper function for display_notes *)
+  let rec color_notes counter all_parts =
+    match all_parts with
+    | (colour, other_part)::t -> Graphics.set_color (colour_to_color colour);
+      moveto left_edge !counter ;lineto right_edge !counter;
+      Graphics.set_color black; counter := !counter - 26;
+      notes_rec counter other_part; color_notes counter t
+    | [] -> ()
+
+
+  (* helper function to recurse throught a list *)
+  let rec print_lst counter bookshelf =
+    match bookshelf with
+    | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs);
+    incr counter; print_lst counter t
+    | [] -> ()
+
+
+  (* helper function for [search_notes] *)
+  let rec search_lst text lst =
+    match lst with
+    | (colour, (s, words)):: t ->
+      if text = words
+      then
+        (Graphics.clear_graph (); Graphics.set_color colour;
+        custom_print text left_edge top_edge; Graphics.set_color black)
+      else search_lst text t
+    | [] -> Graphics.clear_graph (); failwith "Text not found in notes"
+
+
+(************ DRAWING PAGES, ANNOTATIONS, MEANINGS AND SEARCH ****************)
 
   (* draws the page number and percentage read of the current page in the
   footer of the Graphics window *)
@@ -104,6 +173,7 @@ module UserInterface = struct
     Graphics.set_color blue; Graphics.moveto 248 13;
     Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%");
     Graphics.set_color black
+
 
   (* Bookmarks the current page and draws a bookmark of color [colour] on the
   far right corner on the Graphics window to signify the same  *)
@@ -119,6 +189,7 @@ module UserInterface = struct
       | DataController.Annotation_Error ->
       print_endline "A bookmark already exists"; t1
 
+
   (* Erases the bookmark of the current page on the Graphics window *)
   let erase_bookmark t1 =
     try
@@ -132,14 +203,15 @@ module UserInterface = struct
       | DataController.Annotation_Error ->
       print_endline "The bookmark doesn't exist" ; t1
 
+
   (* Takes user input of a position on the Graphics window, saving a related note
   (by taking user input once again). Displays the created note by plaxing a small
   dot of color [colour] below the position which was clicked on on the Graphics
   window *)
   let draw_notes colour t1 =
     try
-      print_endline ("Please select on the window where you want to place the note"
-      ^ " and after that type in the associated note here: ");
+      print_endline ("Please select on the window where you want to place the"
+      ^ " note and after that type in the associated note here: ");
       let first_pos = Graphics.wait_next_event [Button_down] in
       let note_text = read_line () in
       let start_x = within_x_range first_pos.mouse_x in
@@ -155,6 +227,7 @@ module UserInterface = struct
     with
       | DataController.Annotation_Error ->
       print_endline "Notes can't be added at this point" ; t1
+
 
   (* Takes user input of a position on the Graphics window corresponding to the
   note that must be deleted. Erases that note of the current page on the
@@ -176,6 +249,7 @@ module UserInterface = struct
     with
       | DataController.Annotation_Error ->
       print_endline "The note doesn't exist" ; t1
+
 
   (* Takes a start and end position from the user and highlights all text between
   those positions with color [colour] on the Graphics window *)
@@ -200,6 +274,7 @@ module UserInterface = struct
       | DataController.Annotation_Error ->
       print_endline "A highlight already exists" ; t1
 
+
     (* Takes the start position from the user and deletes any highlights that
     contains that position *)
   let erase_highlights t =
@@ -221,10 +296,6 @@ module UserInterface = struct
       | DataController.Annotation_Error ->
       print_endline "No highlight starts at this position." ; t
 
-  (* Takes the start and end position from the user and tries to find the
-  meaning of that word, displaying it on the Graphics window*)
-
-
 
   (* Draws the current highlights, if any, of the page on the Graphics window *)
   let rec draw_existing_highlights lst =
@@ -236,6 +307,7 @@ module UserInterface = struct
               draw_existing_highlights t
     | [] -> Graphics.set_color black
 
+
   (* Draws the current notes, if any, of the page on the Graphics window *)
   let rec draw_existing_notes lst =
     match lst with
@@ -245,6 +317,7 @@ module UserInterface = struct
               draw_existing_notes t
     | [] -> Graphics.set_color black
 
+
   (* Draws the current bookmark, if any, of the page on the Graphics window *)
   let draw_existing_bookmark col_option =
     match col_option with
@@ -252,6 +325,7 @@ module UserInterface = struct
        fill_poly [|(522, 624); (522,648); (538, 648); (538, 624); (530, 635);
        (522, 624) |];
     | None -> ()
+
 
   (* Draws the page, complete with formatted text and all annotations *)
   let draw_page which t =
@@ -271,22 +345,6 @@ module UserInterface = struct
     with
       | DataController.Page_Undefined _ -> print_string "Can't draw page"; t
 
-  (* helper function to recurse through a list *)
-  let rec highlights_rec counter lst =
-    match lst with
-    | (start, content)::t -> custom_print content 18 !counter;
-    let str_length = String.length content in
-    counter := !counter - 13 * ((str_length / max_char) + 1);
-    highlights_rec counter t
-    | [] -> ()
-  (* helper function for display_highlights *)
-  let rec color_highlights counter all_parts =
-    match all_parts with
-    | (colour, other_part)::t -> Graphics.set_color (colour_to_color colour);
-      moveto left_edge !counter ;lineto right_edge !counter;
-      Graphics.set_color black; counter := !counter - 26;
-      highlights_rec counter other_part; color_highlights counter t
-    | [] -> ()
 
   (* Displays all highlights of the book on the Graphics window, in their resp
   -ective colors *)
@@ -302,24 +360,6 @@ module UserInterface = struct
     if ans.keypressed = true then draw_page `Curr t else t
 
 
-  (* helper function to recurse through a list *)
-  let rec notes_rec counter lst =
-    match lst with
-    | (start, info, content)::t -> custom_print content 18 !counter;
-    let str_length = String.length content in
-    counter := !counter - 13 * ((str_length / max_char) + 1);
-    notes_rec counter t
-    | [] -> ()
-
-  (* helper function for display_notes *)
-  let rec color_notes counter all_parts =
-    match all_parts with
-    | (colour, other_part)::t -> Graphics.set_color (colour_to_color colour);
-      moveto left_edge !counter ;lineto right_edge !counter;
-      Graphics.set_color black; counter := !counter - 26;
-      notes_rec counter other_part; color_notes counter t
-    | [] -> ()
-
   (* Displays all notes of the book on the Graphics window, in their
   respective colors *)
   let display_notes t =
@@ -333,6 +373,9 @@ module UserInterface = struct
     let ans = wait_next_event [Key_pressed] in
     if ans.keypressed = true then draw_page `Curr t else t
 
+
+  (* displays the meaning of the word selected by user input or a message to
+  convey there is no meaning or an incorrect word string was entered *)
   let draw_meaning t =
     try
       (* Highlight word *)
@@ -367,23 +410,9 @@ module UserInterface = struct
                         "or no meaning of the word exists")
                         left_edge top_edge; t
 
-  (* helper function to recurse throught a list *)
-  let rec print_lst counter bookshelf =
-    match bookshelf with
-    | (id, bs)::t -> print_int !counter; print_endline (": " ^ bs);
-    incr counter; print_lst counter t
-    | [] -> ()
 
-  let rec search_lst text lst =
-    match lst with
-    | (colour, (s, words)):: t ->
-      if text = words
-      then
-        (Graphics.clear_graph (); Graphics.set_color colour;
-        custom_print text left_edge top_edge; Graphics.set_color black)
-      else search_lst text t
-    | [] -> Graphics.clear_graph (); failwith "Text not found in notes"
-
+  (* checks if keyword enters by user matches content in any notes and
+  returns corresponding output on the Graphics window *)
   let search_notes t =
   try
     print_endline "Enter the text to search: ";
@@ -396,7 +425,6 @@ module UserInterface = struct
   with
   | _ -> custom_print "Couldn't find this text in current set of notes"
    left_edge top_edge; t
-
 
 
 (****************** OPENING AND CLOSING THE BOOK ***************************)
@@ -413,15 +441,14 @@ module UserInterface = struct
     | _ -> failwith "Can't open book"
 
 
-  (* CHECK *)
-
   (* Helper function to choose a book from a bookshelf (referenced through a
   bookshelf_id) on the terminal *)
   let rec choose_book bookshelf_id =
   (* print a list of books on this bookshelf given by a helper function *)
   try
     let lst_of_books = DataController.book_list bookshelf_id in
-    print_endline "Choose a book"; print_endline " "; print_lst (ref 0) lst_of_books;
+    print_endline "Choose a book"; print_endline " ";
+    print_lst (ref 0) lst_of_books;
     print_endline "Please choose a book by entering the index before the book: ";
     let int_input = read_int () in
     let array_of_bookshelves = Array.of_list lst_of_books in
@@ -432,7 +459,6 @@ module UserInterface = struct
     | _ -> print_endline "Can't choose book; please choose again";
         choose_book bookshelf_id
 
-  (* CHECK *)
 
   (* Displays the current list of bookshelves on the user's computer on the
   terminal *)
@@ -459,19 +485,19 @@ module UserInterface = struct
     print_endline "";
     print_endline "You closed the book" (* add book name here *)
 
-  (* searching notes *)
 
 (******************************** REPL ***********************************)
 
-  (* CHECK *)
 
   (* The REPL is a loop that ensures the user can continously interact with
   the OCindle interface *)
   let rec repl t colour =
       let keys = Graphics.wait_next_event [Key_pressed] in
       match keys.key with
-      | 'd' -> Graphics.set_color black; let t1 = draw_page `Next t in repl t1 colour
-      | 'a' -> Graphics.set_color black; let t1 = draw_page `Prev t in repl t1 colour
+      | 'd' -> Graphics.set_color black;
+              let t1 = draw_page `Next t in repl t1 colour
+      | 'a' -> Graphics.set_color black;
+              let t1 = draw_page `Prev t in repl t1 colour
       | 'b' -> let t1 = draw_bookmark colour t  in repl t1 colour
       | 'h' -> let t1 = draw_highlights colour t in repl t1 colour
       | 'n' -> let t1 = draw_notes colour t in repl t1 colour
@@ -495,6 +521,7 @@ module UserInterface = struct
         if ans = "o" then let t1 = choose_bookshelf () in repl t1 black
       else exit 0
       | _ -> print_string "You pressed an incorrect key. Press again!"; exit 0
+
 
   (* Allows the user to open a book and passes control to the REPL to perform
   further actions *)
