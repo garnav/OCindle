@@ -23,6 +23,13 @@ module type Marginalia = functor (C: Colours) -> sig
 end *)
 
 module Marginalia = (*functor (Colours: Colours) ->*) struct
+
+  let to_sub str start end' =
+    String.sub str start (end' - start)
+
+  let get_bookshelf_path =
+    let parent_folder = to_sub (Sys.getcwd ()) 0 ((String.rindex (Sys.getcwd ()) '/') + 1) in
+    parent_folder ^ "bookshelves"
   
   exception Already_Exists
   exception Corrupted_Data
@@ -99,7 +106,7 @@ module Marginalia = (*functor (Colours: Colours) ->*) struct
 	let base_next = (base + 1) * 2000 in
 	let ending = e / 2000 in
 	try
-	  let j_file = Basic.from_file (bookshelf ^ Filename.dir_sep ^ (string_of_int t.id) ^ "_" ^ (string_of_int base) ^ ".json") |> to_assoc in
+	  let j_file = Basic.from_file (get_bookshelf_path ^ bookshelf ^ Filename.dir_sep ^ (string_of_int t.id) ^ "_" ^ (string_of_int base) ^ ".json") |> to_assoc in
 	  t.file_json <- add_assoc t.file_json j_file;
 	  if ending = base then collect_annotations j_file (b, e) f
 	  else collect_annotations j_file (b, base_next - 1) f
@@ -263,7 +270,7 @@ module Marginalia = (*functor (Colours: Colours) ->*) struct
   let save_to_file assoc_copy bookshelf id (b, e) =
     let to_save = List.filter (fun (j, x) -> let k = int_of_string j in k >= b && k < e) assoc_copy in
 	let base = b / 2000 in
-	let file_name = bookshelf ^ Filename.dir_sep ^ (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
+	let file_name = get_bookshelf_path ^ bookshelf ^ Filename.dir_sep ^ (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
 	if to_save = [] then try Sys.remove file_name with Sys_error _ -> ()
 	else Basic.to_file file_name (`Assoc to_save)
 	
