@@ -1,6 +1,7 @@
 module Marginalia = struct
   
-  exception Already_Exists		
+  exception Already_Exists
+  exception Corrupted_Data
   		
   open List
   open Yojson
@@ -108,18 +109,22 @@ module Marginalia = struct
 	 { init with highlights = new_h ; notes = new_n ; bookmark = page_bookmark }
   
   let json_add t1 is tag c ad_key ad =
-    let without_assoc = t1.file_json |> to_assoc in
-	let prepare = (tag, `Assoc [("colour", `String c); (ad_key, ad)]) in
-	if mem_assoc is without_assoc then
-	  let to_alter = assoc is without_assoc |> to_assoc in
-	  let altered = `Assoc (prepare :: to_alter) in
-	  let removed = delete_helper without_assoc is in
-	  let changed = `Assoc ((is, altered) :: removed) in
-	  t1.file_json <- changed
-	else
-	  let addition = (is, `Assoc [prepare]) in
-	  let final = `Assoc (addition :: without_assoc) in
-	  t1.file_json <- final
+  	let prepare = (tag, `Assoc [("colour", `String c); (ad_key, ad)]) in
+    if t1.file_json = `Null then
+	  	let addition = (is, `Assoc [prepare]) in
+	    t1.file_json <- `Assoc [addition]
+    else
+      let without_assoc = t1.file_json |> to_assoc in
+	  if mem_assoc is without_assoc then
+	    let to_alter = assoc is without_assoc |> to_assoc in
+	    let altered = `Assoc (prepare :: to_alter) in
+	    let removed = delete_helper without_assoc is in
+	    let changed = `Assoc ((is, altered) :: removed) in
+	    t1.file_json <- changed
+	  else
+	    let addition = (is, `Assoc [prepare]) in
+	    let final = `Assoc (addition :: without_assoc) in
+	    t1.file_json <- final
 
   let add_note i note c t1 =
     if not (mem_assoc i t1.notes) then
@@ -188,18 +193,22 @@ module Marginalia = struct
   because adding bookmarks to each would eventually cause conflicts if the size was returned to normal.*)
 
   let json_add_bookmark t1 is c =
-    let without_assoc = t1.file_json |> to_assoc in
-	let prepare = ("bookmarks", `Assoc [("colour", `String c)]) in
-	if mem_assoc is without_assoc then
-	  let to_alter = assoc is without_assoc |> to_assoc in
-	  let altered = `Assoc (prepare :: to_alter) in
-	  let removed = delete_helper without_assoc is in
-	  let changed = `Assoc ((is, altered) :: removed) in
-	  t1.file_json <- changed
-	else
+    let prepare = ("bookmarks", `Assoc [("colour", `String c)]) in
+	if t1.file_json = `Null then
 	  let addition = (is, `Assoc [prepare]) in
-	  let final = `Assoc (addition :: without_assoc) in
-	  t1.file_json <- final
+	  t1.file_json <- `Assoc [addition]
+	else
+     let without_assoc = t1.file_json |> to_assoc in
+	 if mem_assoc is without_assoc then
+	   let to_alter = assoc is without_assoc |> to_assoc in
+       let altered = `Assoc (prepare :: to_alter) in
+	   let removed = delete_helper without_assoc is in
+	   let changed = `Assoc ((is, altered) :: removed) in
+	   t1.file_json <- changed
+	 else
+	   let addition = (is, `Assoc [prepare]) in
+	   let final = `Assoc (addition :: without_assoc) in
+	   t1.file_json <- final
 
   (*can't add a bookmark if t1 is already bookmarked*)
   let add_bookmark t1 c =
@@ -247,6 +256,7 @@ module Marginalia = struct
 	| `Assoc x -> let copy = fold_left (fun acc x -> x::acc) [] (t1.file_json |> to_assoc) in
 	              let sorted = List.sort (fun (i, _) (k, _) -> Pervasives.compare i k) copy in
 				  save_all sorted t1.id t1.page
+	| _        -> raise Corrupted_Data
 				  
   let notes_list t1 = t1.notes
   

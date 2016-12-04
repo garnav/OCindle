@@ -129,7 +129,6 @@ module DataController = struct
   let prev_page max_char t =
     (*Save all annotations on the current page*)
     Marginalia.save_page (debox_ann t.page_annotations) ;
-    let book_length = String.length t.book_text in
     (*Ensure that the current page is not the first page*)
     let new_end = if t.page_start = 0 then raise (Page_Undefined "Can't go back")
                   else t.page_start - 1 in
@@ -145,7 +144,7 @@ module DataController = struct
 	  
   (*returns [t] for the page that contains index. Index may not necessarily be the beginning
   of the page. Is an existing t being kept track of.*)
-  let get_page index max_char book_id shelf_id=
+  let get_page index max_char shelf_id book_id =
     (*division by max_char returns the highest multiple of max_char lower than index
 	and thus, the 'page number' of the book.*)
     let page_start = (index / max_char) * max_char in
@@ -155,9 +154,9 @@ module DataController = struct
 	               else page_start + max_char - 1 in
 	create_page_info page_start page_end book shelf_id book_id
 	    
-	(*let return_definition word =
+  (*let return_definition word =
     try
-      Bookshelf.get_definition word
+      Dictionary.get_definition word
     with
     | Word_Not_Found -> raise No_Annotation*)
 	
