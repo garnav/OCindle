@@ -1,23 +1,3 @@
-module type Marginalia = sig
-
-  open Colours
-  type t
-  type page = int * int
-  val get_range : t -> int * int
-  val get_page_overlay : int -> page -> t
-  val add_note : int -> string -> Colours.t -> t -> t
-  val delete_note : int -> t -> t
-  val add_highlight : int -> int -> Colours.t -> t -> t
-  val delete_highlight : int -> t -> t
-  val is_bookmarked : t -> Colours.t option
-  val add_bookmark : t -> Colours.t -> t
-  val remove_bookmark : t -> t
-  val notes_list : t -> (int * (Colours.t * string)) list
-  val highlights_list : t -> (int * (Colours.t * int)) list
-  val save_page : t -> unit
-
-end
-
 module Marginalia = struct
   
   exception Already_Exists
@@ -90,19 +70,19 @@ module Marginalia = struct
 	                                      @ collect_annotations j_entire (b, e - 1) f
 	else collect_annotations j_entire (b, e - 1) f
 	  
-  let rec collect_all (b, e) t f =
+  let rec collect_all bookshelf (b, e) t f =
     let base = b / 2000 in
 	let base_next = (base + 1) * 2000 in
 	let ending = e / 2000 in
 	try
-	  let j_file = Basic.from_file (t.bookshelf ^ Filename.dir_sep ^ (string_of_int t.id) ^ "_" ^ (string_of_int base) ^ ".json") |> to_assoc in
+	  let j_file = Basic.from_file (bookshelf ^ Filename.dir_sep ^ (string_of_int t.id) ^ "_" ^ (string_of_int base) ^ ".json") |> to_assoc in
 	  t.file_json <- add_assoc t.file_json j_file;
 	  if ending = base then collect_annotations j_file (b, e) f
 	  else collect_annotations j_file (b, base_next - 1) f
-	     @ collect_all (base_next, e) t f
+	     @ collect_all bookshelf (base_next, e) t f
 	with
 	| Sys_error _ -> if ending = base then []
-	                 else collect_all (base_next, e) t f
+	                 else collect_all bookshelf (base_next, e) t f
 	
 	let check_bookmark t i =
 	  try
@@ -115,7 +95,7 @@ module Marginalia = struct
 	    | _ -> None
 	
   (*also have to add the json stuff to the record*)
-   let get_page_overlay book_id (b,e) =
+   let get_page_overlay shelf_id book_id (b,e) =
      let init = { id = book_id ;
 		          page = (b, e) ;
 		          highlights = [] ;
@@ -123,8 +103,8 @@ module Marginalia = struct
 		          bookmark = None ;
 		          file_json = `Null }
 				  in
-     let new_h = collect_all (b, e) init single_highlight in
-	 let new_n = collect_all (b, e) init single_note in
+     let new_h = collect_all shelf_id (b, e) init single_highlight in
+	 let new_n = collect_all shelf_id (b, e) init single_note in
 	 let page_bookmark = check_bookmark init ((b + e)/2) in (*init has had it's file_json changed by the prev. fun. calls*)
 	 { init with highlights = new_h ; notes = new_n ; bookmark = page_bookmark }
   
@@ -252,30 +232,30 @@ module Marginalia = struct
 	let base_next = (base + 1) * 2000 in
 	let file_name = bookshelf_id ^ Filename.dir_sep ^ (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
 	if base = ending then try Sys.remove file_name with Sys_error _ -> ()
-	else try Sys.remove file_name ; remove_all_files id (base_next, e)
-	     with Sys_error _ -> remove_all_files id (base_next, e)
+	else try Sys.remove file_name ; remove_all_files bookshelf_id id (base_next, e)
+	     with Sys_error _ -> remove_all_files bookshelf_id id (base_next, e)
   
   (*give it a sorted list? and copy, without assoc too.*)
-  let save_to_file assoc_copy id (b, e) =
+  let save_to_file assoc_copy bookshelf id (b, e) =
     let to_save = List.filter (fun (j, x) -> let k = int_of_string j in k >= b && k < e) assoc_copy in
 	let base = b / 2000 in
-	let file_name = bookshelf_id ^ Filename.dir_sep ^ (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
+	let file_name = bookshelf ^ Filename.dir_sep ^ (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
 	if to_save = [] then try Sys.remove file_name with Sys_error _ -> ()
 	else Basic.to_file file_name (`Assoc to_save)
 	
-  let rec save_all bookshelf assoc_copy id (b,e) =
+  let rec save_all assoc_copy bookshelf id (b,e) =
     let base = b / 2000 in
 	let ending = e / 2000 in
 	let base_next = (base + 1) * 2000 in
-	if base = ending then save_to_file assoc_copy id (base * 2000, base_next)
-	else (save_to_file assoc_copy id (base * 2000, base_next) ; save_all assoc_copy id (base_next, e))
+	if base = ending then save_to_file assoc_copy bookshelf id (base * 2000, base_next)
+	else (save_to_file assoc_copy bookshelf id (base * 2000, base_next) ; save_all assoc_copy bookshelf id (base_next, e))
   
-  let save_page t1 =
+  let save_page t1 bookshelf =
     match t1.file_json with
-	| `Null    -> remove_all_files t1.bookshelf t1.id t1.page
+	| `Null    -> remove_all_files bookshelf t1.id t1.page
 	| `Assoc x -> let copy = fold_left (fun acc x -> x::acc) [] (t1.file_json |> to_assoc) in
 	              let sorted = List.sort (fun (i, _) (k, _) -> Pervasives.compare i k) copy in
-				  save_all sorted t1.bookshelf t1.id t1.page
+				  save_all sorted bookshelf t1.id t1.page
 	| _        -> raise Corrupted_Data
 				  
   let notes_list t1 = t1.notes
