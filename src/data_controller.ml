@@ -154,11 +154,11 @@ module DataController = struct
 	               else page_start + max_char - 1 in
 	create_page_info page_start page_end book shelf_id book_id
 	    
-  (*let return_definition word =
+  let return_definition word =
     try
       Dictionary.get_definition word
     with
-    | Dictionary.Word_Not_Found -> raise No_Annotation*)
+    | Dictionary.Word_Not_Found -> raise No_Annotation
 	
 (**************************** META BOOK DATA *****************************************)
 
