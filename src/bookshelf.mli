@@ -18,8 +18,6 @@ module type Bookshelf = sig
   (* Lists the books currently on the bookshelf with the given ID *)
   val list_books : bookshelf_id -> book_data list
   
-  val format
-  
   (* Returns the text of a book given a book id *)
   val get_book_text : bookshelf_id -> book_id -> book_text
   
