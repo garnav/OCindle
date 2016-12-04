@@ -1,3 +1,23 @@
+module type Marginalia = sig
+
+  open Colours
+  type t
+  type page = int * int
+  val get_range : t -> int * int
+  val get_page_overlay : int -> page -> t
+  val add_note : int -> string -> Colours.t -> t -> t
+  val delete_note : int -> t -> t
+  val add_highlight : int -> int -> Colours.t -> t -> t
+  val delete_highlight : int -> t -> t
+  val is_bookmarked : t -> Colours.t option
+  val add_bookmark : t -> Colours.t -> t
+  val remove_bookmark : t -> t
+  val notes_list : t -> (int * (Colours.t * string)) list
+  val highlights_list : t -> (int * (Colours.t * int)) list
+  val save_page : t -> unit
+
+end
+
 module Marginalia = struct
   
   exception Already_Exists
