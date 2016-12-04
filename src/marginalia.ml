@@ -1,6 +1,7 @@
 module Marginalia = struct
   
-  exception Already_Exists		
+  exception Already_Exists
+  exception Corrupted_Data
   		
   open List
   open Yojson
@@ -247,6 +248,7 @@ module Marginalia = struct
 	| `Assoc x -> let copy = fold_left (fun acc x -> x::acc) [] (t1.file_json |> to_assoc) in
 	              let sorted = List.sort (fun (i, _) (k, _) -> Pervasives.compare i k) copy in
 				  save_all sorted t1.id t1.page
+	| _        -> raise Corrupted_Data
 				  
   let notes_list t1 = t1.notes
   

@@ -9,10 +9,11 @@ module DataController = struct
   
 (**************************** TYPE DEFINITIONS ************************************)
 
-  (* [t] is a record containing important information about the book *)
+  (* [t] containts important information about the book, including its id, bookhelf
+  id and details of the current page. *)
   type t = {
-            bookshelf : int ;
-            id : int ;
+            bookshelf : Bookshelf.bookshelf_id ;
+            id : Bookshelf.book_id ;
             book_text : string ;
             page_start : int ;
             page_end : int ;
@@ -128,7 +129,6 @@ module DataController = struct
   let prev_page max_char t =
     (*Save all annotations on the current page*)
     Marginalia.save_page (debox_ann t.page_annotations) ;
-    let book_length = String.length t.book_text in
     (*Ensure that the current page is not the first page*)
     let new_end = if t.page_start = 0 then raise (Page_Undefined "Can't go back")
                   else t.page_start - 1 in
@@ -164,6 +164,7 @@ module DataController = struct
 
   let meta_annotations t = Perspective.create_range t.id (0, String.length t.book_text)
 	
+  (*what if the highlight goes beyond the bounds of the book*)	
   let highlight_surroundings i e t1 = String.sub t1.book_text i (e - i + 1)
   
   let note_surroundings i max_num t1 =
