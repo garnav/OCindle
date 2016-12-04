@@ -1,4 +1,4 @@
-open Colours
+(*open Colours
 
 module type Marginalia = functor (C: Colours) -> sig
 
@@ -20,9 +20,9 @@ module type Marginalia = functor (C: Colours) -> sig
   exception Already_Exists
   exception Corrupted_Data
 
-end
+end *)
 
-module Annotations : Marginalia = functor (Colours: Colours) -> struct
+module Marginalia = (*functor (Colours: Colours) ->*) struct
   
   exception Already_Exists
   exception Corrupted_Data
@@ -30,6 +30,7 @@ module Annotations : Marginalia = functor (Colours: Colours) -> struct
   open List
   open Yojson
   open Yojson.Basic.Util
+  open Colours
   		
   type notes_list = (int * (Colours.t *  string)) list
   
@@ -287,4 +288,4 @@ module Annotations : Marginalia = functor (Colours: Colours) -> struct
 				  
 end
 
-module Marginalia = Annotations (Colours)
+(*module Marginalia = Annotations (Colours) *)
