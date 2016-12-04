@@ -35,35 +35,40 @@ module Bookshelf = struct
       let len = String.length str in
       string_after str (len - 1)
   
-  let rec get_bookshelf_ids = function
+  let rec get_bookshelf_ids bookshelf_folder = function
     | [] -> []
     | h:: t ->
-        let () = print_endline h in
-        if Sys.is_directory h &&
-          ((to_sub h 0 1) <> "." && (to_sub h 0 1) <> "_") then
-          h:: (get_bookshelf_ids t)
-        else get_bookshelf_ids t
+        try
+          let path = bookshelf_folder ^ Filename.dir_sep ^ h in
+          if Sys.is_directory (path) &&
+            ((to_sub h 0 1) <> "." && (to_sub h 0 1) <> "_") then
+            h:: (get_bookshelf_ids bookshelf_folder t)
+          else 
+            get_bookshelf_ids bookshelf_folder t
+        with
+        | Sys_error e -> failwith ("Bookshelf not found: " ^ e) 
   
   let list_bookshelves =
-    let bookshelf_folder = Sys.getcwd () ^ Filename.dir_sep ^ ".." ^ 
-      Filename.dir_sep ^ "bookshelves" in 
+    let parent_folder = to_sub (Sys.getcwd ()) 0 ((String.rindex (Sys.getcwd ()) '/') + 1) in
+    let bookshelf_folder = parent_folder ^ "bookshelves" in
     let all_files = Sys.readdir (bookshelf_folder) in
-    get_bookshelf_ids (Array.to_list all_files)
+    get_bookshelf_ids bookshelf_folder (Array.to_list all_files)
     
   let get_bookshelf_path bookshelf_id =
     (Sys.getcwd ()) ^ Filename.dir_sep ^ bookshelf_id
   
-  (* TODO(Greg): check for non-hyphen dashes at eol *)
   let rec list_to_string = function
     | [] -> ""
     | h:: t ->
         let h = String.trim h in
-        if get_last_char h = "-" then
-          let len = String.length h in
-          let h = to_sub h 0 (len - 1) in
-          h ^ (list_to_string t)
-        else
-          h ^ " " ^ (list_to_string t)
+        (* Checks for hyphen at end of line - commenting out since proj. *)
+        (* gutenberg books don't hyphenate between lines *)
+        (* if get_last_char h = "-" then     *)
+        (*   let len = String.length h in    *)
+        (*   let h = to_sub h 0 (len - 1) in *)
+        (*   h ^ (list_to_string t)          *)
+        (* else                              *)
+        h ^ " " ^ (list_to_string t)
   
   (* Returns the text of a book given a book id I wrote this function      *)
   (* after looking at the following page on Stack Overflow:                *)
