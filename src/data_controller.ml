@@ -143,14 +143,17 @@ module DataController = struct
                     else potential_start in
 	create_page_info new_start new_end t.book_text t.bookshelf t.id max_char
 	
-  let page_number t = t.page_start / t.page_length
+  let page_number t = i_to_page_num t.page_start t.page_length
   
   let percent_read t =
     (/.) (float_of_int t.page_end) (float_of_int ((String.length t.book_text) - 1))
 	  
   (*returns [t] for the page that contains index. Index may not necessarily be the beginning
   of the page. Is an existing t being kept track of.*)
-  let get_page number max_char shelf_id book_id =
+  let get_page number t =
+    let max_char = t.page_length in
+	let shelf_id = t.bookshelf in
+	let book_id = t.id in
     (*division by max_char returns the highest multiple of max_char lower than index
 	and thus, the 'page number' of the book.*)
     let page_start = num_to_i number max_char in
@@ -160,11 +163,11 @@ module DataController = struct
 	               else page_start + max_char - 1 in
 	create_page_info page_start page_end book shelf_id book_id max_char
 	    
-  (*let return_definition word =
+  let return_definition word =
     try
       Dictionary.get_definition word
     with
-    | Dictionary.Word_Not_Found -> raise No_Annotation*)
+    | Dictionary.Word_Not_Found -> raise No_Annotation
 	
 (**************************** META BOOK DATA *****************************************)
 
