@@ -95,7 +95,7 @@ module Marginalia = struct
 	let base_next = (base + 1) * 2000 in
 	let ending = e / 2000 in
 	try
-	  let j_file = Basic.from_file ((string_of_int t.id) ^ "_" ^ (string_of_int base) ^ ".json") |> to_assoc in
+	  let j_file = Basic.from_file (t.bookshelf ^ Filename.dir_sep ^ (string_of_int t.id) ^ "_" ^ (string_of_int base) ^ ".json") |> to_assoc in
 	  t.file_json <- add_assoc t.file_json j_file;
 	  if ending = base then collect_annotations j_file (b, e) f
 	  else collect_annotations j_file (b, base_next - 1) f
@@ -246,11 +246,11 @@ module Marginalia = struct
 	else json_remove t1 (t1.bookmark |> debox_marked |> fst |> string_of_int) "bookmarks";
 	{ t1 with bookmark = None }
 	  
-  let rec remove_all_files id (b,e) =
+  let rec remove_all_files bookshelf_id id (b,e) =
     let base = b / 2000 in
 	let ending = e / 2000 in
 	let base_next = (base + 1) * 2000 in
-	let file_name = (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
+	let file_name = bookshelf_id ^ Filename.dir_sep ^ (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
 	if base = ending then try Sys.remove file_name with Sys_error _ -> ()
 	else try Sys.remove file_name ; remove_all_files id (base_next, e)
 	     with Sys_error _ -> remove_all_files id (base_next, e)
@@ -259,11 +259,11 @@ module Marginalia = struct
   let save_to_file assoc_copy id (b, e) =
     let to_save = List.filter (fun (j, x) -> let k = int_of_string j in k >= b && k < e) assoc_copy in
 	let base = b / 2000 in
-	let file_name = (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
+	let file_name = bookshelf_id ^ Filename.dir_sep ^ (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
 	if to_save = [] then try Sys.remove file_name with Sys_error _ -> ()
 	else Basic.to_file file_name (`Assoc to_save)
 	
-  let rec save_all assoc_copy id (b,e) =
+  let rec save_all bookshelf assoc_copy id (b,e) =
     let base = b / 2000 in
 	let ending = e / 2000 in
 	let base_next = (base + 1) * 2000 in
@@ -272,10 +272,10 @@ module Marginalia = struct
   
   let save_page t1 =
     match t1.file_json with
-	| `Null    -> remove_all_files t1.id t1.page
+	| `Null    -> remove_all_files t1.bookshelf t1.id t1.page
 	| `Assoc x -> let copy = fold_left (fun acc x -> x::acc) [] (t1.file_json |> to_assoc) in
 	              let sorted = List.sort (fun (i, _) (k, _) -> Pervasives.compare i k) copy in
-				  save_all sorted t1.id t1.page
+				  save_all sorted t1.bookshelf t1.id t1.page
 	| _        -> raise Corrupted_Data
 				  
   let notes_list t1 = t1.notes
