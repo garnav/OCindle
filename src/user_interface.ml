@@ -268,7 +268,7 @@ module UserInterface = struct
 
   (* helper function to recurse through a list *)
   let rec highlights_rec counter lst =
-    match lst with
+    match lst withf
     | (start, content)::t -> custom_print content 18 !counter;
     counter := !counter - 13; highlights_rec counter t
     | [] -> ()
@@ -433,20 +433,21 @@ module UserInterface = struct
       | 'h' -> let t1 = draw_highlights colour t in repl t1 colour
       | 'n' -> let t1 = draw_notes colour t in repl t1 colour
       | 'q' -> let t1 = erase_bookmark t in repl t1 colour
-      | 'w' -> let t1 = erase_highlights t in repl t1 colour
+      | 'x' -> let t1 = erase_highlights t in repl t1 colour
       | 'e' -> let t1 = erase_notes t in repl t1 colour
       | 'o' -> let t1 = choose_bookshelf () in repl t1 colour
-      | 'c' -> close_book t;
-        print_string "Press o to open another book or q to quit: ";
-        let ans = read_line () in
-        if ans = "o" then let t1 = choose_bookshelf () in repl t1 black
-      else exit 0
+      | 'w' -> let t1 = draw_meaning t in repl t1 colour
       | '1' -> repl t black
       | '2' -> repl t red
       | '3' -> repl t blue
       | '4' -> repl t yellow
       | '5' -> repl t green
       | '6' -> repl t white
+      | 'c' -> close_book t;
+        print_string "Press o to open another book or q to quit: ";
+        let ans = read_line () in
+        if ans = "o" then let t1 = choose_bookshelf () in repl t1 black
+      else exit 0
       | _ -> print_string "You pressed an incorrect key. Press again!"; exit 0
 
   (* Allows the user to open a book and passes control to the REPL to perform
