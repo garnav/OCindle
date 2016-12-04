@@ -65,6 +65,21 @@ module Bookshelf = struct
       " " ^ get_spaces (n-1)
     else 
       ""
+      
+  let rec remove_multiple_spaces_helper str cur_idx last_char =
+    if cur_idx >= String.length str then
+      ""
+    else
+      let cur_char = String.get str cur_idx in
+      if last_char = ' ' && cur_char = ' ' then
+        remove_multiple_spaces str (cur_idx + 1) cur_char
+      else
+        Char.escaped cur_char ^ 
+          remove_multiple_spaces str (cur_idx + 1) cur_char
+          
+  let remove_multiple_spaces str =
+    remove_multiple_spaces_helper str 0 '-'
+      
   
   let rec list_to_string line_width = function
     | [] -> ""
