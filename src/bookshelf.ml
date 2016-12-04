@@ -116,7 +116,10 @@ module Bookshelf = struct
         let last_dot_pos = String.rindex h '.' in
         let extension = string_after h last_dot_pos in
         (match extension with
-          | ".json" -> (get_record_from_json bs_id h):: (get_books bs_id t)
+          | ".json" -> 
+            if not String.contains h '_' then
+              (get_record_from_json bs_id h):: (get_books bs_id t)
+            else get_books bs_id t
           | _ -> get_books bs_id t
         )
   
