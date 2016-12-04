@@ -1,1 +1,5 @@
-{"1":{"notes":{"colour":"black","note":"H of Hello"},"highlight":{"colour":"blue","end":18},"highlight":null,"notes":null,"bookmarks":null},"10":{"notes":null},"5":{"bookmarks":{"colour":"red"}},"939":{"highlight":{"colour":"red","end":958}}}
+{"0":{"highlight":{"end":10,"colour":"blue"},"notes":{"colour":"blue","note":"testing"},"bookmarks":{"colour":"blue"}},
+"40":{"highlight":{"end":50,"colour":"green"},"notes":{"colour":"blue","note":"testing"},"bookmarks":{"colour":"blue"}},
+"80":{"highlight":{"end":90,"colour":"yellow"},"notes":{"colour":"blue","note":"testing"},"bookmarks":{"colour":"blue"}},
+"120":{"highlight":{"end":130,"colour":"red"},"notes":{"colour":"blue","note":"testing"},"bookmarks":{"colour":"blue"}},
+}
