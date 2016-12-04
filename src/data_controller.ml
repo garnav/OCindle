@@ -156,7 +156,7 @@ module DataController = struct
 	    
   let return_definition word =
     try
-      get_definition word
+      Dictionary.get_definition word
     with
     | Word_Not_Found -> raise No_Annotation
 	
