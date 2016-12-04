@@ -340,7 +340,7 @@ module UserInterface = struct
 
       (* Clear page and print definition if it exists *)
       Graphics.clear_graph ();
-      custom_print ("Definition: " ^ extr_str) left_edge top_edge;
+      custom_print ("Definition: " ^ word_meaning) left_edge top_edge;
       (* return current page on key press *)
       let ans = wait_next_event [Key_pressed] in
       if ans.keypressed = true then draw_page `Curr t else t
