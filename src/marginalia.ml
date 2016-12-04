@@ -109,18 +109,22 @@ module Marginalia = struct
 	 { init with highlights = new_h ; notes = new_n ; bookmark = page_bookmark }
   
   let json_add t1 is tag c ad_key ad =
-    let without_assoc = t1.file_json |> to_assoc in
-	let prepare = (tag, `Assoc [("colour", `String c); (ad_key, ad)]) in
-	if mem_assoc is without_assoc then
-	  let to_alter = assoc is without_assoc |> to_assoc in
-	  let altered = `Assoc (prepare :: to_alter) in
-	  let removed = delete_helper without_assoc is in
-	  let changed = `Assoc ((is, altered) :: removed) in
-	  t1.file_json <- changed
-	else
-	  let addition = (is, `Assoc [prepare]) in
-	  let final = `Assoc (addition :: without_assoc) in
-	  t1.file_json <- final
+  	let prepare = (tag, `Assoc [("colour", `String c); (ad_key, ad)]) in
+    if t1.file_json = `Null then
+	  	let addition = (is, `Assoc [prepare]) in
+	    t1.file_json <- `Assoc [addition]
+    else
+      let without_assoc = t1.file_json |> to_assoc in
+	  if mem_assoc is without_assoc then
+	    let to_alter = assoc is without_assoc |> to_assoc in
+	    let altered = `Assoc (prepare :: to_alter) in
+	    let removed = delete_helper without_assoc is in
+	    let changed = `Assoc ((is, altered) :: removed) in
+	    t1.file_json <- changed
+	  else
+	    let addition = (is, `Assoc [prepare]) in
+	    let final = `Assoc (addition :: without_assoc) in
+	    t1.file_json <- final
 
   let add_note i note c t1 =
     if not (mem_assoc i t1.notes) then
