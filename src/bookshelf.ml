@@ -138,11 +138,16 @@ module Bookshelf = struct
       
   let get_bookshelf_name bookshelf_id =
     bookshelf_id
-	
+  
+  (* Getters for book_data, to maintain type abstraction *)
   let get_current_position bd = bd.current_position
   let get_book_id bd = bd.id
   let get_title bd = bd.title
+  let get_author bd = bd.author
+  let get_current_position bd = bd.current_position
   let get_total_chars bd = bd.total_chars
   
+  let get_bookshelf_name bookshelf_id =
+     bookshelf_id
   
 end
