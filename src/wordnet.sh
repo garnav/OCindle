@@ -17,8 +17,12 @@ cd WordNet-3.0
 echo "export WNHOME=$DIR/wordnet" >> ~/.bash_profile
 echo "export WNSEARCHDIR=$DIR/WordNet-3.0/dict" >> ~/.bash_profile
 echo "export PATH=\$PATH:\${exec_prefix}/bin:$DIR/wordnet/bin" >> ~/.bash_profile
+echo ". ~/.bash_profile" >> ~/.bashrc
 
 make
 make install
 
-. ~/.bash_profile
+cd $DIR
+rm wordnet.cmi
+ocamlbuild 'wordnet.cmi'
+cp _build/wordnet.cmi .
