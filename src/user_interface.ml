@@ -98,10 +98,10 @@ module UserInterface = struct
   footer of the Graphics window *)
   let draw_page_data t1 =
     let page_number = DataController.page_number t1 max_char in
-    let percent_read = DataController.percent_read t1 in
+    let percent_read = int_of_float (DataController.percent_read t1 *. 100.0) in
     let page_number_string = string_of_int page_number in
-    let percent_read_string = string_of_int (int_of_float percent_read * 100) in
-    Graphics.set_color blue; Graphics.moveto 270 13;
+    let percent_read_string = string_of_int percent_read in
+    Graphics.set_color blue; Graphics.moveto 248 13;
     Graphics.draw_string (page_number_string ^ " | " ^ percent_read_string ^ "%");
     Graphics.set_color black
 
@@ -220,7 +220,7 @@ module UserInterface = struct
   (* Takes the start and end position from the user and tries to find the
   meaning of that word, displaying it on the Graphics window*)
 
-  (* let draw_meaning t =
+  let draw_meaning t =
   try
     (* Highlight word *)
     let first_pos = Graphics.wait_next_event [Button_down] in
@@ -250,7 +250,7 @@ module UserInterface = struct
   with
   | _ -> print_string ("You didn't choose a single word " ^
                       "or no meaning of the word exists")
- *)
+
   (* helper function to recurse throught a list *)
   let rec print_lst counter bookshelf =
     match bookshelf with
@@ -359,10 +359,13 @@ module UserInterface = struct
   (* Opens the book specified by the bookshelf_id and book_id and displays the
   last saved page on the Graphics window *)
   let open_book bookshelf_id book_id =
-    Graphics.open_graph window_size;
-    Graphics.set_window_title window_title;
-    let t1 = DataController.init_book max_char bookshelf_id book_id in
-    draw_page `Curr t1
+    try
+      Graphics.open_graph window_size;
+      Graphics.set_window_title window_title;
+      let t1 = DataController.init_book max_char bookshelf_id book_id in
+      draw_page `Curr t1
+    with
+    | _ -> failwith "Can't open book"
 
 
   (* CHECK *)
@@ -380,15 +383,16 @@ module UserInterface = struct
     let reqd_bookshelf = array_of_bookshelves.(int_input) in
     open_book bookshelf_id (fst reqd_bookshelf)
 
+
   with
-    | _ -> print_endline "Can't open book; please choose again";
+    | _ -> print_endline "Can't choose book; please choose again";
         choose_book bookshelf_id
 
   (* CHECK *)
 
   (* Displays the current list of bookshelves on the user's computer on the
   terminal *)
-  let choose_bookshelf () =
+  let rec choose_bookshelf () =
   try
     let lst_of_bookshelves = DataController.bookshelf_list () in
     print_endline "Choose a bookshelf"; print_lst (ref 0) lst_of_bookshelves;
@@ -400,7 +404,7 @@ module UserInterface = struct
     choose_book (fst reqd_bookshelf)
 
   with
-    | _ -> failwith "Can't open bookshelf"
+    | _ -> failwith "Can't open bookshelf; please choose again"
 
   (* CHECK for error handling*)
 
@@ -441,8 +445,7 @@ module UserInterface = struct
       | '4' -> repl t yellow
       | '5' -> repl t green
       | '6' -> repl t white
-      | _ -> print_string "You pressed an incorrect key. Press again!";
-      repl t colour
+      | _ -> print_string "You pressed an incorrect key. Press again!"; exit 0
 
   (* Allows the user to open a book and passes control to the REPL to perform
   further actions *)

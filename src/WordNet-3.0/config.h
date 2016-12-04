@@ -2,7 +2,7 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Default installation prefix. */
-#define DEFAULTPATH "/home/ubuntu/Documents/FinalProject/src/WordNet_sh_test/wordnet/dict"
+#define DEFAULTPATH "/home/ubuntu/OCindle/src/wordnet/dict"
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
