@@ -1,5 +1,3 @@
-module UserInterface = struct
-
   open DataController
   open Colours
 
@@ -111,19 +109,19 @@ module UserInterface = struct
     let page_no = string_of_int page_number in
     custom_print (page_no ^ " : " ^ content) 18 !counter;
     let str_length = String.length content in
-    counter := !counter - 13 * ((str_length / max_char) + 1);
+    counter := !counter - 13 * ((str_length / (chars_line + 1)) + 1);
     highlights_rec counter t
     | [] -> ()
 
 
-(*   helper function for [display_highlights] *)
+  (* helper function for [display_highlights] *)
   let rec color_highlights counter all_parts =
     match all_parts with
-    | (colour, other_part)::t -> Graphics.set_color (colour_to_color colour);
+    | (colour, other_part)::t -> print_endline " "; Graphics.set_color (colour_to_color colour);
       moveto left_edge !counter ;lineto right_edge !counter;
       Graphics.set_color Graphics.black; counter := !counter - 26;
       highlights_rec counter other_part;
-      print_endline " "; color_highlights counter t
+       color_highlights counter t
     | [] -> ()
 
 
@@ -134,12 +132,12 @@ module UserInterface = struct
     let page_no = string_of_int page_number in
     custom_print (page_no ^ " | Note: " ^ note_info ^ " | Context: " ^ context) 18 !counter;
     let str_length = String.length (note_info ^ context) in
-    counter := !counter - 13 * ((str_length / max_char) + 1);
+    counter := !counter - 13 * ((str_length / (chars_line + 1)) + 1);
     notes_rec counter t
     | [] -> ()
 
 
-(*   helper function for [display_notes] *)
+  (* helper function for [display_notes] *)
   let rec color_notes counter all_parts =
     match all_parts with
     | (colour, other_part)::t -> Graphics.set_color (colour_to_color colour);
@@ -165,7 +163,6 @@ module UserInterface = struct
     print_endline (": Title - " ^ title ^ " | Author - " ^ author);
     incr counter; print_lst_book counter t
     | [] -> ()
-
 
 
   (* helper function for [search_notes] *)
@@ -382,10 +379,10 @@ module UserInterface = struct
     Graphics.clear_graph ();
     let all_ann = DataController.meta_annotations t in
     let all_highlights = DataController.sort_highlights_colour t all_ann in
-     ignore (if all_highlights = [] then
+     if all_highlights = [] then
     custom_print "Currently no highlights! " left_edge top_edge
   else
-    color_highlights (ref 611) all_highlights);
+    color_highlights (ref 611) all_highlights;
     Pervasives.print_string ("Enter page number to go. " ^
     "Enter '/' to go back to the current page: ");
     let page_to = read_line () in
@@ -394,8 +391,9 @@ module UserInterface = struct
     let new_t = DataController.get_page int_page t in
     draw_page `Curr new_t)
   with
-    | _ -> ignore (Sys.command "clear"); print_endline " ";
-    print_endline "Error in reading input!"; draw_page `Curr t
+    | _ -> print_endline " ";
+    print_endline "Error in reading input! Returned to last viewed page";
+    draw_page `Curr t
 
 
   (* Displays all notes of the book on the Graphics window, in their
@@ -405,10 +403,10 @@ module UserInterface = struct
     Graphics.clear_graph ();
     let all_ann = DataController.meta_annotations t in
     let all_notes = DataController.sort_notes_colour t all_ann 20 in
-    ignore (if all_notes = [] then
+    if all_notes = [] then
     custom_print "Currently no notes! " left_edge top_edge
   else
-    color_notes (ref 611) all_notes);
+    color_notes (ref 611) all_notes;
     Pervasives.print_string ("Enter page number to go. " ^
     "Enter '/' to go back to the current page: ");
     let page_to = read_line () in
@@ -417,7 +415,7 @@ module UserInterface = struct
     let new_t = DataController.get_page int_page t in
     draw_page `Curr new_t)
   with
-    | _ -> ignore (Sys.command "clear"); print_endline " ";
+    | _ -> print_endline " ";
     print_endline "Error in reading input!"; draw_page `Curr t
 
 
@@ -544,7 +542,7 @@ module UserInterface = struct
     " Press 'q' to exit the program" ^
     " or any other key to choose another bookshelf: ");
     let ans = read_line () in
-    if ans = "q" then (ignore (Sys.command "clear"); exit 0)
+    if ans = "q" then ( exit 0)
   else choose_bookshelf ()
 
 
@@ -557,13 +555,84 @@ module UserInterface = struct
     "We hope you enjoyed using the OCindle interface!")
 
 
+  (* Displays the help menu*)
+  let help () =
+  ANSITerminal.print_string [ANSITerminal.yellow] ("The commands and their" ^
+  "explanations: ");
+  print_endline " ";
+  ANSITerminal.print_string [ANSITerminal.yellow] "The default color is black.";
+  print_endline " ";
+  ANSITerminal.print_string [ANSITerminal.green] "  d ";
+  print_endline ": Goes to the next page.";
+  ANSITerminal.print_string [ANSITerminal.green] "  a ";
+  print_endline ": Goes to the previous page. ";
+  ANSITerminal.print_string [ANSITerminal.green] "  b ";
+  print_endline (": Bookmarks the current page. A bookmark is displayed on the " ^
+  "top right corner ");
+  ANSITerminal.print_string [ANSITerminal.green] "  h ";
+  print_endline (": Highlight the current page. After pressing this key, the " ^
+  "user will be prompted to select a start and end position on the screen " ^
+  "respectively. The highlight is made in the current color ");
+  ANSITerminal.print_string [ANSITerminal.green] "  n ";
+  print_endline (": Makes a note on the current page. After pressing this key," ^
+  "the user will be prompted to select the letter corresponding to the note." ^
+  "The user will then be prompted on the terminal to write the note." ^
+  "The presence of a note is signified by a dot below the letter the note" ^
+  "was made. ");
+  ANSITerminal.print_string [ANSITerminal.green] "  q ";
+  print_endline ": Erases the bookmark on the current page. ";
+  ANSITerminal.print_string [ANSITerminal.green] "  x ";
+  print_endline ": Erases the selected higlight on the current page. ";
+  ANSITerminal.print_string [ANSITerminal.green] "  e ";
+  print_endline ": Erases the selected note on the current page. ";
+  ANSITerminal.print_string [ANSITerminal.green] "  o ";
+  print_endline (": Opens the current set of bookshelves on the user's folder." ^
+  "The user is then prompted to select one, then choose and open a book inside it. " ^
+  "The book is opened to the last saved position ");
+  ANSITerminal.print_string [ANSITerminal.green] "  w ";
+  print_endline (": Displays the meaning of the word selected by the user. " ^
+  "After pressing this key, the user will be prompted to highlight a word, " ^
+  "as is done for highlighting. If the word meaning exists, it is displayed on " ^
+  "a new page. The user should press any key besides the ones mentioned in this " ^
+  "section to exit the definition page and return to the last read page ");
+  ANSITerminal.print_string [ANSITerminal.green] "  s ";
+  print_endline (": Searches the current set of notes for the given word. " ^
+  "After pressing this key, the user will be prompted to enter the search term " ^
+  "on the terminal. The word is then searched, and if found, displayed on a new " ^
+   "page. The user should press any key besides the ones mentioned in this " ^
+   "section to exit the definition page and return to the last read page ");
+  ANSITerminal.print_string [ANSITerminal.green] "  z ";
+  print_endline (": Displays the set of current highlights with their page " ^
+  "numbers sorted by colour and then by indices. The user will be then be " ^
+  "prompted to return to the book: pressing '/' returns to the last read page, " ^
+   "while entering a valid page will take the user to that page");
+  ANSITerminal.print_string [ANSITerminal.green] "  m ";
+  print_endline (": Displays the set of current notes with their page numbers " ^
+  "sorted by colour and then by indices. The user will be then be prompted to " ^
+  "return to the book: pressing '/' returns to the last read page, while " ^
+  "entering a valid page will take the user to that page");
+  ANSITerminal.print_string [ANSITerminal.green] "  c ";
+  print_endline (": Closes the current book. The user will then b
+  e prompted to press 'q' to quit the program or 'o' to open another book");
+  ANSITerminal.print_string [ANSITerminal.green] "  1 ";
+  print_endline ": Change the current color to black. ";
+  ANSITerminal.print_string [ANSITerminal.green] "  2 ";
+  print_endline ": Change the current color to red. ";
+  ANSITerminal.print_string [ANSITerminal.green] "  3 ";
+  print_endline ": Change the current color to blue. ";
+  ANSITerminal.print_string [ANSITerminal.green] "  4 ";
+  print_endline ": Change the current color to yellow. ";
+  ANSITerminal.print_string [ANSITerminal.green] "  5 ";
+  print_endline ": Change the current color to green. ";
+  ANSITerminal.print_string [ANSITerminal.green] "  6 ";
+  print_endline ": Change the current color to purple. "
+
 (******************************** REPL ***********************************)
 
 
   (* The REPL is a loop that ensures the user can continously interact with
   the OCindle interface *)
   let rec repl t colour =
-    ignore (Sys.command "clear");
     let keys = Graphics.wait_next_event [Key_pressed] in
     match keys.key with
       | 'd' -> Graphics.set_color Graphics.black;
@@ -581,19 +650,19 @@ module UserInterface = struct
       | 's' -> let t1 = search_notes t in repl t1 colour
       | 'z' -> let t1 = display_highlights t in repl t1 colour
       | 'm' -> let t1 = display_notes t in repl t1 colour
+      | 'v' -> help (); repl t colour
       | '1' -> repl t Graphics.black
       | '2' -> repl t Graphics.red
       | '3' -> repl t Graphics.blue
       | '4' -> repl t Graphics.yellow
       | '5' -> repl t Graphics.green
-      | '6' -> repl t Graphics.white
+      | '6' -> repl t Graphics.magenta
       | 'c' -> close_book t; print_endline " ";
       Pervasives.print_string ("Press 'q' to exit the program" ^
       " or any other key to choose another bookshelf: ");
       let ans = read_line () in
-      if ans = "q" then (ignore (Sys.command "clear"); exit 0)
-      else (ignore (Sys.command "clear");
-      let t1 = choose_bookshelf () in repl t1 Graphics.black)
+      if ans = "q" then (exit 0)
+      else choose_bookshelf ()
       | _ -> print_endline " ";
       print_endline "You pressed an incorrect key. Press again!"; repl t colour
 
@@ -601,7 +670,7 @@ module UserInterface = struct
   (* Allows the user to open a book and passes control to the REPL to perform
   further actions *)
   let main () =
-    ignore (Sys.command "clear");
+
     ANSITerminal.print_string [ANSITerminal.yellow]
     "Welcome to OCindle - the e-reader for OCaml!";
     print_endline " ";
@@ -609,5 +678,3 @@ module UserInterface = struct
     " to choose a book from a bookshelf. Instructions follow.");
     let t = choose_bookshelf () in
     repl t Graphics.black;
-
-end

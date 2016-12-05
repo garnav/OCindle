@@ -1,4 +1,3 @@
-module UserInterface :
     (* [custom_highlight start_x start_y end_x end_y] underlines all text
       between (start_x, start_y) and (end_x, end_y)*)                                                           sig                                                                               exception Invalid_Colour
     val custom_highlight : int -> int -> int -> int -> unit
@@ -74,5 +73,3 @@ module UserInterface :
     user to either open another existing book or quit the program *)
     val close_book : t -> unit
 
-
-  end
