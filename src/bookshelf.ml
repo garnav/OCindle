@@ -3,12 +3,6 @@
 (* The type of the text that represents the content of a book *)
 type book_text = string
 
-(* The unique identifier for a bookshelf *)
-type bookshelf_id = string
-
-(* The unique identifier for a book *)
-type book_id = int
-
 (* The data contained by an individual book *)
 type book_data = { id : book_id; title : string; author : string;
   current_position : int; total_chars : int }
@@ -199,6 +193,3 @@ let get_title bd = bd.title
 let get_author bd = bd.author
 let get_current_position bd = bd.current_position
 let get_total_chars bd = bd.total_chars
-
-let get_bookshelf_name bookshelf_id =
-  bookshelf_id
