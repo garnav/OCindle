@@ -94,14 +94,6 @@ let is_only_whitespace str =
 let rec list_to_string line_width = function
   | [] -> ""
   | h:: t ->
-      (* let h = String.trim h in *)
-      (* Checks for hyphen at end of line - commenting out since proj. *)
-      (* gutenberg books don't hyphenate between lines *)
-      (* if get_last_char h = "-" then     *)
-      (*   let len = String.length h in    *)
-      (*   let h = to_sub h 0 (len - 1) in *)
-      (*   h ^ (list_to_string t)          *)
-      (* else                              *)
       if is_only_whitespace h then
         let h = (get_spaces (line_width - (String.length h))) in
         h ^ (list_to_string line_width t)
@@ -152,10 +144,6 @@ let rec get_books bs_id = function
 let list_books bookshelf_id =
   let all_files = Sys.readdir (get_bookshelf_path bookshelf_id) in
   get_books bookshelf_id (Array.to_list all_files)
-
-(* Deprecated: use save_book_position instead. *)
-let close_book book_id cur_pos =
-  failwith "Deprecated"
 
 (* Returns the number of books in the given bookshelf *)
 let get_num_books bookshelf_id =
