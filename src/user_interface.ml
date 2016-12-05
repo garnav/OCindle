@@ -196,12 +196,13 @@
   far right corner on the Graphics window to signify the same  *)
   let draw_bookmark colour t1 =
     try
-       Graphics.set_color colour;
+       let new_t = Data_controller.add_bookmarks t1 (color_to_colour colour) in
+       Data_controller.close_book t1; 
+      Graphics.set_color colour;
        Graphics.fill_poly [|(522, 624); (522,648); (538, 648); (538, 624); (530, 635);
        (522, 624) |];
        Graphics.set_color Graphics.black;
-       let new_t = Data_controller.add_bookmarks t1 (color_to_colour colour) in
-       Data_controller.close_book t1; new_t
+      new_t
     with
       | Data_controller.Annotation_Error ->
       print_endline " ";
@@ -211,12 +212,13 @@
   (* Erases the bookmark of the current page on the Graphics window *)
   let erase_bookmark t1 =
     try
-      Graphics.set_color Graphics.white;
-       Graphics.fill_poly [|(522, 624); (522,648); (538, 648); (538, 624); (530, 635);
-       (522, 624) |];
-      Graphics.set_color Graphics.black; (* original color *)
       let new_t = Data_controller.delete_bookmarks t1 in
-      Data_controller.close_book t1; new_t
+      Data_controller.close_book t1; 
+      Graphics.set_color Graphics.white;
+      Graphics.fill_poly [|(522, 624); (522,648); (538, 648); (538, 624); (530, 635);
+      (522, 624) |];
+      Graphics.set_color Graphics.black; (* original color *)
+      new_t
     with
       | Data_controller.Annotation_Error ->
         print_endline " ";

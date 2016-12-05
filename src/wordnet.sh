@@ -25,6 +25,5 @@ make install
 cd $DIR
 rm wordnet.cmi
 ocamlbuild 'wordnet.cma'
-cp _build/wordnet.cmi .
 
 source ~/.bash_profile
