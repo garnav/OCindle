@@ -1,5 +1,58 @@
 (* Controls and stores data about available books *)
-module Bookshelf = struct
+module type Bookshelf = sig
+  
+  (* The unique identifier for a bookshelf *)
+  type bookshelf_id
+  
+  (* The unique identifier for a book *)
+  type book_id
+  
+  (* The type of the text that represents the content of a book *)
+  type book_text
+  
+  (* The data contained by an individual book *)
+  type book_data
+  
+  val list_bookshelves : bookshelf_id list
+  
+  (* Lists the books currently on the bookshelf with the given ID *)
+  val list_books : bookshelf_id -> book_data list
+  
+  (* Formats a book text to a specified line width *)
+  (* val format_book_text : book_text -> num_chars_per_line -> book_text *)
+  
+  (* [get_book_text bs_id b_id chars_per_line] Returns the text of a book with *)
+  (* book_id b_id on bookshelf with bookshelf_id bs_id and formatted to fit *)
+  (* line width chars_per_line *)
+  val get_book_text : bookshelf_id -> book_id -> int -> book_text
+  
+  (* [close_book bid position] Closes the book with book id [bid] and saves
+  current reading position at [position]. Returns true if save was 
+  successful *)
+  val close_book : book_id -> int -> bool
+  (* DEPRECATED: use save_book_position instead *)
+  
+  val save_book_position : bookshelf_id -> book_id -> int -> bool
+  
+  (* Returns the number of books in the given bookshelf *)
+  val get_num_books : bookshelf_id -> int
+  
+  (* Returns the data for a given book *)
+  val get_book_data : bookshelf_id -> book_id -> book_data
+  
+  (* Getters for book_data information *)
+  val get_book_id : book_data -> book_id
+  val get_title : book_data -> string
+  val get_author : book_data -> string
+  val get_current_position : book_data -> int
+  val get_total_chars : book_data -> int
+  
+  val get_bookshelf_name : bookshelf_id -> string
+  
+end
+
+(* Controls and stores data about available books *)
+module Bookshelf : Bookshelf = struct
   
   (* The type of the text that represents the content of a book *)
   type book_text = string
@@ -35,8 +88,12 @@ module Bookshelf = struct
       let len = String.length str in
       string_after str (len - 1)
       
+  let p = 
+    print_endline (string_of_int Pervasives.__LINE__)
+      
   let get_bookshelves_path =
     let parent_folder = to_sub (Sys.getcwd ()) 0 ((String.rindex (Sys.getcwd ()) '/') + 1) in
+    p;
     parent_folder ^ "bookshelves"
   
   let rec get_bookshelf_ids bookshelf_folder = function
@@ -186,7 +243,8 @@ module Bookshelf = struct
       ("current_position", `Int cur_pos); ("total_chars", `Int d.total_chars);
       ("id", `Int d.id) ] in
     Yojson.Basic.to_file ((get_bookshelf_path bookshelf_id) ^ Filename.dir_sep ^
-      ((string_of_int book_id) ^ ".json")) json
+      ((string_of_int book_id) ^ ".json")) json;
+    true
       
   (* Getters for book_data, to maintain type abstraction *)
   let get_current_position bd = bd.current_position
