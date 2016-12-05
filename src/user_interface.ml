@@ -372,7 +372,8 @@
       draw_page_data new_t; new_t
 
     with
-      | Data_controller.Page_Undefined _ -> print_endline "Can't draw page"; t
+      | Data_controller.Page_Undefined _ -> 
+        print_endline "Can't turn page: end of book reached"; t
 
 
   (* Displays all highlights of the book on the Graphics window, in their resp
