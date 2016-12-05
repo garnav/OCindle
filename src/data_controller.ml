@@ -10,8 +10,8 @@
   (* [t] containts important information about the book, including its id, bookhelf
   id and details of the current page. *)
   type t = {
-            bookshelf : Bookshelf.bookshelf_id ;
-            id : Bookshelf.book_id ;
+            bookshelf : string ;
+            id : int ;
             book_text : string ;
             page_start : int ;
             page_end : int ;
@@ -104,9 +104,9 @@
 
 (**************************** PAGE CONTENT CONTROL ***********************************)
 
-  let create_page_info start ending text (shelf_id:bookshelf_id) book_id max_char =
+  let create_page_info start ending text shelf_id book_id max_char =
     let new_contents = String.sub text start (ending - start + 1) in
-    let new_ann = Marginalia.get_page_overlay shelf_id  book_id (start, ending) in
+    let new_ann = Marginalia.get_page_overlay shelf_id book_id (start, ending) in
     { bookshelf = shelf_id ;
 	  id = book_id ;
 	  book_text = text ;
@@ -156,6 +156,7 @@
 	and thus, the 'page number' of the book.*)
     let page_start = num_to_i number max_char in
 	let book = get_book_text shelf_id book_id 84 in
+  let book = get_book_string book in
 	let book_length = String.length book in
 	let page_end = if page_start + max_char > book_length then book_length - 1
 	               else page_start + max_char - 1 in
@@ -204,7 +205,7 @@
 
   let bookshelf_list () =
     let bs_lst = list_bookshelves in
-	List.map (fun x -> (x, get_bookshelf_name x)) bs_lst
+	List.map (fun x -> (x, x)) bs_lst
    
   let book_list shelf_id =
     let returned_lst = list_books shelf_id in
@@ -212,6 +213,7 @@
 	
   let init_book max_char shelf_id book_id =
     let book = Bookshelf.get_book_text shelf_id book_id 84 in
+    let book = get_book_string book in
     let book_length = String.length book in
 	(*get the beginning of the page in which the saved position belongs*)
 	let curr_pos = ((get_current_position (get_book_data shelf_id book_id)) / max_char) * max_char in

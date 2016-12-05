@@ -4,8 +4,6 @@ open Wordnet
   
 (* exception - no definition was found for the given string *)
 exception Word_Not_Found
-  
-type definition = string
 
 let ptype_to_string = function
   | NOUN -> "noun"

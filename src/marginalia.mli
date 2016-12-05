@@ -19,7 +19,7 @@
   Annotations beginning within the page are retrieved.
   requires:
   - [range], ie (s,t), where s and t are non-negative. t > s*)
-  val get_page_overlay : Bookshelf.bookshelf_id -> Bookshelf.book_id -> page -> t
+  val get_page_overlay : string -> int -> page -> t
 
   (* [add_note i note c t1] is [t2] with [note] of colour [c]
   added at index [i]. Exception Already_Exists

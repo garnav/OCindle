@@ -25,7 +25,7 @@ successful *)
 val close_book : int -> int -> bool
 (* DEPRECATED: use save_book_position instead *)
 
-val save_book_position : string -> int -> int -> bool
+val save_book_position : string -> int -> int -> unit
 
 (* Returns the number of books in the given bookshelf *)
 val get_num_books : string -> int
@@ -33,11 +33,11 @@ val get_num_books : string -> int
 (* Returns the data for a given book *)
 val get_book_data : string -> int -> book_data
 
+val get_book_string : book_text -> string
+
 (* Getters for book_data information *)
-val get_book_id : book_data -> book_id
+val get_book_id : book_data -> int
 val get_title : book_data -> string
 val get_author : book_data -> string
 val get_current_position : book_data -> int
 val get_total_chars : book_data -> int
-
-val get_bookshelf_name : string -> string

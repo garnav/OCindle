@@ -4,7 +4,7 @@
 type book_text = string
 
 (* The data contained by an individual book *)
-type book_data = { id : book_id; title : string; author : string;
+type book_data = { id : int; title : string; author : string;
   current_position : int; total_chars : int }
 
 (* Convenience functions, to make long functions names more compact and  *)
@@ -183,8 +183,10 @@ let save_book_position bookshelf_id book_id cur_pos =
     ("current_position", `Int cur_pos); ("total_chars", `Int d.total_chars);
     ("id", `Int d.id) ] in
   Yojson.Basic.to_file ((get_bookshelf_path bookshelf_id) ^ Filename.dir_sep ^
-    ((string_of_int book_id) ^ ".json")) json;
-  true
+    ((string_of_int book_id) ^ ".json")) json
+    
+let get_book_string book_text : string =
+  book_text
     
 (* Getters for book_data, to maintain type abstraction *)
 let get_current_position bd = bd.current_position
