@@ -1,5 +1,3 @@
-module Perspective = struct
-  
   open Colours
   open Marginalia
   open List
@@ -54,5 +52,14 @@ module Perspective = struct
     fold_left (fun acc (i, (c, s)) -> if search_in_string (String.lowercase_ascii note) s
 	                                    then (i, (c, s)) :: acc
 									  else acc) [] (notes_list t1)
-
-end
+									  
+  let rec bookmark_lst shelf_id book_id (b,e) max_char =
+    if e > b then
+      let collected_ann = create_range shelf_id book_id (b, b + max_char - 1) in
+	  let bookmark_details =
+	    (match Marginalia.is_bookmarked collected_ann with
+		| Some x -> [(b,x)]
+		| None   -> [])
+	    in
+		(bookmark_lst shelf_id book_id (b + max_char, e) max_char) @ bookmark_details
+	else []

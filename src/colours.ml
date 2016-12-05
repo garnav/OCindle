@@ -1,11 +1,4 @@
-(*module type Colours = sig
-   type t
-   val compare_colours : t -> t -> int
-   val colorify : string -> t
-   val decolorify : t -> string		
-end *)
 
-module Colours (*: Colours*) = struct
 
    type t = RED | BLUE | GREEN | YELLOW | PURPLE | BLACK
  
@@ -44,4 +37,3 @@ module Colours (*: Colours*) = struct
 	 | PURPLE -> "purple"
 	 | BLACK  -> "black"
 	 
-end
