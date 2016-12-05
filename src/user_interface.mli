@@ -1,7 +1,11 @@
     (* [custom_highlight start_x start_y end_x end_y] underlines all text
-      between (start_x, start_y) and (end_x, end_y)*)                                                           sig                                                                               exception Invalid_Colour
+      between (start_x, start_y) and (end_x, end_y)*)                                                                                                                                         
+      
+    exception Invalid_Colour
+    
+    type t = Data_controller.t
+    
     val custom_highlight : int -> int -> int -> int -> unit
-
 
     (* [custom_print str start_x start_y] draws string [str] on the Graphics
     window starting from (start_x, start_y), taking into account the margin on
@@ -72,4 +76,6 @@
     (* [close_book t] closes the current book reprenseted by [t] and allows the
     user to either open another existing book or quit the program *)
     val close_book : t -> unit
+    
+    val main : unit -> unit
 

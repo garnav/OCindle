@@ -1,9 +1,9 @@
-  open DataController
+  open Data_controller
   open Colours
 
   exception Invalid_Colour
 
-  type t = DataController.t
+  type t = Data_controller.t
 
 (**************************** WINDOW CONSTANTS *******************************)
 
@@ -49,23 +49,23 @@
 
   (* Converts a Graphics.colour to Colours.t *)
   let color_to_colour c =
-    if c = Graphics.black then BLACK
-    else if c = Graphics.red then RED
-    else if c = Graphics.blue then BLUE
-    else if c = Graphics.yellow then YELLOW
-    else if c = Graphics.magenta then PURPLE
-    else if c = Graphics.green then GREEN
+    if c = Graphics.black then colorify "black"
+    else if c = Graphics.red then colorify "red"
+    else if c = Graphics.blue then colorify "blue"
+    else if c = Graphics.yellow then colorify "yellow"
+    else if c = Graphics.magenta then colorify "purple"
+    else if c = Graphics.green then colorify "green"
     else raise Invalid_Colour
 
 
   (* Converts a Colours.t to a Graphics.colour. Inverse of [color_to_colour] *)
   let colour_to_color c =
-    if c = BLACK then Graphics.black
-    else if c = RED then Graphics.red
-    else if c = BLUE then Graphics.blue
-    else if c = YELLOW then Graphics.yellow
-    else if c = PURPLE then Graphics.magenta
-    else if c = GREEN then Graphics.green
+    if c = colorify "black" then Graphics.black
+    else if c = colorify "red" then Graphics.red
+    else if c = colorify "blue" then Graphics.blue
+    else if c = colorify "yellow" then Graphics.yellow
+    else if c = colorify "purple" then Graphics.magenta
+    else if c = colorify "green" then Graphics.green
     else raise Invalid_Colour
 
 
@@ -118,7 +118,7 @@
   let rec color_highlights counter all_parts =
     match all_parts with
     | (colour, other_part)::t -> print_endline " "; Graphics.set_color (colour_to_color colour);
-      moveto left_edge !counter ;lineto right_edge !counter;
+      Graphics.moveto left_edge !counter ;Graphics.lineto right_edge !counter;
       Graphics.set_color Graphics.black; counter := !counter - 26;
       highlights_rec counter other_part;
        color_highlights counter t
@@ -141,7 +141,7 @@
   let rec color_notes counter all_parts =
     match all_parts with
     | (colour, other_part)::t -> Graphics.set_color (colour_to_color colour);
-      moveto left_edge !counter ;lineto right_edge !counter;
+      Graphics.moveto left_edge !counter ;Graphics.lineto right_edge !counter;
       Graphics.set_color Graphics.black; counter := !counter - 26;
       notes_rec counter other_part;
       print_endline " ";
@@ -182,8 +182,8 @@
   (* draws the page number and percentage read of the current page in the
   footer of the Graphics window *)
   let draw_page_data t1 =
-    let page_number = DataController.page_number t1 in
-    let percent_read = int_of_float (DataController.percent_read t1 *. 100.0) in
+    let page_number = Data_controller.page_number t1 in
+    let percent_read = int_of_float (Data_controller.percent_read t1 *. 100.0) in
     let page_number_string = string_of_int page_number in
     let percent_read_string = string_of_int percent_read in
     Graphics.set_color Graphics.blue; Graphics.moveto 248 13;
@@ -196,13 +196,13 @@
   let draw_bookmark colour t1 =
     try
        Graphics.set_color colour;
-       fill_poly [|(522, 624); (522,648); (538, 648); (538, 624); (530, 635);
+       Graphics.fill_poly [|(522, 624); (522,648); (538, 648); (538, 624); (530, 635);
        (522, 624) |];
        Graphics.set_color Graphics.black;
-       let new_t = DataController.add_bookmarks t1 (color_to_colour colour) in
-       DataController.close_book t1; new_t
+       let new_t = Data_controller.add_bookmarks t1 (color_to_colour colour) in
+       Data_controller.close_book t1; new_t
     with
-      | DataController.Annotation_Error ->
+      | Data_controller.Annotation_Error ->
       print_endline " ";
       print_endline "A bookmark already exists"; t1
 
@@ -211,13 +211,13 @@
   let erase_bookmark t1 =
     try
       Graphics.set_color Graphics.white;
-       fill_poly [|(522, 624); (522,648); (538, 648); (538, 624); (530, 635);
+       Graphics.fill_poly [|(522, 624); (522,648); (538, 648); (538, 624); (530, 635);
        (522, 624) |];
       Graphics.set_color Graphics.black; (* original color *)
-      let new_t = DataController.delete_bookmarks t1 in
-      DataController.close_book t1; new_t
+      let new_t = Data_controller.delete_bookmarks t1 in
+      Data_controller.close_book t1; new_t
     with
-      | DataController.Annotation_Error ->
+      | Data_controller.Annotation_Error ->
         print_endline " ";
         print_endline "The bookmark doesn't exist" ; t1
 
@@ -235,16 +235,16 @@
       let note_text = read_line () in
       let start_x = within_x_range first_pos.mouse_x in
       let start_y = within_y_range first_pos.mouse_y in
-      let new_t = DataController.add_notes
+      let new_t = Data_controller.add_notes
                    (relative_index start_x start_y)
                    note_text
-                   (color_to_colour colour) t1 in DataController.close_book t1;
+                   (color_to_colour colour) t1 in Data_controller.close_book t1;
       Graphics.set_color colour;
       Graphics.fill_circle start_x (start_y - 3) 3;
       Graphics.set_color Graphics.black;
       new_t
     with
-      | DataController.Annotation_Error ->
+      | Data_controller.Annotation_Error ->
       print_endline " ";
       print_endline "Notes can't be added at this point" ; t1
 
@@ -260,15 +260,15 @@
       let first_pos = Graphics.wait_next_event [Button_down] in
       let start_x = within_x_range first_pos.mouse_x in
       let start_y = within_y_range first_pos.mouse_y in
-      let new_t = DataController.delete_notes
+      let new_t = Data_controller.delete_notes
                    (relative_index start_x start_y)
-                   t1 in DataController.close_book t1;
+                   t1 in Data_controller.close_book t1;
       Graphics.set_color Graphics.white;
       Graphics.fill_circle start_x (start_y - 3) 3;
       Graphics.set_color Graphics.black;
       new_t
     with
-      | DataController.Annotation_Error ->
+      | Data_controller.Annotation_Error ->
       print_endline " ";
       print_endline "The note doesn't exist" ; t1
 
@@ -286,15 +286,15 @@
     let end_x = within_x_range second_pos.mouse_x in
     let end_y = within_y_range second_pos.mouse_y in
     try
-       let new_t = DataController.add_highlights
+       let new_t = Data_controller.add_highlights
                    (relative_index start_x start_y)
                    (relative_index end_x end_y)
-                   (color_to_colour colour) t1 in DataController.close_book t1;
+                   (color_to_colour colour) t1 in Data_controller.close_book t1;
        Graphics.set_color colour;
        custom_highlight start_x start_y end_x end_y;
        new_t
     with
-      | DataController.Annotation_Error ->
+      | Data_controller.Annotation_Error ->
       print_endline " ";
       print_endline "A highlight already exists" ; t1
 
@@ -309,8 +309,8 @@
     let s_x = within_x_range first_pos.mouse_x in
     let s_y = within_y_range first_pos.mouse_y in
     try
-      let new_t = DataController.delete_highlights (relative_index s_x s_y) t in
-      DataController.close_book t;
+      let new_t = Data_controller.delete_highlights (relative_index s_x s_y) t in
+      Data_controller.close_book t;
       let second_pos = Graphics.wait_next_event [Button_down] in
       let e_x = within_x_range second_pos.mouse_x in
       let e_y = within_y_range second_pos.mouse_y in
@@ -318,7 +318,7 @@
       custom_highlight s_x s_y e_x e_y;
       new_t
     with
-      | DataController.Annotation_Error ->
+      | Data_controller.Annotation_Error ->
       print_endline " ";
       print_endline "No highlight starts at this position." ; t
 
@@ -358,18 +358,18 @@
     try
       let new_t =
       match which with
-      | `Prev -> DataController.prev_page max_char t
-      | `Next -> DataController.next_page max_char t
+      | `Prev -> Data_controller.prev_page max_char t
+      | `Next -> Data_controller.next_page max_char t
       | `Curr -> t in
       Graphics.clear_graph ();
       custom_print new_t.page_content left_edge top_edge;
-      draw_existing_highlights (DataController.page_highlights new_t);
-      draw_existing_notes (DataController.page_notes new_t);
-      draw_existing_bookmark (DataController.page_bookmark new_t);
+      draw_existing_highlights (Data_controller.page_highlights new_t);
+      draw_existing_notes (Data_controller.page_notes new_t);
+      draw_existing_bookmark (Data_controller.page_bookmark new_t);
       draw_page_data new_t; new_t
 
     with
-      | DataController.Page_Undefined _ -> print_endline "Can't draw page"; t
+      | Data_controller.Page_Undefined _ -> print_endline "Can't draw page"; t
 
 
   (* Displays all highlights of the book on the Graphics window, in their resp
@@ -377,8 +377,8 @@
   let display_highlights t =
   try
     Graphics.clear_graph ();
-    let all_ann = DataController.meta_annotations t in
-    let all_highlights = DataController.sort_highlights_colour t all_ann in
+    let all_ann = Data_controller.meta_annotations t in
+    let all_highlights = Data_controller.sort_highlights_colour t all_ann in
      if all_highlights = [] then
     custom_print "Currently no highlights! " left_edge top_edge
   else
@@ -388,7 +388,7 @@
     let page_to = read_line () in
     if page_to = "/" then draw_page `Curr t else
     (let int_page = int_of_string page_to in
-    let new_t = DataController.get_page int_page t in
+    let new_t = Data_controller.get_page int_page t in
     draw_page `Curr new_t)
   with
     | _ -> print_endline " ";
@@ -401,8 +401,8 @@
   let display_notes t =
   try
     Graphics.clear_graph ();
-    let all_ann = DataController.meta_annotations t in
-    let all_notes = DataController.sort_notes_colour t all_ann 20 in
+    let all_ann = Data_controller.meta_annotations t in
+    let all_notes = Data_controller.sort_notes_colour t all_ann 20 in
     if all_notes = [] then
     custom_print "Currently no notes! " left_edge top_edge
   else
@@ -412,7 +412,7 @@
     let page_to = read_line () in
     if page_to = "/" then draw_page `Curr t else
     (let int_page = int_of_string page_to in
-    let new_t = DataController.get_page int_page t in
+    let new_t = Data_controller.get_page int_page t in
     draw_page `Curr new_t)
   with
     | _ -> print_endline " ";
@@ -443,7 +443,7 @@
       (* Clear page and print definition if it exists *)
       Graphics.clear_graph ();
       (* Find word meaning *)
-      let word_meaning = DataController.return_definition extr_str in
+      let word_meaning = Data_controller.return_definition extr_str in
       Graphics.set_color Graphics.blue;
       custom_print ("Definition of " ^ extr_str ^ " :") left_edge top_edge;
       Graphics.set_color Graphics.black;
@@ -465,8 +465,8 @@
     print_endline " ";
     print_endline "Enter the text to search: ";
     let text = read_line () in
-    let all_ann = DataController.meta_annotations t in
-    let search_list = DataController.search text all_ann in
+    let all_ann = Data_controller.meta_annotations t in
+    let search_list = Data_controller.search text all_ann in
     search_lst text search_list;
     let key_ans = wait_next_event [Key_pressed] in
       if key_ans.keypressed = true then draw_page `Curr t else t
@@ -483,7 +483,7 @@
     try
       Graphics.open_graph window_size;
       Graphics.set_window_title window_title;
-      let t1 = DataController.init_book max_char bookshelf_id book_id in
+      let t1 = Data_controller.init_book max_char bookshelf_id book_id in
       draw_page `Curr t1
     with
     | _ -> print_endline " ";
@@ -500,7 +500,7 @@
     print_endline " ";
     ANSITerminal.print_string [ANSITerminal.green] "Choose a book";
     print_endline " "; print_endline " ";
-    let lst_of_books = DataController.book_list bookshelf_id in
+    let lst_of_books = Data_controller.book_list bookshelf_id in
     print_lst_book (ref 0) lst_of_books; print_endline " ";
     ANSITerminal.print_string [ANSITerminal.green]
     ("Please choose a book by entering the" ^
@@ -526,7 +526,7 @@
     print_endline " ";
     ANSITerminal.print_string [ANSITerminal.green] "List of bookshelves: ";
     print_endline " ";
-    let lst_of_bookshelves = DataController.bookshelf_list () in
+    let lst_of_bookshelves = Data_controller.bookshelf_list () in
     print_lst_bookshelf (ref 0) lst_of_bookshelves; print_endline "";
     ANSITerminal.print_string [ANSITerminal.green]
      ("Please choose a bookshelf by entering the index before the"
@@ -548,7 +548,7 @@
 
   (* Closes the current book *)
   let close_book t =
-    DataController.close_book t;
+    Data_controller.close_book t;
     Graphics.close_graph ();
     print_endline "";
     ANSITerminal.print_string [ANSITerminal.green] ("You closed the book. " ^
