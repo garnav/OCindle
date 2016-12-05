@@ -1,5 +1,3 @@
-module UserInterface = struct
-
   open DataController
   open Colours
 
@@ -680,5 +678,3 @@ module UserInterface = struct
     " to choose a book from a bookshelf. Instructions follow.");
     let t = choose_bookshelf () in
     repl t Graphics.black;
-
-end
