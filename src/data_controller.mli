@@ -115,15 +115,15 @@
 	
  (* [bookshelf_list unit] returns a list of available bookshelf ids and
   * their corresponding names. *)
-  val bookshelf_list : unit -> (Bookshelf.bookshelf_id * string) list
+  val bookshelf_list : unit -> (int * string) list
 	
  (* [book_list shelf_id] returns a list books available in bookshelf of [shelf_id].
   * Specifically each element in the list is of the form (id, title, author). *)
-  val book_list : Bookshelf.bookshelf_id -> (Bookshelf.book_id * string * string) list
+  val book_list : string -> (int * string * string) list
 	
  (* [init_book page_length shelf_id book_id] is [t] for a book of [book_id] in
   *  bookshelf of [shelf_id]. [t]'s page is of maximum length [page_length]. *)
-  val init_book : int -> Bookshelf.bookshelf_id -> Bookshelf.book_id -> t
+  val init_book : int -> string -> int -> t
 	
  (* [close_book t1] ensures that data of the current reading session, including
   * the reading position and updated annotations are correctly saved in local memory. *)
