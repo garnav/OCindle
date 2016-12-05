@@ -79,12 +79,25 @@ module Bookshelf = struct
           
   let remove_multiple_spaces str =
     remove_multiple_spaces_helper str 0 '-'
-      
+    
+  let rec is_only_whitespace_helper str cur_idx len =
+    if cur_idx >= len then
+      true
+    else
+      let cur_char = String.get str cur_idx in
+      if cur_char <> ' ' && cur_char <> '\t' && cur_char <> '\n' && 
+        cur_char <> '\r' && cur_char <> '\012' then
+        false
+      else 
+        is_only_whitespace_helper str (cur_idx + 1) len
+        
+  let is_only_whitespace str =
+    is_only_whitespace_helper str 0 (String.length str)
   
   let rec list_to_string line_width = function
     | [] -> ""
     | h:: t ->
-        let h = String.trim h in
+        (* let h = String.trim h in *)
         (* Checks for hyphen at end of line - commenting out since proj. *)
         (* gutenberg books don't hyphenate between lines *)
         (* if get_last_char h = "-" then     *)
@@ -92,8 +105,8 @@ module Bookshelf = struct
         (*   let h = to_sub h 0 (len - 1) in *)
         (*   h ^ (list_to_string t)          *)
         (* else                              *)
-        if String.length h = 0 then
-          let h = get_spaces line_width in
+        if is_only_whitespace h then
+          let h = (get_spaces (line_width - (String.length h))) in
           h ^ (list_to_string line_width t)
         else
           let h = h ^ (get_spaces (line_width - (String.length h))) in

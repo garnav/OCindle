@@ -1,4 +1,4 @@
-module Dictionary = struct
+module Dictionary : Dictionary = struct
 
   open Wordnet
   
