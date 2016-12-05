@@ -25,7 +25,8 @@
     String.sub str start (end' - start)
 
   let get_bookshelf_path =
-    let parent_folder = to_sub (Sys.getcwd ()) 0 ((String.rindex (Sys.getcwd ()) '/') + 1) in
+    let parent_folder = to_sub
+	                   (Sys.getcwd ()) 0 ((String.rindex (Sys.getcwd ()) '/') + 1) in
     parent_folder ^ "bookshelves" ^ Filename.dir_sep
   
   (*if the file_json is empty, then add whats there,
@@ -45,14 +46,16 @@
   let single_note j_index =
     try
 	  let single = List.assoc "notes" j_index |> to_assoc in
-	  Some (List.assoc "colour" single |> to_string |> Colours.colorify, List.assoc "note" single |> to_string)
+	  Some (List.assoc "colour" single |> to_string |>
+	        Colours.colorify, List.assoc "note" single |> to_string)
 	with
 	| _ -> None
   
   let single_highlight j_index =
     try 
       let single = List.assoc "highlight" j_index |> to_assoc in
-	  Some (List.assoc "colour" single |> to_string |> Colours.colorify, List.assoc "end" single |> to_int)
+	  Some (List.assoc "colour" single |> to_string |>
+	        Colours.colorify, List.assoc "end" single |> to_int)
 	with
 	| _ -> None
 	
@@ -66,12 +69,14 @@
 	| Some x -> x
 	| None  -> raise Not_found
   
-  (*e must be greater than or equal to b. collects highlights in a one json. optimized so that notes and highlights
-  are collected together, insteaad of having to over the structure twice?*) 
+  (*e must be greater than or equal to b. collects highlights in a one json.
+  optimized so that notes and highlights are collected together, insteaad of
+  having to over the structure twice?*) 
   let rec collect_annotations j_entire (b,e) f =
     let index = string_of_int e in
     if e < b then []
-	else if mem_assoc index j_entire then (List.assoc index j_entire |> to_assoc |> f |> debox_lst e)
+	else if mem_assoc index j_entire then (List.assoc index j_entire |> to_assoc |>
+	                                       f |> debox_lst e)
 	                                      @ collect_annotations j_entire (b, e - 1) f
 	else collect_annotations j_entire (b, e - 1) f
 	  
@@ -80,7 +85,9 @@
 	let base_next = (base + 1) * 2000 in
 	let ending = e / 2000 in
 	try
-	  let j_file = Basic.from_file (get_bookshelf_path ^ bookshelf ^ Filename.dir_sep ^ (string_of_int t.id) ^ "_" ^ (string_of_int base) ^ ".json") |> to_assoc in
+	  let j_file = Basic.from_file (get_bookshelf_path ^ bookshelf ^ Filename.dir_sep
+	                                ^ (string_of_int t.id) ^ "_" ^ (string_of_int base)
+									^ ".json") |> to_assoc in
 	  t.file_json <- add_assoc t.file_json j_file;
 	  if ending = base then collect_annotations j_file (b, e) f
 	  else collect_annotations j_file (b, base_next - 1) f
@@ -110,7 +117,7 @@
 				  in
      let new_h = collect_all shelf_id (b, e) init single_highlight in
 	 let new_n = collect_all shelf_id (b, e) init single_note in
-	 let page_bookmark = check_bookmark init ((b + e)/2) in (*init has had it's file_json changed by the prev. fun. calls*)
+	 let page_bookmark = check_bookmark init ((b + e)/2) in
 	 { init with highlights = new_h ; notes = new_n ; bookmark = page_bookmark }
   
   let json_add t1 is tag c ad_key ad =
@@ -133,7 +140,8 @@
 
   let add_note i note c t1 =
     if not (mem_assoc i t1.notes) then
-	  let () = json_add t1 (string_of_int i) "notes" (Colours.decolorify c) "note" (`String note) in
+	  let () = json_add t1 (string_of_int i)
+	           "notes" (Colours.decolorify c) "note" (`String note) in
 	  { t1 with notes = (i, (c, note))::t1.notes }
 	else raise Already_Exists
   
@@ -146,7 +154,8 @@
   (*doesn't preserve order, just adds to the beginning of the list.*)
   let add_highlight i e c t1 =
     if not (mem_assoc i t1.highlights) && not (existing_highlight i e t1.highlights) then
-	  let () = json_add t1 (string_of_int i) "highlight" (Colours.decolorify c) "end" (`Int e) in
+	  let () = json_add t1 (string_of_int i)
+	           "highlight" (Colours.decolorify c) "end" (`Int e) in
 	  { t1 with highlights = (i, (c, e))::t1.highlights }
 	else raise Already_Exists
 	(*also have to add to JSON structure, note that it could also be empty*)
@@ -235,16 +244,19 @@
     let base = b / 2000 in
 	let ending = e / 2000 in
 	let base_next = (base + 1) * 2000 in
-	let file_name = bookshelf_id ^ Filename.dir_sep ^ (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
+	let file_name = bookshelf_id ^ Filename.dir_sep
+	               ^ (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
 	if base = ending then try Sys.remove file_name with Sys_error _ -> ()
 	else try Sys.remove file_name ; remove_all_files bookshelf_id id (base_next, e)
 	     with Sys_error _ -> remove_all_files bookshelf_id id (base_next, e)
   
   (*give it a sorted list? and copy, without assoc too.*)
   let save_to_file assoc_copy bookshelf id (b, e) =
-    let to_save = List.filter (fun (j, x) -> let k = int_of_string j in k >= b && k < e) assoc_copy in
+    let to_save = List.filter (fun (j, x) -> let k = int_of_string j in k >= b && k < e)
+	              assoc_copy in
 	let base = b / 2000 in
-	let file_name = get_bookshelf_path ^ bookshelf ^ Filename.dir_sep ^ (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
+	let file_name = get_bookshelf_path ^ bookshelf ^ Filename.dir_sep
+	               ^ (string_of_int id) ^ "_" ^ (string_of_int base) ^ ".json" in
 	if to_save = [] then try Sys.remove file_name with Sys_error _ -> ()
 	else Basic.to_file file_name (`Assoc to_save)
 	
@@ -253,7 +265,8 @@
 	let ending = e / 2000 in
 	let base_next = (base + 1) * 2000 in
 	if base = ending then save_to_file assoc_copy bookshelf id (base * 2000, base_next)
-	else (save_to_file assoc_copy bookshelf id (base * 2000, base_next) ; save_all assoc_copy bookshelf id (base_next, e))
+	else (save_to_file assoc_copy bookshelf id (base * 2000, base_next) ;
+	      save_all assoc_copy bookshelf id (base_next, e))
   
   let save_page t1 bookshelf =
     match t1.file_json with

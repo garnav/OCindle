@@ -1,6 +1,6 @@
 README
 Install Instructions:
-(Assuming a fresh Virtual Machine)
+(Assuming a fresh CS 3110 2016 Virtual Machine)
 1. Ensure that OCindle has been downloaded into your documents folder (perhaps using git clone).
 2. cd Documents
 3. cd OCindle/src
@@ -11,6 +11,12 @@ Install Instructions:
 6. Enter the command make into the terminal and enjoy the OCindle experience!
 
 Precondition: Do NOT attempt to manipulate the size of the graphics window.
+
+Adding New Books: If a user would like to add a new .txt book, they can do so
+by placing a .txt file in one of the directories placed in the directory named bookshelves.
+The book's name <bookname> must be uniquely named with alphanumeric characters.
+Furthermore, a file of the form <bookname>.json must be created based on the examples
+available.
 
 Below Is An Exact Copy of the Help Window:
 The commands and their explanations:  

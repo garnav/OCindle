@@ -170,33 +170,38 @@
 	
 (**************************** META BOOK DATA *****************************************)
 
-  let meta_annotations t = Perspective.create_range t.bookshelf t.id (0, String.length t.book_text)
+  let meta_annotations t =
+    Perspective.create_range t.bookshelf t.id (0, String.length t.book_text)
 	
   (*what if the highlight goes beyond the bounds of the book*)	
   let highlight_surroundings i e t1 = String.sub t1.book_text i (e - i + 1)
   
   let note_surroundings i max_num t1 =
     let book_length = String.length t1.book_text in
-	(*be able to provide a general view of the noted string, with a roughly equal amount on both sides of
-	the note.*)
+	(*be able to provide a general view of the noted string, with a roughly equal
+	amount on both sides of the note.*)
 	if i + (max_num/2) > book_length then
 	  let end_i = book_length - i in
       let prev_i = max_num - end_i in
 	 (String.sub t1.book_text (i - prev_i) prev_i) ^ (String.sub t1.book_text (i + 1) (end_i))
     else if i - (max_num/2) < 0 then 
 	  let beg_length = i + 1 in
-	  (String.sub t1.book_text 0 beg_length) ^ (String.sub t1.book_text beg_length (max_num - beg_length))
-	else (String.sub t1.book_text (i - (max_num/2) + 1) (max_num/2)) ^ (String.sub t1.book_text i (max_num/2))
+	  (String.sub t1.book_text 0 beg_length) ^
+	  (String.sub t1.book_text beg_length (max_num - beg_length))
+	else (String.sub t1.book_text (i - (max_num/2) + 1)
+	     (max_num/2)) ^ (String.sub t1.book_text i (max_num/2))
   
   (*the first List.map is O(1) because we only have 7 elements in that list at a maximum.*)
   let sort_highlights_colour t1 all_ann =
     let retrieved_lst = Perspective.highlight_by_colour all_ann in
-	let internal_function = (fun (s,e) -> (i_to_page_num s t1.page_length, highlight_surroundings s e t1)) in
+	let internal_function =
+	    (fun (s,e) -> (i_to_page_num s t1.page_length, highlight_surroundings s e t1)) in
 	List.map (fun (c,lst) -> (c, List.map internal_function lst)) retrieved_lst
 			 
   let sort_notes_colour t1 all_ann max_num =
     let retrieved_lst = Perspective.note_by_colour all_ann in
-	let checking_function = (fun (i, s) -> (i_to_page_num i t1.page_length, s, note_surroundings i max_num t1)) in
+	let checking_function =
+	    (fun (i, s) -> (i_to_page_num i t1.page_length, s, note_surroundings i max_num t1)) in
 	List.map (fun (c,lst) -> (c,List.map checking_function lst)) retrieved_lst	
 	
   let search term all_ann = Perspective.search_notes all_ann term
@@ -216,7 +221,8 @@
     let book = get_book_string book in
     let book_length = String.length book in
 	(*get the beginning of the page in which the saved position belongs*)
-	let curr_pos = ((get_current_position (get_book_data shelf_id book_id)) / max_char) * max_char in
+	let curr_pos = ((get_current_position
+	               (get_book_data shelf_id book_id)) / max_char) * max_char in
 	let (actual_start, actual_end) =
 	  (*empty book*)
 	  if book_length = 0 then raise (Book_Error "Empty Book")
@@ -227,8 +233,10 @@
 	  else if curr_pos + max_char > book_length then (curr_pos, book_length - 1)
 	  (*anywhere else in a book*)
 	  else (curr_pos, curr_pos + max_char - 1) in
-    let new_content = String.sub book actual_start (actual_end - actual_start + 1)  in
-    let new_ann = Marginalia.get_page_overlay shelf_id book_id (actual_start, actual_end) in
+    let new_content = String.sub book actual_start
+	                 (actual_end - actual_start + 1)  in
+    let new_ann = Marginalia.get_page_overlay
+	              shelf_id book_id (actual_start, actual_end) in
     { bookshelf = shelf_id ;
 	  id = book_id ;
       book_text = book ;
