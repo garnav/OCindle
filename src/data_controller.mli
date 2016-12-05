@@ -128,3 +128,5 @@
  (* [close_book t1] ensures that data of the current reading session, including
   * the reading position and updated annotations are correctly saved in local memory. *)
   val close_book : t -> unit
+	
+	val get_page_contents: t -> string
