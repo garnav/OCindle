@@ -115,7 +115,7 @@
 	
  (* [bookshelf_list unit] returns a list of available bookshelf ids and
   * their corresponding names. *)
-  val bookshelf_list : unit -> (int * string) list
+  val bookshelf_list : unit -> (string * string) list
 	
  (* [book_list shelf_id] returns a list books available in bookshelf of [shelf_id].
   * Specifically each element in the list is of the form (id, title, author). *)
@@ -129,4 +129,4 @@
   * the reading position and updated annotations are correctly saved in local memory. *)
   val close_book : t -> unit
 	
-	val get_page_contents: t -> string
+	val get-page_contents: t -> string
