@@ -616,8 +616,8 @@
   "return to the book: pressing '/' returns to the last read page, while " ^
   "entering a valid page will take the user to that page");
   ANSITerminal.print_string [ANSITerminal.green] "  c ";
-  print_endline (": Closes the current book. The user will then b
-  e prompted to press 'q' to quit the program or 'o' to open another book");
+  print_endline (": Closes the current book. The user will then be " ^
+  "prompted to press 'q' to quit the program or 'o' to open another book");
   ANSITerminal.print_string [ANSITerminal.green] "  1 ";
   print_endline ": Change the current color to black. ";
   ANSITerminal.print_string [ANSITerminal.green] "  2 ";
