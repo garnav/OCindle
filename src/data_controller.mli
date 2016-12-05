@@ -1,5 +1,3 @@
-module DataController = sig
-
   (* [t] maintains important meta-information about the book
 	and the current index range, ie: page, of the book being
 	considered. This range is hereby referred to as page.*)
@@ -26,6 +24,8 @@ module DataController = sig
 	 * b and e are relative to the start of t1's page. *)
 	val add_highlights : int -> int -> Colours.t -> t -> t
 	
+ (* [delete_highlights i t1] is [t] with all the details of [t1] but
+	* details of a highlight starting at index [i], relative to t1's page, removed. *)
   val delete_highlights : int -> t -> t
 	
  (* [page_highlights t1] is a list of highlights that start in t1's current
@@ -39,7 +39,14 @@ module DataController = sig
 	* [i] is relative to the start of t1's page. *)
   val add_notes : int -> string -> Colours.t -> t -> t
 	
+ (* [delete_notes i t1] is [t] with all the details of [t1] but
+	* details of a note at index [i], relative to t1's page, removed. *)
   val delete_notes : int -> t -> t
+	
+ (* [page_notes t1] is a list of notes in t1's current
+    page range. Specifically each element is of the form (i(c,note)),
+		where i is the index of the note, relative
+		to the start of t1's page. c is the colour of the note. *)
   val page_notes : t -> (int * (Colours.t * string)) list
 	
  (* [add_bookmarks t1 c] is [t] with all the details of [t1] and
@@ -47,6 +54,7 @@ module DataController = sig
   val add_bookmarks : t -> Colours.t -> t
 	
   val delete_bookmarks : t -> t
+
   val page_bookmark : t -> Colours.t option
 	
 	(*************** PAGE MANIPULATION ********************************)
@@ -103,15 +111,13 @@ module DataController = sig
   val bookshelf_list : unit -> (Bookshelf.bookshelf_id * string) list
 	
  (* [book_list shelf_id] returns a list books available in bookshelf of [shelf_id].
-  * Specifically each element in the list is of the form (id, title, author). * )
+  * Specifically each element in the list is of the form (id, title, author). *)
   val book_list : Bookshelf.bookshelf_id -> (Bookshelf.book_id * string * string) list
 	
  (* [init_book page_length shelf_id book_id] is [t] for a book of [book_id] in
-  *  bookshelf of [shelf_id]. [t]'s page is of maximum length [page_length]. * )
+  *  bookshelf of [shelf_id]. [t]'s page is of maximum length [page_length]. *)
   val init_book : int -> Bookshelf.bookshelf_id -> Bookshelf.book_id -> t
 	
  (* [close_book t1] ensures that data of the current reading session, including
   * the reading position and updated annotations are correctly saved in local memory. *)
   val close_book : t -> unit
-		
-end

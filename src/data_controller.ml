@@ -1,5 +1,3 @@
-module DataController = struct
- 
   open Bookshelf
  
   exception Annotation_Error
@@ -242,5 +240,3 @@ module DataController = struct
   let close_book t =
     Marginalia.save_page (debox_ann t.page_annotations) t.bookshelf ;
 	save_book_position t.bookshelf t.id t.page_start
-	
-end
