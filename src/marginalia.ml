@@ -1,6 +1,6 @@
 (*open Colours
 
-module type Marginalia = functor (C: Colours) -> sig
+module type Marginalia = functor (C: Colours.Colours) -> sig
 
   type t
   type page = int * int
@@ -22,14 +22,14 @@ module type Marginalia = functor (C: Colours) -> sig
 
 end *)
 
-module Marginalia = (*functor (Colours: Colours) ->*) struct
+module Marginalia = (*: Marginalia = functor (Colours: Colours.Colours) ->*) struct
 
   let to_sub str start end' =
     String.sub str start (end' - start)
 
   let get_bookshelf_path =
     let parent_folder = to_sub (Sys.getcwd ()) 0 ((String.rindex (Sys.getcwd ()) '/') + 1) in
-    parent_folder ^ "bookshelves"
+    parent_folder ^ "bookshelves" ^ Filename.dir_sep
   
   exception Already_Exists
   exception Corrupted_Data
@@ -294,5 +294,5 @@ module Marginalia = (*functor (Colours: Colours) ->*) struct
   let highlights_list t1 = t1.highlights
 				  
 end
-
+ 
 (*module Marginalia = Annotations (Colours) *)
