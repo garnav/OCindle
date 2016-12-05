@@ -1,36 +1,33 @@
-module type QA = sig
-	
-  (* [t'] represents either a Question (Q) or
-  Answer (A)*)
-  type t' = Q | A
+(* [t'] represents either a Question (Q) or
+Answer (A)*)
+type t' = Q | A
   
-  type qa_data
+type qa_data
   
-  (* val get_questions : int -> *)
+(* val get_questions : int -> *)
   
   
-  (* [post t1 str] is [true] if the
-  statement [str] is added as a question
-  or answer [t1] to the database.
-  [false] otherwise.*)
-  val post : t' -> string -> bool
+(* [post t1 str] is [true] if the
+statement [str] is added as a question
+or answer [t1] to the database.
+[false] otherwise.*)
+val post : t' -> string -> bool
 
-  (* [get book_id from to] is a list of the question and answer data *)
-  (* stored on the database between character positions from and to for book *)
-  (* with book id book_id *)
-  val get : int -> int -> int -> qa_data list
+(* [get book_id from to] is a list of the question and answer data *)
+(* stored on the database between character positions from and to for book *)
+(* with book id book_id *)
+val get : int -> int -> int -> qa_data list
 
-  (* [delete t1 i] is [true], if the the question or answer
-  with id [i] is successfully deleted from the database.
-  [t1] determines whether the retrieved [str] is a question
-  or answer.*)
-  val delete : t' -> int -> bool
+(* [delete t1 i] is [true], if the the question or answer
+with id [i] is successfully deleted from the database.
+[t1] determines whether the retrieved [str] is a question
+or answer.*)
+val delete : t' -> int -> bool
 
-  (* [question_list ()] is the list of question present in the given
-  database and ids they correspond too.*)
-  val question_list : unit -> int * string list
+(* [question_list ()] is the list of question present in the given
+database and ids they correspond too.*)
+val question_list : unit -> int * string list
 
-end
 
 Interaction
 QA (Think of these as dicussion threads?)
