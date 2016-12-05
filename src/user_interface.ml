@@ -1,5 +1,6 @@
   open Data_controller
   open Colours
+  open Graphics
 
   exception Invalid_Colour
 
@@ -362,7 +363,7 @@
       | `Next -> Data_controller.next_page max_char t
       | `Curr -> t in
       Graphics.clear_graph ();
-      custom_print new_t.page_content left_edge top_edge;
+      custom_print (get_page_contents new_t) left_edge top_edge;
       draw_existing_highlights (Data_controller.page_highlights new_t);
       draw_existing_notes (Data_controller.page_notes new_t);
       draw_existing_bookmark (Data_controller.page_bookmark new_t);
@@ -437,7 +438,7 @@
       (* Convert to English word *)
       let start_pos = relative_index start_x start_y in
       let end_pos = relative_index end_x end_y in
-      let extr_str = String.sub t.page_content start_pos (end_pos - start_pos + 1) in
+      let extr_str = String.sub (get_page_contents t) start_pos (end_pos - start_pos + 1) in
       (* Don't know whether this is a single word or not *)
 
       (* Clear page and print definition if it exists *)

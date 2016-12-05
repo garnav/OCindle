@@ -104,7 +104,7 @@
 
 (**************************** PAGE CONTENT CONTROL ***********************************)
 
-  let create_page_info start ending text shelf_id book_id max_char =
+  let create_page_info start ending text (shelf_id:bookshelf_id) book_id max_char =
     let new_contents = String.sub text start (ending - start + 1) in
     let new_ann = Marginalia.get_page_overlay shelf_id  book_id (start, ending) in
     { bookshelf = shelf_id ;

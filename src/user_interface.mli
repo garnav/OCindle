@@ -70,12 +70,12 @@
     (* [open_book bookshelf_id book_id] opens the book corresponding to
     bookshelf ID [bookshelf_id] and book ID [book_id] and displays the last read
     page *)
-    val open_book : string -> int -> t
+    val open_book : Bookshelf.bookshelf_id -> Bookshelf.book_id -> t
 
 
     (* [close_book t] closes the current book reprenseted by [t] and allows the
     user to either open another existing book or quit the program *)
     val close_book : t -> unit
     
-    val main : unit -> unit
+    val main : unit -> t
 
