@@ -26,4 +26,7 @@ cd $DIR
 rm wordnet.cmi
 ocamlbuild 'wordnet.cma'
 
+opam install cohttp
+opam install ANSITerminal
+
 source ~/.bash_profile
