@@ -585,7 +585,7 @@
   ANSITerminal.print_string [ANSITerminal.green] "  q ";
   print_endline ": Erases the bookmark on the current page. ";
   ANSITerminal.print_string [ANSITerminal.green] "  x ";
-  print_endline ": Erases the selected higlight on the current page. ";
+  print_endline ": Erases the selected highlight on the current page. ";
   ANSITerminal.print_string [ANSITerminal.green] "  e ";
   print_endline ": Erases the selected note on the current page. ";
   ANSITerminal.print_string [ANSITerminal.green] "  o ";
