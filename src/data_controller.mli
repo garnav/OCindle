@@ -69,7 +69,7 @@
   val delete_bookmarks : t -> t
 	
  (* [page_bookmark t1] is [Some c] if the page [t1]
-  * refers to is bookmarked with colour c. [None] otherwise. 
+  * refers to is bookmarked with colour c. [None] otherwise.*) 
   val page_bookmark : t -> Colours.t option
 	
 	(*************** PAGE MANIPULATION ********************************)
