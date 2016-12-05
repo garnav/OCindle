@@ -1,36 +1,3 @@
-(*open Colours
-
-module type Marginalia = functor (C: Colours.Colours) -> sig
-
-  type t
-  type page = int * int
-  val get_range : t -> int * int
-  val get_page_overlay : string -> int -> page -> t
-  val add_note : int -> string -> C.t -> t -> t
-  val delete_note : int -> t -> t
-  val add_highlight : int -> int -> C.t -> t -> t
-  val delete_highlight : int -> t -> t
-  val is_bookmarked : t -> C.t option
-  val add_bookmark : t -> C.t -> t
-  val remove_bookmark : t -> t
-  val notes_list : t -> (int * (C.t * string)) list
-  val highlights_list : t -> (int * (C.t * int)) list
-  val save_page : t -> string -> unit
-  
-  exception Already_Exists
-  exception Corrupted_Data
-
-end *)
-
-module Marginalia = (*: Marginalia = functor (Colours: Colours.Colours) ->*) struct
-
-  let to_sub str start end' =
-    String.sub str start (end' - start)
-
-  let get_bookshelf_path =
-    let parent_folder = to_sub (Sys.getcwd ()) 0 ((String.rindex (Sys.getcwd ()) '/') + 1) in
-    parent_folder ^ "bookshelves" ^ Filename.dir_sep
-  
   exception Already_Exists
   exception Corrupted_Data
   	
@@ -53,6 +20,13 @@ module Marginalia = (*: Marginalia = functor (Colours: Colours.Colours) ->*) str
 	bookmark : (int * Colours.t) option ;
 	mutable file_json : Yojson.Basic.json
   }
+  
+  let to_sub str start end' =
+    String.sub str start (end' - start)
+
+  let get_bookshelf_path =
+    let parent_folder = to_sub (Sys.getcwd ()) 0 ((String.rindex (Sys.getcwd ()) '/') + 1) in
+    parent_folder ^ "bookshelves" ^ Filename.dir_sep
   
   (*if the file_json is empty, then add whats there,
   what if add is empty. prevent duplicates.*)
@@ -293,6 +267,3 @@ module Marginalia = (*: Marginalia = functor (Colours: Colours.Colours) ->*) str
   
   let highlights_list t1 = t1.highlights
 				  
-end
- 
-(*module Marginalia = Annotations (Colours) *)

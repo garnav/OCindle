@@ -1,8 +1,6 @@
-open Colours
-
-module type Marginalia = functor (C: Colours) -> sig
+  open Colours
 	
-  (* type [t] represents the annotations,
+	(* type [t] represents the annotations,
   ie: highlights, notes and bookmark status of a given
   page. *)
   type t
@@ -28,7 +26,7 @@ module type Marginalia = functor (C: Colours) -> sig
   is thrown if [t1] already contains a note at i.
   requires:
   - [i] must be within [t1]'s page.*)
-  val add_note : int -> string -> C.t -> t -> t
+  val add_note : int -> string -> Colours.t -> t -> t
   
  (* [delete_note i t1] is [t2] with the note at index [i] removed.
   Exception Not_found is thrown if [t1] does not contain a note
@@ -44,7 +42,7 @@ module type Marginalia = functor (C: Colours) -> sig
   requires:
   - [i] must be within [t1]'s page.
   - [e] must be greater than [i]. *)
-  val add_highlight : int -> int -> C.t -> t -> t
+  val add_highlight : int -> int -> Colours.t -> t -> t
   
   (* [delete_highlight i t1] is [t2] with the highlight at index [i] removed.
   Exception Not_found is thrown if [t1] does not contain a highlight
@@ -55,12 +53,12 @@ module type Marginalia = functor (C: Colours) -> sig
 
   (* [is_bookmarked t1] is [Some c] if the page [t1]
   refers to is bookmarked with colour c. [None] otherwise. *)
-  val is_bookmarked : t -> C.t option
+  val is_bookmarked : t -> Colours.t option
 
   (* [add_bookmark t1 c1] is [t2] with all the properties
   of [t1], only bookmarked with colour [c1]. Exception Already_Exists
   is thrown if (is_bookmarked t1) is not None*)
-  val add_bookmark : t -> C.t -> t
+  val add_bookmark : t -> Colours.t -> t
   
   (* [remove_bookmark t1] is [t2] with all the properties
   of [t1], only with it's bookmark removed. Exception Not_found
@@ -71,13 +69,13 @@ module type Marginalia = functor (C: Colours) -> sig
 	present on the page that t1 represents. Specifically,
 	this returns a list of (s, (c, note)) where s is the index position
 	of the note and c is it's colour.*)
-	val notes_list : t -> (int * (C.t * string)) list
+	val notes_list : t -> (int * (Colours.t * string)) list
 	
 	(* [highlights_list t1] is a list of all the highlights
 	present on the page that t1 represents. Specifically,
 	this returns a list of (s, (c, e)) where s is the starting and
 	e is the ending index and c is the colour of the highlight.*)
-	val highlights_list : t -> (int * (C.t * int)) list
+	val highlights_list : t -> (int * (Colours.t * int)) list
 	
 	(* [save_page t1 dir] ensures that the page represent by [t1] is
 	stored in local memory, within directory [dir].
@@ -86,7 +84,3 @@ module type Marginalia = functor (C: Colours) -> sig
 	
 	exception Already_Exists
   exception Corrupted_Data
-
-end
-
-module Marginalia : Marginalia

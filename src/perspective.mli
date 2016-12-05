@@ -1,7 +1,3 @@
-module type Perspective = sig
-
-  open Marginalia
-  
   (* [t] represents the annotations present over a
   specified range of an entire book. *) 
   type t
@@ -37,5 +33,3 @@ module type Perspective = sig
   from least to greatest. The sequence of colours is as
   determined by the Colours module. *)
   val highlight_by_colour : t -> (Colours.t * (int * int) list) list
-
-end
