@@ -129,4 +129,4 @@
   * the reading position and updated annotations are correctly saved in local memory. *)
   val close_book : t -> unit
 	
-	val get-page_contents: t -> string
+	val get_page_contents: t -> string
