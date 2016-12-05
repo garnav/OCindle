@@ -1,4 +1,9 @@
-  (* [t] maintains important meta-information about the book
+  exception Annotation_Error
+  exception No_Annotation
+  exception Page_Undefined of string
+  exception Book_Error of string
+	
+	(* [t] maintains important meta-information about the book
 	and the current index range, ie: page, of the book being
 	considered. This range is hereby referred to as page.*)
   type t
@@ -53,6 +58,7 @@
 	* a bookmark of colour [c] added for the page t1 represents. *)
   val add_bookmarks : t -> Colours.t -> t
 	
+
   val delete_bookmarks : t -> t
 
   val page_bookmark : t -> Colours.t option
@@ -90,7 +96,8 @@
   val get_page : int -> t-> t
 	
 	(*************** BOOK META-ANNOTATIONS ********************************)
- (* [meta_annotations t] returns *)
+ (* [meta_annotations t] returns the details of annotations present
+ in the book t1 refers too.*)
 	val meta_annotations : t -> Perspective.t
 	
  (* [search term meta_ann] *)
