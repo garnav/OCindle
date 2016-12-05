@@ -631,9 +631,14 @@
   "entering a valid page will take the user to that page");
   print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  c ";
+<<<<<<< HEAD
   print_endline (": Closes the current book. The user will then b
   e prompted to press 'q' to quit the program or 'o' to open another book");
   print_endline" ";
+=======
+  print_endline (": Closes the current book. The user will then be " ^
+  "prompted to press 'q' to quit the program or 'o' to open another book");
+>>>>>>> 906ccd48f7a8eb3fbb14e3c026ccb7fa76953985
   ANSITerminal.print_string [ANSITerminal.green] "  1 ";
   print_endline ": Change the current color to black. ";
   print_endline" ";

@@ -197,7 +197,7 @@
   let draw_bookmark colour t1 =
     try
        let new_t = Data_controller.add_bookmarks t1 (color_to_colour colour) in
-       Data_controller.close_book t1;
+       Data_controller.close_book t1; 
       Graphics.set_color colour;
        Graphics.fill_poly [|(522, 624); (522,648); (538, 648); (538, 624); (530, 635);
        (522, 624) |];
@@ -213,7 +213,7 @@
   let erase_bookmark t1 =
     try
       let new_t = Data_controller.delete_bookmarks t1 in
-      Data_controller.close_book t1;
+      Data_controller.close_book t1; 
       Graphics.set_color Graphics.white;
       Graphics.fill_poly [|(522, 624); (522,648); (538, 648); (538, 624); (530, 635);
       (522, 624) |];
@@ -372,7 +372,7 @@
       draw_page_data new_t; new_t
 
     with
-      | Data_controller.Page_Undefined _ ->
+      | Data_controller.Page_Undefined _ -> 
         print_endline "Can't turn page: end of book reached"; t
 
 
@@ -568,90 +568,69 @@
   print_endline " ";
   ANSITerminal.print_string [ANSITerminal.green] "  d ";
   print_endline ": Goes to the next page.";
-  print_endline " ";
   ANSITerminal.print_string [ANSITerminal.green] "  a ";
   print_endline ": Goes to the previous page. ";
-  print_endline " ";
   ANSITerminal.print_string [ANSITerminal.green] "  b ";
   print_endline (": Bookmarks the current page. A bookmark is displayed on the " ^
   "top right corner ");
-  print_endline " ";
   ANSITerminal.print_string [ANSITerminal.green] "  h ";
-  print_endline (": Highlights the current page. After pressing this key, the " ^
+  print_endline (": Highlight the current page. After pressing this key, the " ^
   "user will be prompted to select a start and end position on the screen " ^
   "respectively. The highlight is made in the current color ");
-  print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  n ";
   print_endline (": Makes a note on the current page. After pressing this key," ^
   "the user will be prompted to select the letter corresponding to the note." ^
   "The user will then be prompted on the terminal to write the note." ^
   "The presence of a note is signified by a dot below the letter the note" ^
   "was made. ");
-  print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  q ";
-  print_endline ": Erases the bookmark on the current page. " ;
-  print_endline" ";
+  print_endline ": Erases the bookmark on the current page. ";
   ANSITerminal.print_string [ANSITerminal.green] "  x ";
-    print_endline (": Erases the highlight on the current page. The process is " ^
-  "similar to the process for adding a higlight.");
-  print_endline" ";
+  print_endline ": Erases the selected highlight on the current page. ";
   ANSITerminal.print_string [ANSITerminal.green] "  e ";
-  print_endline (": Erases the selected note on the current page. Click the " ^
-  " position where the note starts");
-  print_endline" ";
+  print_endline ": Erases the selected note on the current page. ";
   ANSITerminal.print_string [ANSITerminal.green] "  o ";
   print_endline (": Opens the current set of bookshelves on the user's folder." ^
   "The user is then prompted to select one, then choose and open a book inside it. " ^
   "The book is opened to the last saved position ");
-  print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  w ";
   print_endline (": Displays the meaning of the word selected by the user. " ^
   "After pressing this key, the user will be prompted to highlight a word, " ^
   "as is done for highlighting. If the word meaning exists, it is displayed on " ^
   "a new page. The user should press any key besides the ones mentioned in this " ^
   "section to exit the definition page and return to the last read page ");
-  print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  s ";
   print_endline (": Searches the current set of notes for the given word. " ^
   "After pressing this key, the user will be prompted to enter the search term " ^
   "on the terminal. The word is then searched, and if found, displayed on a new " ^
    "page. The user should press any key besides the ones mentioned in this " ^
    "section to exit the definition page and return to the last read page ");
-  print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  z ";
   print_endline (": Displays the set of current highlights with their page " ^
   "numbers sorted by colour and then by indices. The user will be then be " ^
   "prompted to return to the book: pressing '/' returns to the last read page, " ^
    "while entering a valid page will take the user to that page");
-  print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  m ";
   print_endline (": Displays the set of current notes with their page numbers " ^
   "sorted by colour and then by indices. The user will be then be prompted to " ^
   "return to the book: pressing '/' returns to the last read page, while " ^
   "entering a valid page will take the user to that page");
-  print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  c ";
-  print_endline (": Closes the current book. The user will then b
-  e prompted to press 'q' to quit the program or 'o' to open another book");
-  print_endline" ";
+  print_endline (": Closes the current book. The user will then be " ^
+  "prompted to press 'q' to quit the program or 'o' to open another book");
   ANSITerminal.print_string [ANSITerminal.green] "  1 ";
   print_endline ": Change the current color to black. ";
-  print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  2 ";
   print_endline ": Change the current color to red. ";
-  print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  3 ";
   print_endline ": Change the current color to blue. ";
-  print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  4 ";
   print_endline ": Change the current color to yellow. ";
-  print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  5 ";
   print_endline ": Change the current color to green. ";
-  print_endline" ";
   ANSITerminal.print_string [ANSITerminal.green] "  6 ";
-  print_endline ": Change the current color to purple. ";
-  print_endline" "
+  print_endline ": Change the current color to purple. "
+
 (******************************** REPL ***********************************)
 
 
