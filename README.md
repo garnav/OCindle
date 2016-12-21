@@ -1,3 +1,0 @@
-(* OCindle *)
-
-(* Requires Graphics *)
