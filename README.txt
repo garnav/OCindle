@@ -1,4 +1,30 @@
-INSTALLING:
+This application was part of the final project for CS 3110: Data Structures and Functional Programming at Cornell University during Fall 2016. 
+
+The team members are
+- Raghav Batra (rb698)
+- Arnav Ghosh (ag983)
+- Gregory Stepniak (gps43)
+
+Any questions/comments can be emailed to any of the members at rb698@cornell.edu, ag983@cornell.edu and gps43@cornell.edu
+
+OVERVIEW
+We present to you, OCindle, the e-reader for OCaml. 
+OCindle uses a non-GUI interface that works purely on the terminal. OCindle is what you want when you need a break from those long 3110 assignments.
+
+KEY FEATURES
+- Presents books for reading with the ability to turn pages
+- Highlighting capability
+- Retrieving definitions
+- Bookmarks
+- Making notes
+- Searching notes
+- Finding word meanings
+- Saving books and their annotations locally
+- Display page number and percentage of book read
+- Display sorted list of notes and highlights (by color and indices)
+- Turning the page to view any notes or highlights made by the user
+
+INSTALLATION:
 (Assuming a fresh CS 3110 2016 Virtual Machine)
 1. Ensure that OCindle has been downloaded into your documents folder (perhaps using git clone).
 2. cd Documents
@@ -9,9 +35,10 @@ INSTALLING:
 5. Enter the command source ~/.bash_profile into the terminal.
 6. Enter the command make into the terminal and enjoy the OCindle experience!
 
-PRECONDITION Do NOT attempt to manipulate the size of the graphics window.
+PRECONDITION: Do NOT attempt to manipulate the size of the graphics window.
 
-ADDING NEW BOOKS: If a user would like to add a new .txt book, they can do so
+ADDING NEW BOOKS: 
+If a user would like to add a new .txt book, they can do so
 by placing a .txt file in one of the directories placed in the directory named bookshelves.
 The book's name <bookname> must be uniquely named with alphanumeric characters.
 Furthermore, a file of the form <bookname>.json must be created based on the examples
@@ -19,7 +46,8 @@ available.
 
 HELP: Type v while reading any text to see all the commands available. 
 
-EXACT COPY OF THE HELP WINDOW
+EXACT VIEW OF THE HELP WINDOW
+
 The commands and their explanations:  
 The default color is black. 
   d : Goes to the next page.
