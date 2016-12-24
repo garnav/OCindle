@@ -1,17 +1,18 @@
 This application was part of the final project for CS 3110: Data Structures and Functional Programming at Cornell University during Fall 2016. 
 
-The team members are
+TEAM MEMBERS:
 - Raghav Batra (rb698)
 - Arnav Ghosh (ag983)
 - Gregory Stepniak (gps43)
 
 Any questions/comments can be emailed to any of the members at rb698@cornell.edu, ag983@cornell.edu and gps43@cornell.edu
 
-OVERVIEW
+OVERVIEW:
 We present to you, OCindle, the e-reader for OCaml. 
-OCindle uses a non-GUI interface that works purely on the terminal. OCindle is what you want when you need a break from those long 3110 assignments.
+OCindle uses a non-GUI interface that works purely on the terminal. 
+OCindle is what you want when you need a break from those long 3110 assignments.
 
-KEY FEATURES
+KEY FEATURES:
 - Presents books for reading with the ability to turn pages
 - Highlighting capability
 - Retrieving definitions
