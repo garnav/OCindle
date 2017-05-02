@@ -51,25 +51,25 @@ EXACT VIEW OF THE HELP WINDOW
 
 The commands and their explanations:  
 The default color is black. 
- * d. Goes to the next page.
-  a. Goes to the previous page. 
-  b. Bookmarks the current page. A bookmark is displayed on the top right corner 
-  h. Highlight the current page. After pressing this key, the user will be prompted to select a start and end position on the screen respectively. The highlight is made in the current color 
-  n. Makes a note on the current page. After pressing this key,the user will be prompted to select the letter corresponding to the note.The user will then be prompted on the terminal to write the note.The presence of a note is signified by a dot below the letter the notewas made. 
-  q. Erases the bookmark on the current page. 
-  x. Erases the selected highlight on the current page. 
-  e. Erases the selected note on the current page. 
-  o. Opens the current set of bookshelves on the user's folder.The user is then prompted to select one, then choose and open a book inside it. The book is opened to the last saved position 
-  w. Displays the meaning of the word selected by the user. After pressing this key, the user will be prompted to highlight a word, as is done for highlighting. If the word meaning exists, it is displayed on a new page. The user should press any key besides the ones mentioned in this section to exit the definition page and return to the last read page 
-  s. Searches the current set of notes for the given word. After pressing this key, the user will be prompted to enter the search term on the terminal. The word is then searched, and if found, displayed on a new page. The user should press any key besides the ones mentioned in this section to exit the definition page and return to the last read page 
-  z. Displays the set of current highlights with their page numbers sorted by colour and then by indices. The user will be then be prompted to return to the book: pressing '/' returns to the last read page, while entering a valid page will take the user to that page
-  m. Displays the set of current notes with their page numbers sorted by colour and then by indices. The user will be then be prompted to return to the book: pressing '/' returns to the last read page, while entering a valid page will take the user to that page
-  c. Closes the current book. The user will then b
-  e. prompted to press 'q' to quit the program or 'o' to open another book
-  1. Change the current color to black. 
-  2. Change the current color to red. 
-  3. Change the current color to blue. 
-  4. Change the current color to yellow. 
-  5. Change the current color to green. 
-  6. Change the current color to purple. 
+ *d. Goes to the next page.
+ *a. Goes to the previous page. 
+ *b. Bookmarks the current page. A bookmark is displayed on the top right corner 
+ *h. Highlight the current page. After pressing this key, the user will be prompted to select a start and end position on the screen respectively. The highlight is made in the current color 
+ *n. Makes a note on the current page. After pressing this key,the user will be prompted to select the letter corresponding to the note.The user will then be prompted on the terminal to write the note.The presence of a note is signified by a dot below the letter the notewas made. 
+ *q. Erases the bookmark on the current page. 
+ *x. Erases the selected highlight on the current page. 
+ *e. Erases the selected note on the current page. 
+ *o. Opens the current set of bookshelves on the user's folder.The user is then prompted to select one, then choose and open a book inside it. The book is opened to the last saved position 
+ *w. Displays the meaning of the word selected by the user. After pressing this key, the user will be prompted to highlight a word, as is done for highlighting. If the word meaning exists, it is displayed on a new page. The user should press any key besides the ones mentioned in this section to exit the definition page and return to the last read page 
+ *s. Searches the current set of notes for the given word. After pressing this key, the user will be prompted to enter the search term on the terminal. The word is then searched, and if found, displayed on a new page. The user should press any key besides the ones mentioned in this section to exit the definition page and return to the last read page 
+ *z. Displays the set of current highlights with their page numbers sorted by colour and then by indices. The user will be then be prompted to return to the book: pressing '/' returns to the last read page, while entering a valid page will take the user to that page
+ *m. Displays the set of current notes with their page numbers sorted by colour and then by indices. The user will be then be prompted to return to the book: pressing '/' returns to the last read page, while entering a valid page will take the user to that page
+ *c. Closes the current book. The user will then b
+ *e. prompted to press 'q' to quit the program or 'o' to open another book
+ *1. Change the current color to black. 
+ *2. Change the current color to red. 
+ *3. Change the current color to blue. 
+ *4. Change the current color to yellow. 
+ *5. Change the current color to green. 
+ *6. Change the current color to purple. 
 
