@@ -51,7 +51,7 @@ EXACT VIEW OF THE HELP WINDOW
 
 The commands and their explanations:  
 The default color is black. 
-  d. Goes to the next page.
+ * d. Goes to the next page.
   a. Goes to the previous page. 
   b. Bookmarks the current page. A bookmark is displayed on the top right corner 
   h. Highlight the current page. After pressing this key, the user will be prompted to select a start and end position on the screen respectively. The highlight is made in the current color 
