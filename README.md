@@ -9,7 +9,7 @@ Any questions/comments can be emailed to any of the members at rb698@cornell.edu
 
 OVERVIEW:
 We present to you, OCindle, the e-reader for OCaml. 
-OCindle uses a non-GUI interface that works purely on the terminal. 
+OCindle uses a GUI interface that works on the terminal. 
 OCindle is what you want when you need a break from those long 3110 assignments.
 
 KEY FEATURES:
