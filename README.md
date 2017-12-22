@@ -1,9 +1,9 @@
 This application was part of the final project for CS 3110: Data Structures and Functional Programming at Cornell University during Fall 2016. 
 
-TEAM MEMBERS:
-- Raghav Batra (rb698)
-- Arnav Ghosh (ag983)
-- Gregory Stepniak (gps43)
+## Contributors
+* Raghav Batra (rb698)
+* Arnav Ghosh (ag983)
+* Gregory Stepniak (gps43)
 
 Any questions/comments can be emailed to any of the members at rb698@cornell.edu, ag983@cornell.edu and gps43@cornell.edu
 
