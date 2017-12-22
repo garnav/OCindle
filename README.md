@@ -1,39 +1,31 @@
-## OVERVIEW:
+## Overview:
 We present to you, OCindle, the e-reader for OCaml. OCindle uses a GUI interface that works on the terminal to allow you to read, highlight and bookmark books as well as search through notes and definitions. 
 
-This application was part of the final project for CS 3110: Data Structures and Functional Programming at Cornell University during Fall 2016. 
-
-## Contributors
-* Raghav Batra (rb698)
-* Arnav Ghosh (ag983)
-* Gregory Stepniak (gps43)
+This application was part of the final project for __CS 3110: Data Structures and Functional Programming__ at Cornell University during Fall 2016. 
 
 ## Key Features
-* Presents books for reading with the ability to turn pages
+* Aesthetically formatted pages
 * Highlighting
-* Retrieving definitions
-* Bookmarks
+* Bookmarking
 * Note-making
-* Searching notes
+* Searching for notes
 * Searching for definitions
 * Saving all annotations locally
-* Display page number and percentage of book read
-* Display sorted list of notes and highlights (by color and indices)
-* Turning the page to view any notes or highlights made by the user
+* Displaying page numbers and percentage read
+* Display a sorted list of notes and highlights (by color and indices)
 
 ## Installation
 (Assuming a fresh CS 3110 2016 Virtual Machine)
 
-PRECONDITION: Do NOT attempt to manipulate the size of the graphics window.
-
-1. Ensure that OCindle has been downloaded into your documents folder (perhaps using git clone).
-2. cd Documents
-3. cd OCindle/src
-4. Enter the command ./wordnet.sh into the terminal.
+1. Clone this repository onto the machine. Navigate to the cloned repo.
+2. `cd OCindle/src`
+3. Enter the command `./wordnet.sh` into the terminal.
    a. The terminal should ask your permission to install a number of dependencies.
       Hit Enter when it does so.
-5. Enter the command source ~/.bash_profile into the terminal.
-6. Enter the command make into the terminal and enjoy the OCindle experience!
+4. Enter the command `source ~/.bash_profile` into the terminal.
+5. Enter the command `make` into the terminal and enjoy the OCindle experience!
+
+__Do NOT attempt to manipulate the size of the graphics window.__
 
 ## Usage
 
@@ -70,3 +62,8 @@ Type _v_ while reading any text to see all the commands available.
  * 4. Change the current color to yellow. 
  * 5. Change the current color to green. 
  * 6. Change the current color to purple. 
+ 
+ ## Contributors
+* Raghav Batra (rb698)
+* Arnav Ghosh (ag983)
+* Gregory Stepniak (gps43)
