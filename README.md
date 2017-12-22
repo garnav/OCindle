@@ -1,27 +1,31 @@
 ## OVERVIEW:
-We present to you, OCindle, the e-reader for OCaml. OCindle uses a GUI interface that works on the terminal to allow you to read, highlight and bookmark books as well as search through notes and definitions. This application was part of the final project for CS 3110: Data Structures and Functional Programming at Cornell University during Fall 2016. 
+We present to you, OCindle, the e-reader for OCaml. OCindle uses a GUI interface that works on the terminal to allow you to read, highlight and bookmark books as well as search through notes and definitions. 
+
+This application was part of the final project for CS 3110: Data Structures and Functional Programming at Cornell University during Fall 2016. 
 
 ## Contributors
 * Raghav Batra (rb698)
 * Arnav Ghosh (ag983)
 * Gregory Stepniak (gps43)
 
+## Key Features
+* Presents books for reading with the ability to turn pages
+* Highlighting
+* Retrieving definitions
+* Bookmarks
+* Note-making
+* Searching notes
+* Searching for definitions
+* Saving all annotations locally
+* Display page number and percentage of book read
+* Display sorted list of notes and highlights (by color and indices)
+* Turning the page to view any notes or highlights made by the user
 
-KEY FEATURES:
-- Presents books for reading with the ability to turn pages
-- Highlighting capability
-- Retrieving definitions
-- Bookmarks
-- Making notes
-- Searching notes
-- Finding word meanings
-- Saving books and their annotations locally
-- Display page number and percentage of book read
-- Display sorted list of notes and highlights (by color and indices)
-- Turning the page to view any notes or highlights made by the user
-
-INSTALLATION:
+## Installation
 (Assuming a fresh CS 3110 2016 Virtual Machine)
+
+PRECONDITION: Do NOT attempt to manipulate the size of the graphics window.
+
 1. Ensure that OCindle has been downloaded into your documents folder (perhaps using git clone).
 2. cd Documents
 3. cd OCindle/src
@@ -31,21 +35,20 @@ INSTALLATION:
 5. Enter the command source ~/.bash_profile into the terminal.
 6. Enter the command make into the terminal and enjoy the OCindle experience!
 
-PRECONDITION: Do NOT attempt to manipulate the size of the graphics window.
+## Usage
 
-ADDING NEW BOOKS: 
+### Adding New Books
 If a user would like to add a new .txt book, they can do so
 by placing a .txt file in one of the directories placed in the directory named bookshelves.
 The book's name <bookname> must be uniquely named with alphanumeric characters.
 Furthermore, a file of the form <bookname>.json must be created based on the examples
 available.
 
-HELP: Type v while reading any text to see all the commands available. 
+### Help
+Type _v_ while reading any text to see all the commands available. 
 
-EXACT VIEW OF THE HELP WINDOW
+### Commands
 
-The commands and their explanations:  
-The default color is black. 
  * d. Goes to the next page.
  * a. Goes to the previous page. 
  * b. Bookmarks the current page. A bookmark is displayed on the top right corner 
@@ -67,4 +70,3 @@ The default color is black.
  * 4. Change the current color to yellow. 
  * 5. Change the current color to green. 
  * 6. Change the current color to purple. 
-
