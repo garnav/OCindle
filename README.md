@@ -41,27 +41,39 @@ Type _v_ while reading any text to see all the commands available.
 
 ### Commands
 
- * d. Goes to the next page.
- * a. Goes to the previous page. 
- * b. Bookmarks the current page. A bookmark is displayed on the top right corner 
- * h. Highlight the current page. After pressing this key, the user will be prompted to select a start and end position on the screen respectively. The highlight is made in the current color 
- * n. Makes a note on the current page. After pressing this key,the user will be prompted to select the letter corresponding to the note.The user will then be prompted on the terminal to write the note.The presence of a note is signified by a dot below the letter the notewas made. 
- * q. Erases the bookmark on the current page. 
- * x. Erases the selected highlight on the current page. 
- * e. Erases the selected note on the current page. 
- * o. Opens the current set of bookshelves on the user's folder.The user is then prompted to select one, then choose and open a book inside it. The book is opened to the last saved position 
- * w. Displays the meaning of the word selected by the user. After pressing this key, the user will be prompted to highlight a word, as is done for highlighting. If the word meaning exists, it is displayed on a new page. The user should press any key besides the ones mentioned in this section to exit the definition page and return to the last read page 
- * s. Searches the current set of notes for the given word. After pressing this key, the user will be prompted to enter the search term on the terminal. The word is then searched, and if found, displayed on a new page. The user should press any key besides the ones mentioned in this section to exit the definition page and return to the last read page 
- * z. Displays the set of current highlights with their page numbers sorted by colour and then by indices. The user will be then be prompted to return to the book: pressing '/' returns to the last read page, while entering a valid page will take the user to that page
- * m. Displays the set of current notes with their page numbers sorted by colour and then by indices. The user will be then be prompted to return to the book: pressing '/' returns to the last read page, while entering a valid page will take the user to that page
- * c. Closes the current book. The user will then b
- * e. prompted to press 'q' to quit the program or 'o' to open another book
- * 1. Change the current color to black. 
- * 2. Change the current color to red. 
- * 3. Change the current color to blue. 
- * 4. Change the current color to yellow. 
- * 5. Change the current color to green. 
- * 6. Change the current color to purple. 
+#### General Controls
+ * _o_. Opens the current set of bookshelves on the user's folder.
+ * _c_. Closes the current book.
+
+Press any non-control key to return to the most recent page.
+
+#### Page Controls
+ * _d_. Next page.
+ * _a_. Previous page.
+
+#### Changing Colours
+ * _1_. Current color <-- black. 
+ * _2_. Current color <-- red. 
+ * _3_. Current color <-- blue. 
+ * _4_. Current color <-- yellow. 
+ * _5_. Current color <-- green. 
+ * _6_. Current color <-- purple.
+
+#### Adding Annotations
+ * _b_. Bookmarks current page. A bookmark is displayed on the top right corner.
+ * _h_. Highlight the current page. The user will be prompted to select a start and end position on the screen. 
+ * _n_. Makes a note on the current page. The user will be prompted to select a location to tether the note and can write the note itself in the terminal. A note is denoted by a coloured dot at the tethered location. 
+ * _q_. Erases the bookmark on the current page. 
+ * _x_. Erases the selected highlight on the current page. 
+ * _e_. Erases the selected note on the current page. 
+
+#### Searching for Annotations
+ * _s_. Searches the current set of notes for the given word. After pressing this key, the user will be prompted to enter the search term on the terminal. If found, the corresponding notes will be displayed on a new page. 
+ * _z_. Displays the set of current highlights with their page numbers sorted by colour and then by indices. The user will be then be prompted to return to the book: pressing '/' returns to the last read page, while entering a valid page will take the user to that page.
+ * _m_. Displays the set of current notes with their page numbers sorted by colour and then by indices. The user will be then be prompted to return to the book: pressing '/' returns to the last read page, while entering a valid page will take the user to that page.
+
+#### Searching for Definitions
+ * _w_. Displays the meaning of the word selected by the user. The user will be prompted to highlight a word.
  
  ## Contributors
 * Raghav Batra (rb698)
