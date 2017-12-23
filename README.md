@@ -89,6 +89,9 @@ _e_. Erases the selected note on the current page.
 #### Searching for Definitions
  _w_. Displays the meaning of the word selected by the user. The user will be prompted to highlight a word.
  
+ ## Examples
+ Highlights: ![Example Highlighting](https://github.com/garnav/OCindle/blob/master/images/highlights.PNG | width=100)
+ 
  ## Contributors
 * Raghav Batra (rb698)
 * Arnav Ghosh (ag983)
