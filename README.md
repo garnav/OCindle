@@ -17,13 +17,12 @@ This application was part of the final project for __CS 3110: Data Structures an
 ## Installation
 (Assuming a fresh CS 3110 2016 Virtual Machine)
 
-1. Clone this repository onto the machine. Navigate to the cloned repo.
-2. `cd OCindle/src`
-3. Enter the command `./wordnet.sh` into the terminal.
-   a. The terminal should ask your permission to install a number of dependencies.
-      Hit Enter when it does so.
-4. Enter the command `source ~/.bash_profile` into the terminal.
-5. Enter the command `make` into the terminal and enjoy the OCindle experience!
+1. Obtain WordNet-3.0 from `http://wordnet.princeton.edu/obtain` and place it in `src`.
+2. Clone this repository onto the machine. Navigate to the cloned repo.
+3. `cd OCindle/src`
+4. Enter the command `./wordnet.sh` into the terminal. The terminal should ask your permission to install a number of dependencies.
+5. Enter the command `source ~/.bash_profile` into the terminal.
+6. Enter the command `make` into the terminal and enjoy the OCindle experience!
 
 __Do NOT attempt to manipulate the size of the graphics window.__
 
